@@ -1,6 +1,26 @@
-#!/usr/bin/env ruby
-require_relative "../config/boot"
-require "active_support/continuous_integration"
+#!/usr/bin/env bash
 
-CI = ActiveSupport::ContinuousIntegration
-require_relative "../config/ci.rb"
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+run_pnpm() {
+  if command -v mise >/dev/null 2>&1; then
+    mise exec -- pnpm "$@"
+  else
+    pnpm "$@"
+  fi
+}
+
+(
+  cd "$ROOT/backend"
+  bin/ci
+)
+
+if [ -f "$ROOT/frontend/package.json" ]; then
+  run_pnpm --dir "$ROOT/frontend" lint
+  run_pnpm --dir "$ROOT/frontend" format:check
+  run_pnpm --dir "$ROOT/frontend" typecheck
+  run_pnpm --dir "$ROOT/frontend" test
+  run_pnpm --dir "$ROOT/frontend" build
+fi

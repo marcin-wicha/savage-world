@@ -1,0 +1,2 @@
+backend: backend/bin/rails server -p 3000
+frontend: pnpm --dir frontend dev
