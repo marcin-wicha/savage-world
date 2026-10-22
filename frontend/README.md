@@ -10,7 +10,8 @@ React single-page application for the Savage Worlds character builder.
 - shadcn/ui + Radix primitives
 - Storybook
 - React Router
-- Apollo Client
+- TanStack Query
+- Fetch-based REST/GraphQL client
 - GraphQL Code Generator
 - React Hook Form + Zod
 - Vitest + React Testing Library + MSW
