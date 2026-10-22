@@ -76,7 +76,7 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 
 - Rails 8.1.4 API-only backend, PostgreSQL 17, no views/assets/importmap/Hotwire.
 - `graphql-ruby` schema at `backend/schema.graphql`, with `viewer`, paginated
-  `origins`, and filtered `edges` and `hindrances` queries.
+  `origins`, and filtered `edges`, `hindrances`, and `skills` queries.
 - Session-cookie authentication with REST session endpoints, CSRF protection,
   CORS, Pundit base policy, and rate-limited sign-in.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
@@ -90,12 +90,14 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 Current gaps, intentionally left for later feature work:
 
 - The SWADE character domain is not implemented beyond the `Origin` scaffold and
-  `Edge`/`Hindrance` reference data.
+  `Edge`/`Hindrance`/`Skill` reference data.
 - `Origin` currently has only `id`, `created_at`, and `updated_at`.
 - `Edge` has SWADE core reference data (133 edges) and optional private Fantasy
   Companion data (100 edges) loaded by `Edges::Importer`.
 - `Hindrance` has SWADE core reference data (57 hindrances) and optional private
   Fantasy Companion data (13 hindrances) loaded by `Hindrances::Importer`.
+- `Skill` has SWADE core reference data (32 skills) and optional private Fantasy
+  Companion data (1 skill) loaded by `Skills::Importer`.
 - There are no GraphQL mutations yet.
 - There is no password-reset flow or mailer usage.
 - There are no domain Pundit policies beyond `ApplicationPolicy`.
@@ -261,7 +263,8 @@ both in the same change when committing.
   schema.
 - Use `db/seeds.rb` for reference data such as edges, hindrances, and skills.
   Keep seed data idempotent.
-- Current tables are `users`, `sessions`, `origins`, `edges`, and `hindrances`.
+- Current tables are `users`, `sessions`, `origins`, `edges`, `hindrances`, and
+  `skills`.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
@@ -270,14 +273,18 @@ both in the same change when committing.
   minimum rank, JSONB requirements, source book/page, and repeatable.
 - `hindrances` stores mechanical reference data: name, unique slug, severity,
   JSONB requirements, and source book/page.
-- Core reference YAML lives in `db/data/edges/swade.yml` and
-  `db/data/hindrances/swade.yml`; it is derived from the Apache-2.0 SWADE
-  Foundry system and keeps its `NOTICE.md` and `LICENSE`.
+- `skills` stores mechanical reference data: name, unique slug, linked
+  attribute, core-skill flag, and source book/page.
+- Core reference YAML lives in `db/data/edges/swade.yml`,
+  `db/data/hindrances/swade.yml`, and `db/data/skills/swade.yml`; it is derived
+  from the Apache-2.0 SWADE Foundry system and keeps its `NOTICE.md` and
+  `LICENSE`.
 - Private Fantasy Companion YAML lives in the gitignored
-  `db/data/edges/private/` and `db/data/hindrances/private/` directories.
-  Never commit it.
-- `Edges::Importer` and `Hindrances::Importer` load both sources, validate the
-  combined batch, and upsert by slug. `db/seeds.rb` invokes both.
+  `db/data/edges/private/`, `db/data/hindrances/private/`, and
+  `db/data/skills/private/` directories. Never commit it.
+- `Edges::Importer`, `Hindrances::Importer`, and `Skills::Importer` load both
+  sources, validate the combined batch, and upsert by slug. `db/seeds.rb`
+  invokes all three.
 
 ### HTTP API
 
@@ -343,6 +350,9 @@ concerns such as the session lifecycle and health checks.
   - `hindrances(severity, source_book, first, after, last, before)` —
     cursor-paginated hindrances ordered by name and id. It is public and
     exposes structured requirements plus computed `requirements_text`.
+  - `skills(attribute, core, source_book, first, after, last, before)` —
+    cursor-paginated skills ordered by name and id. It is public and exposes
+    each skill's linked attribute and core-skill flag.
 - Query limits: max depth `12`, max complexity `300`. Connections default to 25
   items and cap at 100.
 - `GraphQL::Dataloader` is enabled. Add batched source classes for associations
@@ -556,12 +566,13 @@ assets. The entrypoint runs `bin/rails db:prepare` before starting the server.
   `image_processing` is intentionally not included.
 - There are no server-rendered views or mailer templates in the backend. Do not
   reintroduce them for API work.
-- `backend/db/seeds.rb` loads edge and hindrance reference data through their
-  importers. Add new reference data idempotently as domain models are
+- `backend/db/seeds.rb` loads edge, hindrance, and skill reference data through
+  their importers. Add new reference data idempotently as domain models are
   introduced.
-- Keep `backend/db/data/edges/private/` and
-  `backend/db/data/hindrances/private/` out of git. Only the Apache-2.0 SWADE
-  data and its attribution files may be committed.
+- Keep `backend/db/data/edges/private/`,
+  `backend/db/data/hindrances/private/`, and `backend/db/data/skills/private/`
+  out of git. Only the Apache-2.0 SWADE data and its attribution files may be
+  committed.
 - `backend/schema.graphql` and frontend generated GraphQL types are checked in.
   Regenerate both after schema changes.
 - Root `bin/ci` does not run the frontend codegen-freshness diff; CI does. Run

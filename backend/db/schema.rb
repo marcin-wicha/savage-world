@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_175000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_180454) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -60,6 +60,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_175000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "skills", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "linked_attribute", null: false
+    t.boolean "core", default: false, null: false
+    t.string "source_book", null: false
+    t.integer "source_page", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["linked_attribute"], name: "index_skills_on_linked_attribute"
+    t.index ["slug"], name: "index_skills_on_slug", unique: true
+    t.index ["source_book"], name: "index_skills_on_source_book"
+    t.check_constraint "linked_attribute::text = ANY (ARRAY['agility'::character varying, 'smarts'::character varying, 'spirit'::character varying, 'strength'::character varying, 'vigor'::character varying]::text[])", name: "skills_linked_attribute_valid"
   end
 
   create_table "users", force: :cascade do |t|

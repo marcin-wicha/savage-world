@@ -10,6 +10,11 @@ module Types
       argument :source_book, String, required: false
     end
     field :origins, Types::OriginType.connection_type, null: false, max_page_size: 100, default_page_size: 25
+    field :skills, Types::SkillType.connection_type, null: false, max_page_size: 100, default_page_size: 25 do
+      argument :attribute, String, required: false
+      argument :core, Boolean, required: false
+      argument :source_book, String, required: false
+    end
     field :viewer, Types::UserType, null: true
 
     def edges(category: nil, minimum_rank: nil, source_book: nil)
@@ -29,6 +34,14 @@ module Types
 
     def origins
       Origin.order(:id)
+    end
+
+    def skills(attribute: nil, core: nil, source_book: nil)
+      scope = Skill.order(:name, :id)
+      scope = scope.where(linked_attribute: attribute) if attribute
+      scope = scope.where(core: core) unless core.nil?
+      scope = scope.where(source_book: source_book) if source_book
+      scope
     end
 
     def viewer

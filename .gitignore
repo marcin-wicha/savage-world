@@ -43,6 +43,7 @@ backend/storage/*
 # Backend: private, licensed game data
 backend/db/data/edges/private/
 backend/db/data/hindrances/private/
+backend/db/data/skills/private/
 
 # Backend: compiled assets
 backend/public/assets
