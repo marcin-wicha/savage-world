@@ -25,6 +25,27 @@ RSpec.describe "Sessions", type: :request do
     end
   end
 
+  describe "authentication hint" do
+    it "clears a stale hint for signed-out requests" do
+      cookies[:sw_authenticated] = "1"
+
+      get "/api/v1/session", headers: json_headers
+
+      expect(response.cookies["sw_authenticated"]).to be_nil
+    end
+
+    it "restores the hint when a signed-in session is resumed" do
+      post "/api/v1/session",
+        params: { email_address: user.email_address, password: "password123" }.to_json,
+        headers: json_headers
+      cookies.delete("sw_authenticated")
+
+      get "/api/v1/session", headers: json_headers
+
+      expect(response.cookies["sw_authenticated"]).to eq("1")
+    end
+  end
+
   describe "POST /api/v1/session" do
     it "creates a session and sets a session cookie" do
       expect {
@@ -37,6 +58,13 @@ RSpec.describe "Sessions", type: :request do
       expect(json["user"]).to eq("id" => user.id, "email_address" => user.email_address)
       expect(response.cookies["session_id"]).to be_present
       expect(response.headers["Set-Cookie"].join).to include("httponly")
+      expect(response.cookies["sw_authenticated"]).to eq("1")
+
+      hint_cookie = Array(response.headers["Set-Cookie"]).find do |cookie|
+        cookie.start_with?("sw_authenticated=")
+      end
+      expect(hint_cookie).to be_present
+      expect(hint_cookie.downcase).not_to include("httponly")
     end
 
     it "rejects invalid credentials" do
@@ -60,6 +88,7 @@ RSpec.describe "Sessions", type: :request do
       }.to change(Session, :count).by(-1)
 
       expect(response).to have_http_status(:no_content)
+      expect(response.cookies["sw_authenticated"]).to be_nil
 
       get "/api/v1/session", headers: json_headers
       expect(json["user"]).to be_nil

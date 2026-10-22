@@ -292,7 +292,7 @@ both in the same change when committing.
   `db/data/skills/private/` directories. Never commit it.
 - `Edges::Importer`, `Hindrances::Importer`, and `Skills::Importer` load both
   sources, validate the combined batch, and upsert by slug. `db/seeds.rb`
-  invokes all three.
+  invokes all three and creates an idempotent `admin` / `admin` login.
 
 ### HTTP API
 
@@ -332,8 +332,13 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   production.
 - A separate signed cookie named `session_id` points at the `sessions` row. It
   is also `HttpOnly`, `SameSite=Lax`, and `Secure` in production.
-- Sign-in creates a `Session`, calls `reset_session`, and sets both cookies.
-  Sign-out destroys the session, clears cookies, and resets the Rails session.
+- The non-HttpOnly `sw_authenticated=1` cookie is a UI hint only. The SPA uses
+  it to render authenticated routes immediately instead of blocking on
+  `GET /api/v1/session`. It never authorizes requests; the server still uses the
+  HttpOnly session cookie and policies.
+- Sign-in creates a `Session`, calls `reset_session`, and sets the session and
+  hint cookies. Sign-out destroys the session, clears the cookies, and resets
+  the Rails session.
 - CSRF is enabled for all POST/PUT/PATCH/DELETE browser requests, including
   public sign-in and `POST /graphql`. Do not exempt GraphQL.
 - `ApplicationController` sets the non-HttpOnly `XSRF-TOKEN` cookie after every
@@ -414,6 +419,12 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   `useRestMutation`, and `useGraphqlQuery`. Prefer them over calling
   `useQuery`/`useMutation` directly so REST and GraphQL defaults stay
   centralized. GraphQL writes go through REST; do not add GraphQL mutations.
+- Authenticated routes use `RequireAuth`. It reads the `sw_authenticated` hint
+  cookie immediately: without the hint it redirects to `/login` without waiting
+  for the session request; with the hint it renders immediately and validates
+  `useSession` in the background. A missing server session clears the hint and
+  redirects. Signed-out users return to the requested path after sign-in. The
+  shell uses the hint to show guarded navigation and a Log out button.
 - `VITE_API_URL` sets `env.apiBaseUrl`. When empty, requests use relative
   `/api` and `/graphql` paths and rely on the Vite proxy in development.
 - Use `frontend/src/lib/csrf.ts` for CSRF behavior. `ensureCsrfToken()` reads

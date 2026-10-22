@@ -1,6 +1,8 @@
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { buttonVariants } from '@/components/ui/button'
+import { useAuthHint } from '@/features/auth/auth-hint'
+import { LogoutButton } from '@/features/auth/LogoutButton'
 import { cn } from '@/lib/utils'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -10,6 +12,8 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   )
 
 export function AppShell() {
+  const authenticated = useAuthHint()
+
   return (
     <div className="bg-background text-foreground min-h-screen">
       <header className="border-border bg-background/95 border-b backdrop-blur">
@@ -22,9 +26,18 @@ export function AppShell() {
             <NavLink to="/" end className={navLinkClass}>
               Home
             </NavLink>
-            <NavLink to="/characters" className={navLinkClass}>
-              Characters
-            </NavLink>
+            {authenticated ? (
+              <>
+                <NavLink to="/characters" className={navLinkClass}>
+                  Characters
+                </NavLink>
+                <LogoutButton />
+              </>
+            ) : (
+              <NavLink to="/login" className={navLinkClass}>
+                Login
+              </NavLink>
+            )}
           </nav>
         </div>
       </header>

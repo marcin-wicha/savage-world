@@ -1,8 +1,11 @@
 module Authentication
   extend ActiveSupport::Concern
 
+  AUTH_HINT_COOKIE = :sw_authenticated
+
   included do
     before_action :require_authentication
+    after_action :sync_authentication_hint
     helper_method :authenticated?
   end
 
@@ -13,6 +16,23 @@ module Authentication
   end
 
   private
+
+  # UI hint only; authorization still uses the HttpOnly session cookie.
+  def sync_authentication_hint
+    if authenticated?
+      return if cookies[AUTH_HINT_COOKIE] == "1"
+
+      cookies.permanent[AUTH_HINT_COOKIE] = {
+        value: "1",
+        httponly: false,
+        same_site: :lax,
+        secure: Rails.env.production?,
+        path: "/"
+      }
+    elsif cookies[AUTH_HINT_COOKIE].present?
+      cookies.delete(AUTH_HINT_COOKIE, path: "/", same_site: :lax, secure: Rails.env.production?)
+    end
+  end
 
   def authenticated?
     resume_session.present?
