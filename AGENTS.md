@@ -75,8 +75,8 @@ frontend/
 The monorepo and the API/RSpec migration are complete. The current baseline is:
 
 - Rails 8.1.4 API-only backend, PostgreSQL 17, no views/assets/importmap/Hotwire.
-- `graphql-ruby` schema at `backend/schema.graphql`, with `viewer` and paginated
-  `origins` queries.
+- `graphql-ruby` schema at `backend/schema.graphql`, with `viewer`, paginated
+  `origins`, and filtered `edges` queries.
 - Session-cookie authentication with REST session endpoints, CSRF protection,
   CORS, Pundit base policy, and rate-limited sign-in.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
@@ -89,8 +89,11 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 
 Current gaps, intentionally left for later feature work:
 
-- The SWADE character domain is not implemented beyond the `Origin` scaffold.
+- The SWADE character domain is not implemented beyond the `Origin` scaffold and
+  `Edge` reference data.
 - `Origin` currently has only `id`, `created_at`, and `updated_at`.
+- `Edge` has SWADE core reference data (133 edges) and optional private Fantasy
+  Companion data (100 edges) loaded by `Edges::Importer`.
 - There are no GraphQL mutations yet.
 - There is no password-reset flow or mailer usage.
 - There are no domain Pundit policies beyond `ApplicationPolicy`.
@@ -254,11 +257,19 @@ both in the same change when committing.
   schema.
 - Use `db/seeds.rb` for reference data such as edges, hindrances, and skills.
   Keep seed data idempotent.
-- Current tables are `users`, `sessions`, and `origins`.
+- Current tables are `users`, `sessions`, `origins`, and `edges`.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
 - `origins` is still a skeleton table with timestamps only.
+- `edges` stores mechanical reference data: name, unique slug, category,
+  minimum rank, JSONB requirements, source book/page, and repeatable.
+- Core edge YAML lives in `db/data/edges/swade.yml`; it is derived from the
+  Apache-2.0 SWADE Foundry system and keeps its `NOTICE.md` and `LICENSE`.
+- Private Fantasy Companion YAML lives in the gitignored
+  `db/data/edges/private/` directory. Never commit it.
+- `Edges::Importer` loads both sources, validates the combined batch, resolves
+  edge-to-edge requirements, and upserts by slug. `db/seeds.rb` invokes it.
 
 ### HTTP API
 
@@ -318,6 +329,9 @@ concerns such as the session lifecycle and health checks.
   - `viewer: User` — current user or `null`.
   - `origins(first, after, last, before): OriginConnection!` — cursor-paginated
     origins ordered by id.
+  - `edges(category, minimum_rank, source_book, first, after, last, before)` —
+    cursor-paginated edges ordered by name and id. It is public and exposes
+    structured requirements plus computed `requirements_text`.
 - Query limits: max depth `12`, max complexity `300`. Connections default to 25
   items and cap at 100.
 - `GraphQL::Dataloader` is enabled. Add batched source classes for associations
@@ -531,8 +545,10 @@ assets. The entrypoint runs `bin/rails db:prepare` before starting the server.
   `image_processing` is intentionally not included.
 - There are no server-rendered views or mailer templates in the backend. Do not
   reintroduce them for API work.
-- `backend/db/seeds.rb` is still empty; add idempotent reference data as domain
-  models are introduced.
+- `backend/db/seeds.rb` loads edge reference data through `Edges::Importer`.
+  Add new reference data idempotently as domain models are introduced.
+- Keep `backend/db/data/edges/private/` out of git. Only the Apache-2.0 SWADE
+  data and its attribution files may be committed.
 - `backend/schema.graphql` and frontend generated GraphQL types are checked in.
   Regenerate both after schema changes.
 - Root `bin/ci` does not run the frontend codegen-freshness diff; CI does. Run

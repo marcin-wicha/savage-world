@@ -40,6 +40,9 @@ backend/tmp/storage/*
 backend/storage/*
 !backend/storage/.keep
 
+# Backend: private, licensed game data
+backend/db/data/edges/private/
+
 # Backend: compiled assets
 backend/public/assets
 

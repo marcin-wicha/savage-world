@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_21_235026) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_144508) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "edges", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "category", null: false
+    t.integer "minimum_rank", default: 0, null: false
+    t.jsonb "requirements", default: [], null: false
+    t.string "source_book", null: false
+    t.integer "source_page", null: false
+    t.boolean "repeatable", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category", "minimum_rank"], name: "index_edges_on_category_and_minimum_rank"
+    t.index ["slug"], name: "index_edges_on_slug", unique: true
+    t.index ["source_book"], name: "index_edges_on_source_book"
+    t.check_constraint "jsonb_typeof(requirements) = 'array'::text", name: "edges_requirements_array"
+    t.check_constraint "minimum_rank >= 0 AND minimum_rank <= 4", name: "edges_minimum_rank_range"
+  end
 
   create_table "origins", force: :cascade do |t|
     t.datetime "created_at", null: false

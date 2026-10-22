@@ -1,0 +1,1482 @@
+# Mechanical edge data derived from the official SWADE Foundry VTT system.
+# See NOTICE.md and LICENSE in this directory.
+book: SWADE
+edges:
+- name: Ace
+  slug: ace
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  source_book: SWADE
+  source_page: 47
+  repeatable: false
+- name: Acrobat
+  slug: acrobat
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  - kind: skill
+    skill: athletics
+    die: 8
+  source_book: SWADE
+  source_page: 48
+  repeatable: false
+- name: Alertness
+  slug: alertness
+  category: background
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 37
+  repeatable: false
+- name: Ambidextrous
+  slug: ambidextrous
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  source_book: SWADE
+  source_page: 37
+  repeatable: false
+- name: Arcane Background
+  slug: arcane-background
+  category: background
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 37
+  repeatable: false
+- name: Arcane Resistance
+  slug: arcane-resistance
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 37
+  repeatable: false
+- name: Aristocrat
+  slug: aristocrat
+  category: background
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 37
+  repeatable: false
+- name: Artificer
+  slug: artificer
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: arcane_background
+    value: any
+  source_book: SWADE
+  source_page: 45
+  repeatable: false
+- name: Assassin
+  slug: assassin
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  - kind: skill
+    skill: fighting
+    die: 6
+  - kind: skill
+    skill: stealth
+    die: 8
+  source_book: SWADE
+  source_page: 48
+  repeatable: false
+- name: Attractive
+  slug: attractive
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: vigor
+    die: 6
+  source_book: SWADE
+  source_page: 38
+  repeatable: false
+- name: Beast Bond
+  slug: beast-bond
+  category: weird
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 51
+  repeatable: false
+- name: Beast Master
+  slug: beast-master
+  category: weird
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 51
+  repeatable: false
+- name: Berserk
+  slug: berserk
+  category: background
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 38
+  repeatable: false
+- name: Block
+  slug: block
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: skill
+    skill: fighting
+    die: 8
+  source_book: SWADE
+  source_page: 40
+  repeatable: false
+- name: Bolster
+  slug: bolster
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 50
+  repeatable: false
+- name: Brave
+  slug: brave
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 6
+  source_book: SWADE
+  source_page: 38
+  repeatable: false
+- name: Brawler
+  slug: brawler
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: strength
+    die: 8
+  - kind: attribute
+    attribute: vigor
+    die: 8
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Brawny
+  slug: brawny
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: strength
+    die: 6
+  - kind: attribute
+    attribute: vigor
+    die: 6
+  source_book: SWADE
+  source_page: 38
+  repeatable: false
+- name: Bruiser
+  slug: bruiser
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: brawler
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Brute
+  slug: brute
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: strength
+    die: 6
+  - kind: attribute
+    attribute: vigor
+    die: 6
+  source_book: SWADE
+  source_page: 38
+  repeatable: false
+- name: Calculating
+  slug: calculating
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 8
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Champion
+  slug: champion
+  category: weird
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  - kind: skill
+    skill: fighting
+    die: 6
+  source_book: SWADE
+  source_page: 52
+  repeatable: false
+- name: Channeling
+  slug: channeling
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: arcane_background
+    value: any
+  source_book: SWADE
+  source_page: 46
+  repeatable: false
+- name: Charismatic
+  slug: charismatic
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 38
+  repeatable: false
+- name: Chi
+  slug: chi
+  category: weird
+  minimum_rank: veteran
+  requirements:
+  - kind: edge
+    slug: martial-warrior
+  source_book: SWADE
+  source_page: 52
+  repeatable: false
+- name: Combat Acrobat
+  slug: combat-acrobat
+  category: professional
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: acrobat
+  source_book: SWADE
+  source_page: 48
+  repeatable: false
+- name: Combat Reflexes
+  slug: combat-reflexes
+  category: combat
+  minimum_rank: seasoned
+  requirements: []
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Command
+  slug: command
+  category: leadership
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 6
+  source_book: SWADE
+  source_page: 45
+  repeatable: false
+- name: Command Presence
+  slug: command-presence
+  category: leadership
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: command
+  source_book: SWADE
+  source_page: 45
+  repeatable: false
+- name: Common Bond
+  slug: common-bond
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: wild_card
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 50
+  repeatable: false
+- name: Concentration
+  slug: concentration
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: arcane_background
+    value: any
+  source_book: SWADE
+  source_page: 46
+  repeatable: false
+- name: Connections
+  slug: connections
+  category: social
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 50
+  repeatable: false
+- name: Counterattack
+  slug: counterattack
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: skill
+    skill: fighting
+    die: 8
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Danger Sense
+  slug: danger-sense
+  category: weird
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 52
+  repeatable: false
+- name: Dead Shot
+  slug: dead-shot
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: wild_card
+  - kind: any
+    clauses:
+    - kind: skill
+      skill: athletics
+      die: 8
+    - kind: skill
+      skill: shooting
+      die: 8
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Dodge
+  slug: dodge
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Double Tap
+  slug: double-tap
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: skill
+    skill: shooting
+    die: 6
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Elan
+  slug: elan
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 39
+  repeatable: false
+- name: Expert
+  slug: expert
+  category: legendary
+  minimum_rank: legendary
+  requirements:
+  - kind: edge
+    slug: professional
+    detail: in affected Trait
+  source_book: SWADE
+  source_page: 53
+  repeatable: false
+- name: Extra Effort
+  slug: extra-effort
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: arcane_background
+    value: gifted
+  source_book: SWADE
+  source_page: 46
+  repeatable: false
+- name: Extraction
+  slug: extraction
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Fame
+  slug: fame
+  category: background
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 39
+  repeatable: false
+- name: Famous
+  slug: famous
+  category: background
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: fame
+  source_book: SWADE
+  source_page: 39
+  repeatable: false
+- name: Fast Healer
+  slug: fast-healer
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: vigor
+    die: 8
+  source_book: SWADE
+  source_page: 39
+  repeatable: false
+- name: Feint
+  slug: feint
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: skill
+    skill: fighting
+    die: 8
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Fervor
+  slug: fervor
+  category: leadership
+  minimum_rank: veteran
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  - kind: edge
+    slug: command
+  source_book: SWADE
+  source_page: 45
+  repeatable: false
+- name: Filthy Rich
+  slug: filthy-rich
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: edge
+    slug: rich
+  source_book: SWADE
+  source_page: 40
+  repeatable: false
+- name: First Strike
+  slug: first-strike
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Fleet-Footed
+  slug: fleet-footed
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 6
+  source_book: SWADE
+  source_page: 39
+  repeatable: false
+- name: Followers
+  slug: followers
+  category: legendary
+  minimum_rank: legendary
+  requirements:
+  - kind: wild_card
+  source_book: SWADE
+  source_page: 53
+  repeatable: false
+- name: Free Runner
+  slug: free-runner
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  - kind: skill
+    skill: athletics
+    die: 6
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Frenzy
+  slug: frenzy
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: skill
+    skill: fighting
+    die: 8
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Gadgeteer
+  slug: gadgeteer
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: arcane_background
+    value: weird-science
+  - kind: skill
+    skill: weird-science
+    die: 6
+  source_book: SWADE
+  source_page: 46
+  repeatable: false
+- name: Giant Killer
+  slug: giant-killer
+  category: combat
+  minimum_rank: veteran
+  requirements: []
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Great Luck
+  slug: great-luck
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: edge
+    slug: luck
+  source_book: SWADE
+  source_page: 40
+  repeatable: false
+- name: Hard to Kill
+  slug: hard-to-kill
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Harder to Kill
+  slug: harder-to-kill
+  category: combat
+  minimum_rank: veteran
+  requirements:
+  - kind: edge
+    slug: hard-to-kill
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Healer
+  slug: healer
+  category: weird
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 52
+  repeatable: false
+- name: Hold the Line!
+  slug: hold-the-line
+  category: leadership
+  minimum_rank: seasoned
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 8
+  - kind: edge
+    slug: command
+  source_book: SWADE
+  source_page: 45
+  repeatable: false
+- name: Holy/Unholy Warrior
+  slug: holy-unholy-warrior
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: arcane_background
+    value: miracles
+  - kind: skill
+    skill: faith
+    die: 6
+  source_book: SWADE
+  source_page: 46
+  repeatable: false
+- name: Humiliate
+  slug: humiliate
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: skill
+    skill: taunt
+    die: 8
+  source_book: SWADE
+  source_page: 50
+  repeatable: false
+- name: Improved Arcane Resistance
+  slug: improved-arcane-resistance
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: edge
+    slug: arcane-resistance
+  source_book: SWADE
+  source_page: 37
+  repeatable: false
+- name: Improved Block
+  slug: improved-block
+  category: combat
+  minimum_rank: veteran
+  requirements:
+  - kind: edge
+    slug: block
+  source_book: SWADE
+  source_page: 40
+  repeatable: false
+- name: Improved Counterattack
+  slug: improved-counterattack
+  category: combat
+  minimum_rank: veteran
+  requirements:
+  - kind: edge
+    slug: counterattack
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Improved Dodge
+  slug: improved-dodge
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: dodge
+  source_book: SWADE
+  source_page: 41
+  repeatable: false
+- name: Improved Extraction
+  slug: improved-extraction
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: extraction
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Improved First Strike
+  slug: improved-first-strike
+  category: combat
+  minimum_rank: heroic
+  requirements:
+  - kind: edge
+    slug: first-strike
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Improved Frenzy
+  slug: improved-frenzy
+  category: combat
+  minimum_rank: veteran
+  requirements:
+  - kind: edge
+    slug: frenzy
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Improved Nerves of Steel
+  slug: improved-nerves-of-steel
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: edge
+    slug: nerves-of-steel
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Improved Rapid Fire
+  slug: improved-rapid-fire
+  category: combat
+  minimum_rank: veteran
+  requirements:
+  - kind: edge
+    slug: rapid-fire
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Improved Rapid Recharge
+  slug: improved-rapid-recharge
+  category: power
+  minimum_rank: veteran
+  requirements:
+  - kind: edge
+    slug: rapid-recharge
+  source_book: SWADE
+  source_page: 47
+  repeatable: false
+- name: Improved Sweep
+  slug: improved-sweep
+  category: combat
+  minimum_rank: veteran
+  requirements:
+  - kind: edge
+    slug: sweep
+  source_book: SWADE
+  source_page: 44
+  repeatable: false
+- name: Improved Trademark Weapon
+  slug: improved-trademark-weapon
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: trademark-weapon
+  source_book: SWADE
+  source_page: 44
+  repeatable: false
+- name: Improvisational Fighter
+  slug: improvisational-fighter
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 6
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Inspire
+  slug: inspire
+  category: leadership
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: command
+  source_book: SWADE
+  source_page: 45
+  repeatable: false
+- name: Investigator
+  slug: investigator
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 8
+  - kind: skill
+    skill: research
+    die: 8
+  source_book: SWADE
+  source_page: 48
+  repeatable: false
+- name: Iron Jaw
+  slug: iron-jaw
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: vigor
+    die: 8
+  source_book: SWADE
+  source_page: 42
+  repeatable: false
+- name: Iron Will
+  slug: iron-will
+  category: social
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: brave
+  - kind: edge
+    slug: strong-willed
+  source_book: SWADE
+  source_page: 51
+  repeatable: false
+- name: Jack-of-all-Trades
+  slug: jack-of-all-trades
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 10
+  source_book: SWADE
+  source_page: 48
+  repeatable: false
+- name: Killer Instinct
+  slug: killer-instinct
+  category: combat
+  minimum_rank: seasoned
+  requirements: []
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Level Headed
+  slug: level-headed
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 8
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Linguist
+  slug: linguist
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 6
+  source_book: SWADE
+  source_page: 40
+  repeatable: false
+- name: Liquid Courage
+  slug: liquid-courage
+  category: weird
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: vigor
+    die: 8
+  source_book: SWADE
+  source_page: 52
+  repeatable: false
+- name: Luck
+  slug: luck
+  category: background
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 40
+  repeatable: false
+- name: Marksman
+  slug: marksman
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: any
+    clauses:
+    - kind: skill
+      skill: shooting
+      die: 8
+    - kind: skill
+      skill: athletics
+      die: 8
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Martial Artist
+  slug: martial-artist
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: skill
+    skill: fighting
+    die: 6
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Martial Warrior
+  slug: martial-warrior
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: martial-artist
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Master
+  slug: master
+  category: legendary
+  minimum_rank: legendary
+  requirements:
+  - kind: wild_card
+  - kind: edge
+    slug: expert
+    detail: in affected Trait
+  source_book: SWADE
+  source_page: 53
+  repeatable: false
+- name: Master Tactician
+  slug: master-tactician
+  category: leadership
+  minimum_rank: veteran
+  requirements:
+  - kind: edge
+    slug: tactician
+  source_book: SWADE
+  source_page: 45
+  repeatable: false
+- name: Master of Arms
+  slug: master-of-arms
+  category: legendary
+  minimum_rank: legendary
+  requirements:
+  - kind: edge
+    slug: weapon-master
+  source_book: SWADE
+  source_page: 53
+  repeatable: false
+- name: McGyver
+  slug: mcgyver
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 6
+  - kind: skill
+    skill: notice
+    die: 8
+  - kind: skill
+    skill: repair
+    die: 6
+  source_book: SWADE
+  source_page: 49
+  repeatable: false
+- name: Menacing
+  slug: menacing
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: any
+    clauses:
+    - kind: hindrance
+      slug: bloodthirsty
+    - kind: hindrance
+      slug: mean
+    - kind: hindrance
+      slug: ruthless
+    - kind: hindrance
+      slug: ugly
+  source_book: SWADE
+  source_page: 50
+  repeatable: false
+- name: Mentalist
+  slug: mentalist
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: arcane_background
+    value: psionics
+  - kind: skill
+    skill: psionics
+    die: 6
+  source_book: SWADE
+  source_page: 46
+  repeatable: false
+- name: Mighty Blow
+  slug: mighty-blow
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: wild_card
+  - kind: skill
+    skill: fighting
+    die: 8
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Mr. Fix It
+  slug: mr-fix-it
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: skill
+    skill: repair
+    die: 8
+  source_book: SWADE
+  source_page: 49
+  repeatable: false
+- name: Natural Leader
+  slug: natural-leader
+  category: leadership
+  minimum_rank: seasoned
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  - kind: edge
+    slug: command
+  source_book: SWADE
+  source_page: 45
+  repeatable: false
+- name: Nerves of Steel
+  slug: nerves-of-steel
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: vigor
+    die: 8
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: New Powers
+  slug: new-powers
+  category: power
+  minimum_rank: novice
+  requirements:
+  - kind: arcane_background
+    value: any
+  source_book: SWADE
+  source_page: 47
+  repeatable: true
+- name: No Mercy
+  slug: no-mercy
+  category: combat
+  minimum_rank: seasoned
+  requirements: []
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Power Points
+  slug: power-points
+  category: power
+  minimum_rank: novice
+  requirements:
+  - kind: arcane_background
+    value: any
+  source_book: SWADE
+  source_page: 47
+  repeatable: true
+- name: Power Surge
+  slug: power-surge
+  category: power
+  minimum_rank: novice
+  requirements:
+  - kind: wild_card
+  - kind: arcane_background
+    value: any
+  - kind: special
+    text: arcane skill d8+
+  source_book: SWADE
+  source_page: 47
+  repeatable: false
+- name: Professional
+  slug: professional
+  category: legendary
+  minimum_rank: legendary
+  requirements:
+  - kind: special
+    text: maximum die type possible in affected Trait
+  source_book: SWADE
+  source_page: 53
+  repeatable: false
+- name: Provoke
+  slug: provoke
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: skill
+    skill: taunt
+    die: 6
+  source_book: SWADE
+  source_page: 50
+  repeatable: false
+- name: Quick
+  slug: quick
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  source_book: SWADE
+  source_page: 40
+  repeatable: false
+- name: Rabble-Rouser
+  slug: rabble-rouser
+  category: social
+  minimum_rank: seasoned
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 50
+  repeatable: false
+- name: Rapid Fire
+  slug: rapid-fire
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: skill
+    skill: shooting
+    die: 6
+  source_book: SWADE
+  source_page: 43
+  repeatable: false
+- name: Rapid Recharge
+  slug: rapid-recharge
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 6
+  - kind: arcane_background
+    value: any
+  source_book: SWADE
+  source_page: 47
+  repeatable: false
+- name: Reliable
+  slug: reliable
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 51
+  repeatable: false
+- name: Retort
+  slug: retort
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: skill
+    skill: taunt
+    die: 6
+  source_book: SWADE
+  source_page: 51
+  repeatable: false
+- name: Rich
+  slug: rich
+  category: background
+  minimum_rank: novice
+  requirements: []
+  source_book: SWADE
+  source_page: 40
+  repeatable: false
+- name: Rock and Roll!
+  slug: rock-and-roll
+  category: combat
+  minimum_rank: seasoned
+  requirements:
+  - kind: skill
+    skill: shooting
+    die: 8
+  source_book: SWADE
+  source_page: 44
+  repeatable: false
+- name: Scavenger
+  slug: scavenger
+  category: weird
+  minimum_rank: novice
+  requirements:
+  - kind: edge
+    slug: luck
+  source_book: SWADE
+  source_page: 52
+  repeatable: false
+- name: Scholar
+  slug: scholar
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: skill
+    skill: research
+    die: 8
+  source_book: SWADE
+  source_page: 49
+  repeatable: false
+- name: Sidekick
+  slug: sidekick
+  category: legendary
+  minimum_rank: legendary
+  requirements:
+  - kind: wild_card
+  source_book: SWADE
+  source_page: 53
+  repeatable: false
+- name: Soldier
+  slug: soldier
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: strength
+    die: 6
+  - kind: attribute
+    attribute: vigor
+    die: 6
+  source_book: SWADE
+  source_page: 49
+  repeatable: false
+- name: Soul Drain
+  slug: soul-drain
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: arcane_background
+    value: any
+  - kind: special
+    text: arcane skill d10+
+  source_book: SWADE
+  source_page: 47
+  repeatable: false
+- name: Steady Hands
+  slug: steady-hands
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  source_book: SWADE
+  source_page: 44
+  repeatable: false
+- name: Streetwise
+  slug: streetwise
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: smarts
+    die: 6
+  source_book: SWADE
+  source_page: 51
+  repeatable: false
+- name: Strong Willed
+  slug: strong-willed
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 51
+  repeatable: false
+- name: Sweep
+  slug: sweep
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: strength
+    die: 8
+  - kind: skill
+    skill: fighting
+    die: 8
+  source_book: SWADE
+  source_page: 44
+  repeatable: false
+- name: Tactician
+  slug: tactician
+  category: leadership
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: command
+  - kind: attribute
+    attribute: smarts
+    die: 8
+  - kind: skill
+    skill: battle
+    die: 6
+  source_book: SWADE
+  source_page: 45
+  repeatable: false
+- name: Thief
+  slug: thief
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  - kind: skill
+    skill: stealth
+    die: 6
+  - kind: skill
+    skill: thievery
+    die: 6
+  source_book: SWADE
+  source_page: 49
+  repeatable: false
+- name: Tough as Nails
+  slug: tough-as-nails
+  category: legendary
+  minimum_rank: legendary
+  requirements:
+  - kind: attribute
+    attribute: vigor
+    die: 8
+  source_book: SWADE
+  source_page: 53
+  repeatable: false
+- name: Tougher than Nails
+  slug: tougher-than-nails
+  category: legendary
+  minimum_rank: legendary
+  requirements:
+  - kind: edge
+    slug: tough-as-nails
+  - kind: attribute
+    attribute: vigor
+    die: 12
+  source_book: SWADE
+  source_page: 53
+  repeatable: false
+- name: Trademark Weapon
+  slug: trademark-weapon
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: special
+    text: skill with chosen weapon of d8+
+  source_book: SWADE
+  source_page: 44
+  repeatable: true
+- name: Two-Fisted
+  slug: two-fisted
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  source_book: SWADE
+  source_page: 44
+  repeatable: false
+- name: Two-Gun Kid
+  slug: two-gun-kid
+  category: combat
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: agility
+    die: 8
+  source_book: SWADE
+  source_page: 44
+  repeatable: false
+- name: Very Attractive
+  slug: very-attractive
+  category: background
+  minimum_rank: novice
+  requirements:
+  - kind: edge
+    slug: attractive
+  source_book: SWADE
+  source_page: 38
+  repeatable: false
+- name: Weapon Master
+  slug: weapon-master
+  category: legendary
+  minimum_rank: legendary
+  requirements:
+  - kind: skill
+    skill: fighting
+    die: 12
+  source_book: SWADE
+  source_page: 53
+  repeatable: false
+- name: Wizard
+  slug: wizard
+  category: power
+  minimum_rank: seasoned
+  requirements:
+  - kind: arcane_background
+    value: magic
+  - kind: skill
+    skill: spellcasting
+    die: 6
+  source_book: SWADE
+  source_page: 47
+  repeatable: false
+- name: Woodsman
+  slug: woodsman
+  category: professional
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 6
+  - kind: skill
+    skill: survival
+    die: 8
+  source_book: SWADE
+  source_page: 50
+  repeatable: false
+- name: Work the Crowd
+  slug: work-the-crowd
+  category: social
+  minimum_rank: seasoned
+  requirements:
+  - kind: edge
+    slug: work-the-room
+  source_book: SWADE
+  source_page: 51
+  repeatable: false
+- name: Work the Room
+  slug: work-the-room
+  category: social
+  minimum_rank: novice
+  requirements:
+  - kind: attribute
+    attribute: spirit
+    die: 8
+  source_book: SWADE
+  source_page: 51
+  repeatable: false
