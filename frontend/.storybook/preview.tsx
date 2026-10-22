@@ -14,7 +14,17 @@ const preview: Preview = {
       storySort: {
         order: [
           'Design System',
-          ['Introduction', 'Foundations', 'Button', 'Badge', 'Card', 'Input', 'Label', 'Separator'],
+          [
+            'Introduction',
+            'Foundations',
+            'Button',
+            'Badge',
+            'Card',
+            'Input',
+            'Label',
+            'Separator',
+            'Multi Step Flow',
+          ],
         ],
       },
     },
