@@ -29,22 +29,6 @@ jobs:
       - name: Scan for known security vulnerabilities in gems used
         run: bin/bundler-audit
 
-  scan_js:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-          working-directory: backend
-
-      - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bin/importmap audit
-
   lint:
     runs-on: ubuntu-latest
     env:
@@ -75,10 +59,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
+    env:
+      RAILS_ENV: test
+      DATABASE_HOST: localhost
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+
+    steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
@@ -87,40 +88,17 @@ jobs:
         with:
           bundler-cache: true
           working-directory: backend
+
+      - name: Prepare test database
+        run: bin/rails db:prepare
 
       - name: Run tests
-        env:
-          RAILS_ENV: test
-        run: bin/rails db:test:prepare test
+        run: bundle exec rspec
 
-  system-test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
-
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-          working-directory: backend
-
-      - name: Run System Tests
-        env:
-          RAILS_ENV: test
-        run: bin/rails db:test:prepare test:system
-
-      - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: screenshots
-          path: ${{ github.workspace }}/backend/tmp/screenshots
-          if-no-files-found: ignore
+      - name: Verify GraphQL schema is current
+        run: |
+          bin/rails graphql:schema:dump
+          git diff --exit-code schema.graphql
 
   frontend:
     runs-on: ubuntu-latest
@@ -158,6 +136,11 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+      - name: Verify GraphQL types are current
+        run: |
+          pnpm codegen
+          git diff --exit-code src/graphql/generated
 
       - name: Build
         run: pnpm build

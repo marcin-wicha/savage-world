@@ -27,6 +27,9 @@ Rails.application.configure do
 
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
+  config.after_initialize do
+    ApplicationController.allow_forgery_protection = false
+  end
 
   # Store uploaded files on the local file system in a temporary directory.
   config.active_storage.service = :test
@@ -45,7 +48,6 @@ Rails.application.configure do
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
-  # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
 
   # Raise error when a before_action's only/except options reference missing actions.

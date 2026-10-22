@@ -1,0 +1,13 @@
+query Origins($first: Int, $after: String) {
+  origins(first: $first, after: $after) {
+    nodes {
+      id
+      created_at
+      updated_at
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

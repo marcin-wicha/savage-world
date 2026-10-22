@@ -11,6 +11,9 @@ importers:
       '@apollo/client':
         specifier: ^4.3.5
         version: 4.3.5(graphql-ws@6.4.1(graphql@17.0.2)(ws@8.22.0))(graphql@17.0.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(rxjs@7.8.2)
+      '@graphql-typed-document-node/core':
+        specifier: ^3.2.0
+        version: 3.2.0(graphql@17.0.2)
       '@hookform/resolvers':
         specifier: ^6.0.0
         version: 6.0.0(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)
