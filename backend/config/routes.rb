@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resource :session, only: %i[show create destroy]
+      put "characters/:id", to: "characters#upsert", as: :character
     end
   end
 

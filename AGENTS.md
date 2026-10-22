@@ -38,7 +38,7 @@ values must come from the backend.
 backend/
   app/
     controllers/        # Thin HTTP/GraphQL entry points
-    controllers/api/    # REST endpoints, currently session lifecycle
+    controllers/api/    # REST endpoints for sessions and character upsert
     controllers/concerns/
     graphql/            # Schema, types, mutations, resolvers, dataloaders
     models/             # ActiveRecord models
@@ -78,7 +78,8 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 - `graphql-ruby` schema at `backend/schema.graphql`, with `viewer`, paginated
   `origins`, and filtered `edges`, `hindrances`, and `skills` queries.
 - Session-cookie authentication with REST session endpoints, CSRF protection,
-  CORS, Pundit base policy, and rate-limited sign-in.
+  CORS, Pundit authorization, and rate-limited sign-in.
+- Authenticated REST character upsert at `PUT /api/v1/characters/:id`.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
 - React 19/Vite frontend with Apollo Client, CSRF link, generated GraphQL
   operation types, shadcn/ui primitives, and Storybook.
@@ -102,7 +103,7 @@ Current gaps, intentionally left for later feature work:
   Companion data (1 skill) loaded by `Skills::Importer`.
 - There are no GraphQL mutations yet.
 - There is no password-reset flow or mailer usage.
-- There are no domain Pundit policies beyond `ApplicationPolicy`.
+- Domain Pundit policies currently cover only character upsert.
 - Frontend feature UI and MSW handlers are still minimal.
 
 ## Agent operating rules
@@ -306,12 +307,19 @@ Routes are defined in `backend/config/routes.rb`:
   credentials, and `429` when rate limited.
 - `DELETE /api/v1/session` — authenticated; destroys the session and returns
   `204`.
+- `PUT /api/v1/characters/:id` — authenticated; creates or updates the current
+  user's character. JSON body:
+  `{ "character": { "name": "...", "rank": "novice", "edge_ids": [1], "hindrance_ids": [2], "skill_ids": [3] } }`.
+  Returns `201` on create, `200` on update, `401` unauthenticated, `403` for
+  another user's character, and `422` for validation or reference errors.
+  Omitted selection arrays are left unchanged; provided arrays replace the
+  selection.
 - `POST /graphql` — GraphQL endpoint. There is intentionally no GET route.
 
 The sign-in endpoint is rate limited to 10 attempts per 3 minutes.
 
-Domain operations belong in GraphQL, not REST. REST is reserved for transport
-concerns such as the session lifecycle and health checks.
+Prefer GraphQL for domain operations. REST currently covers transport concerns
+(session lifecycle and health checks) plus the character upsert write path.
 
 ### Authentication and CSRF
 
@@ -337,7 +345,8 @@ concerns such as the session lifecycle and health checks.
   `FRONTEND_ORIGINS` environment variable. Credentials are allowed; do not use a
   wildcard origin with credentials.
 - Pundit is wired through `pundit_user = Current.user`. Add a policy for every
-  domain authorization decision; only the base `ApplicationPolicy` exists today.
+  domain authorization decision. `CharacterPolicy` currently guards character
+  upsert by ownership.
 
 ### GraphQL
 
