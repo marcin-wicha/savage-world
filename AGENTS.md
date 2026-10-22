@@ -89,8 +89,10 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 
 Current gaps, intentionally left for later feature work:
 
-- The SWADE character domain is not implemented beyond the `Origin` scaffold and
-  `Edge`/`Hindrance`/`Skill` reference data.
+- The SWADE character domain is still skeletal: `Character` stores a name, rank,
+  and edge/hindrance/skill selections, but attributes, powers, gear, and
+  advances are not implemented.
+- There is no GraphQL API for characters yet.
 - `Origin` currently has only `id`, `created_at`, and `updated_at`.
 - `Edge` has SWADE core reference data (133 edges) and optional private Fantasy
   Companion data (100 edges) loaded by `Edges::Importer`.
@@ -263,11 +265,16 @@ both in the same change when committing.
   schema.
 - Use `db/seeds.rb` for reference data such as edges, hindrances, and skills.
   Keep seed data idempotent.
-- Current tables are `users`, `sessions`, `origins`, `edges`, `hindrances`, and
-  `skills`.
+- Current tables are `users`, `sessions`, `characters`, `character_edges`,
+  `character_hindrances`, `character_skills`, `origins`, `edges`, `hindrances`,
+  and `skills`.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
+- `characters` belongs to `users` and stores a name and rank. Its selected
+  edges, hindrances, and skills are normalized through `character_edges`,
+  `character_hindrances`, and `character_skills`, each with a unique
+  character/reference pair.
 - `origins` is still a skeleton table with timestamps only.
 - `edges` stores mechanical reference data: name, unique slug, category,
   minimum rank, JSONB requirements, source book/page, and repeatable.

@@ -10,9 +10,49 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_180454) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_183343) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "character_edges", force: :cascade do |t|
+    t.bigint "character_id", null: false
+    t.bigint "edge_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_id", "edge_id"], name: "index_character_edges_on_character_id_and_edge_id", unique: true
+    t.index ["character_id"], name: "index_character_edges_on_character_id"
+    t.index ["edge_id"], name: "index_character_edges_on_edge_id"
+  end
+
+  create_table "character_hindrances", force: :cascade do |t|
+    t.bigint "character_id", null: false
+    t.bigint "hindrance_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_id", "hindrance_id"], name: "index_character_hindrances_on_character_id_and_hindrance_id", unique: true
+    t.index ["character_id"], name: "index_character_hindrances_on_character_id"
+    t.index ["hindrance_id"], name: "index_character_hindrances_on_hindrance_id"
+  end
+
+  create_table "character_skills", force: :cascade do |t|
+    t.bigint "character_id", null: false
+    t.bigint "skill_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_id", "skill_id"], name: "index_character_skills_on_character_id_and_skill_id", unique: true
+    t.index ["character_id"], name: "index_character_skills_on_character_id"
+    t.index ["skill_id"], name: "index_character_skills_on_skill_id"
+  end
+
+  create_table "characters", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.integer "rank", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_characters_on_user_id"
+    t.check_constraint "rank >= 0 AND rank <= 4", name: "characters_rank_range"
+  end
 
   create_table "edges", force: :cascade do |t|
     t.string "name", null: false
@@ -85,5 +125,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_180454) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "character_edges", "characters"
+  add_foreign_key "character_edges", "edges"
+  add_foreign_key "character_hindrances", "characters"
+  add_foreign_key "character_hindrances", "hindrances"
+  add_foreign_key "character_skills", "characters"
+  add_foreign_key "character_skills", "skills"
+  add_foreign_key "characters", "users"
   add_foreign_key "sessions", "users"
 end
