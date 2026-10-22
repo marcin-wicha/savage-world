@@ -1,3 +1,6 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+import storybook from 'eslint-plugin-storybook'
+
 import eslint from '@eslint/js'
 import prettier from 'eslint-config-prettier'
 import reactHooks from 'eslint-plugin-react-hooks'
@@ -7,7 +10,7 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'coverage', 'node_modules', 'src/graphql/generated'],
+    ignores: ['dist', 'coverage', 'node_modules', 'src/graphql/generated', 'storybook-static'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -28,6 +31,20 @@ export default tseslint.config(
     },
   },
   {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
     files: ['*.config.{js,ts}', 'codegen.ts'],
     languageOptions: {
       globals: {
@@ -36,4 +53,5 @@ export default tseslint.config(
     },
   },
   prettier,
+  storybook.configs['flat/recommended'],
 )

@@ -1,0 +1,31 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
+
+import { Input } from './input'
+import { Label } from './label'
+
+const meta = {
+  title: 'Design System/Label',
+  component: Label,
+  tags: ['autodocs'],
+  parameters: {
+    layout: 'centered',
+  },
+  args: {
+    children: 'Character name',
+    htmlFor: 'label-story-input',
+  },
+} satisfies Meta<typeof Label>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {}
+
+export const WithInput: Story = {
+  render: (args) => (
+    <div className="grid w-72 gap-2">
+      <Label {...args} />
+      <Input id="label-story-input" placeholder="e.g. Katarina Voss" />
+    </div>
+  ),
+}

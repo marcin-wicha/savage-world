@@ -1,0 +1,35 @@
+import { addons } from 'storybook/manager-api'
+import { create } from 'storybook/theming'
+
+addons.setConfig({
+  theme: create({
+    base: 'dark',
+    brandTitle: 'Savage Worlds Builder',
+    brandUrl: '/',
+    colorPrimary: '#f2eee4',
+    colorSecondary: '#f2eee4',
+    appBg: '#0b0b0b',
+    appContentBg: '#111111',
+    appHoverBg: '#1a1a1a',
+    appPreviewBg: '#0b0b0b',
+    appBorderColor: '#303030',
+    appBorderRadius: 2,
+    fontBase: '"Geist Variable", ui-sans-serif, system-ui, sans-serif',
+    fontCode: 'ui-monospace, monospace',
+    textColor: '#f2eee4',
+    textInverseColor: '#0b0b0b',
+    textMutedColor: '#a3a3a3',
+    barTextColor: '#a3a3a3',
+    barHoverColor: '#f2eee4',
+    barSelectedColor: '#f2eee4',
+    barBg: '#111111',
+    buttonBg: '#111111',
+    buttonBorder: '#303030',
+    booleanBg: '#1a1a1a',
+    booleanSelectedBg: '#f2eee4',
+    inputBg: '#111111',
+    inputBorder: '#303030',
+    inputTextColor: '#f2eee4',
+    inputBorderRadius: 2,
+  }),
+})

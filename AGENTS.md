@@ -52,16 +52,22 @@ backend/
 ### Frontend
 
 ```text
-frontend/src/
-  app/                  # Router, providers, application shell
-  components/           # Shared presentational components
-  features/             # Feature-specific code
-  graphql/
-    generated/          # GraphQL Code Generator output (checked in)
-    operations/         # .graphql operation documents
-  lib/                  # Apollo client, CSRF, environment, utilities
-  routes/               # Route-level components
-  test/                 # Vitest setup
+frontend/
+  .storybook/           # Storybook configuration
+  components.json       # shadcn/ui configuration
+  src/
+    app/                # Router, providers, application shell
+    components/
+      ui/               # shadcn/ui primitives
+    features/           # Feature-specific code
+    graphql/
+      generated/        # GraphQL Code Generator output (checked in)
+      operations/       # .graphql operation documents
+    lib/                # Apollo client, CSRF, environment, utilities
+    routes/             # Route-level components
+    stories/            # Design-system docs and shared stories
+    test/               # Vitest setup
+  scripts/              # Frontend tooling, including the shadcn wrapper
 ```
 
 ## Current implementation status
@@ -74,8 +80,8 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 - Session-cookie authentication with REST session endpoints, CSRF protection,
   CORS, Pundit base policy, and rate-limited sign-in.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
-- React 19/Vite frontend with Apollo Client, CSRF link, and generated GraphQL
-  operation types.
+- React 19/Vite frontend with Apollo Client, CSRF link, generated GraphQL
+  operation types, shadcn/ui primitives, and Storybook.
 - CI runs backend lint/security/tests against PostgreSQL and verifies schema and
   codegen freshness.
 - Docker/Kamal configuration targets PostgreSQL; the production image builds
@@ -203,6 +209,9 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm codegen        # Requires backend/schema.graphql
+pnpm storybook      # Storybook on http://localhost:6006
+pnpm build-storybook
+pnpm ui:add <name>  # shadcn component plus a baseline story
 ```
 
 ### GraphQL schema and generated types
@@ -360,6 +369,34 @@ concerns such as the session lifecycle and health checks.
   `http://localhost:3000` so cookies remain same-origin.
 - Use `frontend/src/lib/env.ts` for environment values.
 
+### Design system and Storybook
+
+- Use shadcn/ui primitives from `src/components/ui`. Do not fork a primitive
+  into a feature directory unless the feature genuinely needs a different
+  contract.
+- Add new shadcn primitives from `frontend/` with `pnpm ui:add <component>`.
+  This wraps the shadcn CLI and scaffolds a co-located baseline story. Use the
+  generated story as a starting point and replace the placeholder args with
+  realistic examples. Running `pnpm dlx shadcn@latest add` directly installs
+  only the component files. Update `components.json` only when changing the
+  design-system configuration.
+- Use semantic Tailwind tokens such as `bg-background`, `text-foreground`,
+  `text-muted-foreground`, `border-border`, `bg-primary`, and
+  `text-primary-foreground`. Avoid raw color classes in new UI.
+- Preserve the monochrome, Shadowdark-inspired visual language: near-black
+  surfaces, warm off-white text, sharp borders, and no decorative color
+  accents. Display headings use Pirata One; UI and body text use Geist.
+- Use `cn` from the `cn` package (re-exported as `@/lib/utils`) to merge
+  conditional class names.
+- Keep light/dark tokens in `src/index.css`; the app is dark by default via the
+  `dark` class on `<html>`.
+- Add a co-located `*.stories.tsx` file for every reusable primitive. Use
+  `Design System/<Component>` as the title and `tags: ['autodocs']`.
+- Use `.storybook/preview.tsx` for global decorators and theme behavior.
+  `pnpm storybook` runs Storybook on port `6006`.
+- Storybook must build with `pnpm build-storybook`; do not commit
+  `storybook-static`.
+
 ### Forms and styling
 
 - Use React Hook Form with Zod for forms.
@@ -403,6 +440,7 @@ pnpm --dir frontend format:check
 pnpm --dir frontend typecheck
 pnpm --dir frontend test
 pnpm --dir frontend build
+pnpm --dir frontend build-storybook
 ```
 
 Run everything from the repository root:
@@ -412,7 +450,8 @@ bin/ci
 ```
 
 `bin/ci` runs backend setup, RuboCop, bundler-audit, Brakeman, RSpec, a GraphQL
-schema dump, then frontend lint, format check, typecheck, tests, and build.
+schema dump, then frontend lint, format check, typecheck, tests, production
+build, and Storybook build.
 
 If GraphQL or database schema changed, also verify freshness explicitly:
 
@@ -446,7 +485,7 @@ CI is defined in `.github/workflows/ci.yml` with these jobs:
 - `test`: PostgreSQL 17 service, `bin/rails db:prepare`, `bundle exec rspec`,
   and a `git diff` check that `backend/schema.graphql` is current.
 - `frontend`: lint, format check, typecheck, tests, GraphQL codegen freshness,
-  and production build.
+  production build, and Storybook build.
 
 The CI PostgreSQL service uses the `postgres:17` image with `postgres` /
 `postgres` credentials on localhost and supplies `DATABASE_HOST`,

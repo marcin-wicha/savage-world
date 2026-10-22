@@ -6,7 +6,7 @@ A character builder for the Savage Worlds Adventure Edition tabletop RPG.
 
 ```text
 backend/   Rails API (PostgreSQL, GraphQL)
-frontend/  React SPA (TypeScript, Tailwind)
+frontend/  React SPA (TypeScript, Tailwind, shadcn/ui, Storybook)
 docs/      Architecture and domain notes
 ```
 
@@ -60,6 +60,13 @@ pnpm --dir frontend typecheck
 pnpm --dir frontend test
 pnpm --dir frontend codegen
 pnpm --dir frontend build
+pnpm --dir frontend build-storybook
+```
+
+Run the design-system explorer with:
+
+```bash
+pnpm --dir frontend storybook
 ```
 
 ## Deployment

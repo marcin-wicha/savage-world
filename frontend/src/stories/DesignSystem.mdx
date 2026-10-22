@@ -1,0 +1,85 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Design System/Introduction" />
+
+# Savage Worlds design system
+
+This Storybook is the visual contract for the character builder. Components are
+built with [shadcn/ui](https://ui.shadcn.com/) and Tailwind CSS, and live in
+`src/components/ui`.
+
+## Principles
+
+- Prefer semantic tokens such as `bg-background`, `text-foreground`,
+  `text-muted-foreground`, and `border-border` over raw palette classes.
+- Keep components accessible by default: labels, focus states, keyboard
+  behavior, and sensible disabled states.
+- Compose small primitives into feature UI instead of adding feature-specific
+  styles to the primitives.
+- Every reusable component should have at least one story showing its main
+  states.
+
+## Foundations
+
+The theme is a high-contrast black-and-white palette inspired by Shadowdark:
+near-black surfaces, warm off-white text, and no decorative color accents.
+Pirata One provides the display headings; Geist handles UI and body text. Light
+and dark tokens are defined in `src/index.css`; use the theme control in the
+Storybook toolbar to inspect both modes.
+
+<div className="grid gap-3 sm:grid-cols-2">
+  <div className="border-border bg-background text-foreground rounded-lg border p-4">
+    <p className="text-sm font-medium">background / foreground</p>
+    <p className="text-muted-foreground text-sm">Page and default text</p>
+  </div>
+  <div className="border-border bg-card text-card-foreground rounded-lg border p-4">
+    <p className="text-sm font-medium">card / card-foreground</p>
+    <p className="text-muted-foreground text-sm">Panels and grouped content</p>
+  </div>
+  <div className="bg-primary text-primary-foreground rounded-lg p-4">
+    <p className="text-sm font-medium">primary / primary-foreground</p>
+    <p className="text-sm opacity-80">Primary actions and brand emphasis</p>
+  </div>
+  <div className="bg-secondary text-secondary-foreground rounded-lg p-4">
+    <p className="text-sm font-medium">secondary / secondary-foreground</p>
+    <p className="text-sm opacity-80">Supporting actions and quiet surfaces</p>
+  </div>
+  <div className="border-border bg-muted text-foreground rounded-lg border p-4">
+    <p className="text-sm font-medium">muted / muted-foreground</p>
+    <p className="text-muted-foreground text-sm">Secondary copy and metadata</p>
+  </div>
+  <div className="border-destructive/40 bg-destructive/10 text-destructive rounded-lg border p-4">
+    <p className="text-sm font-medium">destructive</p>
+    <p className="text-sm opacity-80">Errors and irreversible actions</p>
+  </div>
+</div>
+
+## Usage
+
+```tsx
+import { Button } from '@/components/ui/button'
+
+export function SaveCharacter() {
+  return <Button>Save character</Button>
+}
+```
+
+## Adding components
+
+Use the shadcn wrapper from `frontend/`:
+
+```bash
+pnpm ui:add dialog select
+```
+
+The wrapper runs the shadcn CLI, writes primitives to `src/components/ui`, and
+creates a co-located baseline story. Replace the generated `defaultArgs` with
+realistic props and states before considering the story complete.
+
+## Story conventions
+
+- Use `Design System/<Component>` for primitives.
+- Set `tags: ['autodocs']` so the docs page is generated.
+- Cover default, variants, sizes, disabled, and any important edge states.
+- Use `parameters.layout = 'centered'` for small primitives and a wider layout
+  for composed examples.

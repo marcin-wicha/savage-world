@@ -23,4 +23,5 @@ if [ -f "$ROOT/frontend/package.json" ]; then
   run_pnpm --dir "$ROOT/frontend" typecheck
   run_pnpm --dir "$ROOT/frontend" test
   run_pnpm --dir "$ROOT/frontend" build
+  run_pnpm --dir "$ROOT/frontend" build-storybook
 fi
