@@ -116,7 +116,7 @@ export function LoginRoute() {
                 {...register('login')}
               />
               {errors.login ? (
-                <p id="login-error" className="text-destructive text-sm">
+                <p id="login-error" className="text-danger text-sm">
                   {errors.login.message}
                 </p>
               ) : null}
@@ -133,14 +133,14 @@ export function LoginRoute() {
                 {...register('password')}
               />
               {errors.password ? (
-                <p id="password-error" className="text-destructive text-sm">
+                <p id="password-error" className="text-danger text-sm">
                   {errors.password.message}
                 </p>
               ) : null}
             </div>
 
             {errors.root?.message ? (
-              <p role="alert" className="text-destructive text-sm">
+              <p role="alert" className="text-danger text-sm">
                 {errors.root.message}
               </p>
             ) : null}

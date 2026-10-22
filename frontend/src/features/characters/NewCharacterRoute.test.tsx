@@ -31,8 +31,25 @@ describe('NewCharacterRoute', () => {
       expect(screen.getByRole('button', { name: new RegExp(title, 'i') })).toBeInTheDocument()
     }
 
-    expect(screen.getByRole('heading', { name: /character concept/i })).toBeInTheDocument()
+    expect(screen.getByLabelText(/character name/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/^concept$/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /back/i })).toBeEnabled()
+  })
+
+  it('blocks advancing until the concept step is valid', async () => {
+    const user = userEvent.setup()
+
+    renderRoute()
+
+    await user.click(screen.getByRole('button', { name: /next/i }))
+
+    expect(await screen.findByText(/give your character a name/i)).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /choose an origin/i })).not.toBeInTheDocument()
+
+    await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
+    await user.click(screen.getByRole('button', { name: /next/i }))
+
+    expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
   })
 
   it('returns to the roster from the first step', async () => {
@@ -50,13 +67,16 @@ describe('NewCharacterRoute', () => {
 
     renderRoute()
 
+    await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
     await user.click(screen.getByRole('button', { name: /next/i }))
-    expect(screen.getByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
 
     for (let step = 0; step < 5; step += 1) {
       await user.click(screen.getByRole('button', { name: /next/i }))
     }
-    expect(screen.getByRole('heading', { name: /review your character/i })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: /review your character/i }),
+    ).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /save character/i }))
 

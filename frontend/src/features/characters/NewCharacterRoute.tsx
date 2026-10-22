@@ -1,10 +1,21 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-flow'
 import { Card, CardContent } from '@/components/ui/card'
 
+import { ConceptStep } from './ConceptStep'
+import {
+  type CharacterFormValues,
+  type CharacterStepId,
+  characterFormDefaults,
+  characterFormSchema,
+  characterStepFields,
+} from './character-form'
+
 type StepDefinition = {
-  id: string
+  id: CharacterStepId
   title: string
   heading: string
   description: string
@@ -55,7 +66,10 @@ const stepDefinitions: StepDefinition[] = [
   },
 ]
 
-function StepContent({ heading, description }: Pick<StepDefinition, 'heading' | 'description'>) {
+function PlaceholderStep({
+  heading,
+  description,
+}: Pick<StepDefinition, 'heading' | 'description'>) {
   return (
     <div className="grid max-w-xl gap-2">
       <h2 className="text-foreground text-xl font-medium">{heading}</h2>
@@ -66,12 +80,29 @@ function StepContent({ heading, description }: Pick<StepDefinition, 'heading' | 
 
 export function NewCharacterRoute() {
   const navigate = useNavigate()
+  const form = useForm<CharacterFormValues>({
+    resolver: zodResolver(characterFormSchema),
+    defaultValues: characterFormDefaults,
+    mode: 'onTouched',
+  })
 
   const steps: MultiStepFlowStep[] = stepDefinitions.map((step) => ({
     id: step.id,
     title: step.title,
-    content: <StepContent heading={step.heading} description={step.description} />,
+    content:
+      step.id === 'concept' ? (
+        <ConceptStep />
+      ) : (
+        <PlaceholderStep heading={step.heading} description={step.description} />
+      ),
   }))
+
+  const validateStep = (index: number) =>
+    form.trigger(characterStepFields[stepDefinitions[index].id])
+
+  const handleComplete = form.handleSubmit(() => {
+    navigate('/characters')
+  })
 
   return (
     <section className="mx-auto max-w-5xl">
@@ -82,12 +113,15 @@ export function NewCharacterRoute() {
 
       <Card className="mt-6">
         <CardContent>
-          <MultiStepFlow
-            steps={steps}
-            completeLabel="Save character"
-            onComplete={() => navigate('/characters')}
-            onBack={() => navigate('/characters')}
-          />
+          <FormProvider {...form}>
+            <MultiStepFlow
+              steps={steps}
+              completeLabel="Save character"
+              onBack={() => navigate('/characters')}
+              onBeforeNext={(_step, index) => validateStep(index)}
+              onComplete={handleComplete}
+            />
+          </FormProvider>
         </CardContent>
       </Card>
     </section>

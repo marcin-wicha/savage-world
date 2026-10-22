@@ -78,6 +78,29 @@ describe('MultiStepFlow', () => {
     expect(onBack).toHaveBeenCalledTimes(1)
   })
 
+  it('blocks advancing when onBeforeNext resolves false', async () => {
+    const user = userEvent.setup()
+    const onBeforeNext = vi.fn(async () => false)
+
+    render(<MultiStepFlow steps={steps} onBeforeNext={onBeforeNext} />)
+
+    await user.click(screen.getByRole('button', { name: /next/i }))
+
+    expect(onBeforeNext).toHaveBeenCalledWith(steps[0], 0)
+    expect(screen.getByText('Concept content')).toBeInTheDocument()
+  })
+
+  it('advances when onBeforeNext resolves true', async () => {
+    const user = userEvent.setup()
+    const onBeforeNext = vi.fn(async () => true)
+
+    render(<MultiStepFlow steps={steps} onBeforeNext={onBeforeNext} />)
+
+    await user.click(screen.getByRole('button', { name: /next/i }))
+
+    expect(await screen.findByText('Attributes content')).toBeInTheDocument()
+  })
+
   it('calls onComplete from the final step', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()

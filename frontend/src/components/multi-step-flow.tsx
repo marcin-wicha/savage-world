@@ -18,6 +18,7 @@ type MultiStepFlowProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   onComplete?: () => void
   onBack?: () => void
   canAdvance?: (step: MultiStepFlowStep, index: number) => boolean
+  onBeforeNext?: (step: MultiStepFlowStep, index: number) => boolean | Promise<boolean>
   backLabel?: string
   nextLabel?: string
   completeLabel?: string
@@ -39,6 +40,7 @@ function MultiStepFlow({
   onComplete,
   onBack,
   canAdvance,
+  onBeforeNext,
   backLabel = 'Back',
   nextLabel = 'Next',
   completeLabel = 'Complete',
@@ -50,6 +52,7 @@ function MultiStepFlow({
   ...props
 }: MultiStepFlowProps) {
   const [uncontrolledStep, setUncontrolledStep] = React.useState(defaultStep)
+  const [isAdvancing, setIsAdvancing] = React.useState(false)
   const activeStep = clampStep(currentStep ?? uncontrolledStep, steps.length)
   const step = steps[activeStep]
   const isFirst = activeStep === 0
@@ -65,6 +68,20 @@ function MultiStepFlow({
 
     if (currentStep === undefined) setUncontrolledStep(target)
     onStepChange?.(target)
+  }
+
+  const advance = async () => {
+    if (isAdvancing) return
+
+    setIsAdvancing(true)
+
+    try {
+      const allowed = (await onBeforeNext?.(step, activeStep)) ?? true
+
+      if (allowed) goTo(activeStep + 1)
+    } finally {
+      setIsAdvancing(false)
+    }
   }
 
   return (
@@ -156,10 +173,10 @@ function MultiStepFlow({
             if (isLast) {
               onComplete?.()
             } else {
-              goTo(activeStep + 1)
+              void advance()
             }
           }}
-          disabled={!nextAllowed}
+          disabled={!nextAllowed || isAdvancing}
         >
           {isLast ? completeLabel : nextLabel}
         </Button>
