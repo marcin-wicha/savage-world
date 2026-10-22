@@ -63,7 +63,7 @@ frontend/
     graphql/
       generated/        # GraphQL Code Generator output (checked in)
       operations/       # .graphql operation documents
-    lib/                # Apollo client, CSRF, environment, utilities
+    lib/                # API client, TanStack Query, CSRF, environment, utilities
     routes/             # Route-level components
     stories/            # Design-system docs and shared stories
     test/               # Vitest setup
@@ -81,8 +81,8 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
   CORS, Pundit authorization, and rate-limited sign-in.
 - Authenticated REST character upsert at `PUT /api/v1/characters/:id`.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
-- React 19/Vite frontend with Apollo Client, CSRF link, generated GraphQL
-  operation types, shadcn/ui primitives, and Storybook.
+- React 19/Vite frontend with TanStack Query, a fetch-based REST/GraphQL client,
+  generated GraphQL operation types, shadcn/ui primitives, and Storybook.
 - CI runs backend lint/security/tests against PostgreSQL and verifies schema and
   codegen freshness.
 - Docker/Kamal configuration targets PostgreSQL; the production image builds
@@ -340,7 +340,8 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   request and accepts the `X-CSRF-Token` header. Invalid tokens return `422`
   with `{ "error": "Invalid authenticity token" }`.
 - `frontend/src/lib/csrf.ts` reads the cookie and bootstraps it by calling
-  `GET /api/v1/session` when missing. Apollo attaches the header automatically.
+  `GET /api/v1/session` when missing. The API client attaches the header to
+  unsafe requests automatically.
 - CORS is configured in `config/initializers/cors.rb` from the comma-separated
   `FRONTEND_ORIGINS` environment variable. Credentials are allowed; do not use a
   wildcard origin with credentials.
@@ -404,15 +405,22 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
 
 ### Data fetching and CSRF
 
-- Use Apollo Client. The shared client lives in `frontend/src/lib/apollo.ts`.
-- Link order is CSRF context link, then `HttpLink`; requests use
-  `credentials: 'include'`.
+- Use TanStack Query as the server-state manager. The shared `QueryClient` and
+  global defaults live in `frontend/src/lib/query-client.ts`.
+- Use the fetch-based client in `frontend/src/lib/api-client.ts` for REST and
+  GraphQL requests. Requests use `credentials: 'include'` and add the CSRF
+  header to unsafe methods.
+- Use the base hooks in `frontend/src/lib/queries.ts`: `useRestQuery`,
+  `useRestMutation`, and `useGraphqlQuery`. Prefer them over calling
+  `useQuery`/`useMutation` directly so REST and GraphQL defaults stay
+  centralized. GraphQL writes go through REST; do not add GraphQL mutations.
 - `VITE_API_URL` sets `env.apiBaseUrl`. When empty, requests use relative
   `/api` and `/graphql` paths and rely on the Vite proxy in development.
 - Use `frontend/src/lib/csrf.ts` for CSRF behavior. `ensureCsrfToken()` reads
   `XSRF-TOKEN`, calls `GET /api/v1/session` if needed, and returns `null` on
   failure.
 - Put GraphQL operations in `frontend/src/graphql/operations/*.graphql`.
+- Pass `DocumentNode`s from generated GraphQL operations to the GraphQL hooks.
 - Use GraphQL Code Generator; do not hand-write DTOs that mirror GraphQL
   responses. Generated output is checked in under
   `frontend/src/graphql/generated/`.
