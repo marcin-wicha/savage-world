@@ -1,9 +1,23 @@
+import { Link } from 'react-router-dom'
+
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function CharactersRoute() {
   return (
     <section>
-      <h1 className="text-foreground text-4xl">Characters</h1>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-foreground text-4xl">Characters</h1>
+          <p className="text-muted-foreground mt-2 text-sm">
+            Manage the characters you have created.
+          </p>
+        </div>
+        <Button asChild>
+          <Link to="/characters/new">Create a character</Link>
+        </Button>
+      </div>
+
       <Card className="mt-6 max-w-2xl">
         <CardHeader>
           <CardTitle>No characters yet</CardTitle>

@@ -16,6 +16,7 @@ type MultiStepFlowProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   defaultStep?: number
   onStepChange?: (step: number) => void
   onComplete?: () => void
+  onBack?: () => void
   canAdvance?: (step: MultiStepFlowStep, index: number) => boolean
   backLabel?: string
   nextLabel?: string
@@ -36,6 +37,7 @@ function MultiStepFlow({
   defaultStep = 0,
   onStepChange,
   onComplete,
+  onBack,
   canAdvance,
   backLabel = 'Back',
   nextLabel = 'Next',
@@ -105,12 +107,9 @@ function MultiStepFlow({
                     {isComplete ? <Check className="size-3.5" aria-hidden="true" /> : index + 1}
                   </span>
                   <span className="min-w-0">
-                    <span className="text-muted-foreground block text-[0.65rem] font-medium tracking-[0.18em] uppercase">
-                      Step {index + 1}
-                    </span>
                     <span
                       className={cn(
-                        'block truncate text-sm',
+                        'block text-sm',
                         isCurrent ? 'text-foreground font-medium' : 'text-muted-foreground',
                       )}
                     >
@@ -139,7 +138,17 @@ function MultiStepFlow({
           footerClassName,
         )}
       >
-        <Button variant="ghost" onClick={() => goTo(activeStep - 1)} disabled={isFirst}>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            if (isFirst) {
+              onBack?.()
+            } else {
+              goTo(activeStep - 1)
+            }
+          }}
+          disabled={isFirst && !onBack}
+        >
           {backLabel}
         </Button>
         <Button

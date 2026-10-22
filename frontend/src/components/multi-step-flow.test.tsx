@@ -64,6 +64,20 @@ describe('MultiStepFlow', () => {
     expect(canAdvance).toHaveBeenCalledWith(steps[0], 0)
   })
 
+  it('calls onBack from the first step when provided', async () => {
+    const user = userEvent.setup()
+    const onBack = vi.fn()
+
+    render(<MultiStepFlow steps={steps} onBack={onBack} />)
+
+    const back = screen.getByRole('button', { name: /back/i })
+    expect(back).toBeEnabled()
+
+    await user.click(back)
+
+    expect(onBack).toHaveBeenCalledTimes(1)
+  })
+
   it('calls onComplete from the final step', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
