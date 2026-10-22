@@ -1,6 +1,6 @@
 module Types
-  class EdgeRequirementKindEnum < Types::BaseEnum
-    graphql_name "EdgeRequirementKind"
+  class RequirementKindEnum < Types::BaseEnum
+    graphql_name "RequirementKind"
 
     value "any"
     value "arcane_background"

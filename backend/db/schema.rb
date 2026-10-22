@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_144508) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_175000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -30,6 +30,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_144508) do
     t.index ["source_book"], name: "index_edges_on_source_book"
     t.check_constraint "jsonb_typeof(requirements) = 'array'::text", name: "edges_requirements_array"
     t.check_constraint "minimum_rank >= 0 AND minimum_rank <= 4", name: "edges_minimum_rank_range"
+  end
+
+  create_table "hindrances", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.integer "severity", default: 0, null: false
+    t.jsonb "requirements", default: [], null: false
+    t.string "source_book", null: false
+    t.integer "source_page", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["severity", "source_book"], name: "index_hindrances_on_severity_and_source_book"
+    t.index ["slug"], name: "index_hindrances_on_slug", unique: true
+    t.index ["source_book"], name: "index_hindrances_on_source_book"
+    t.check_constraint "jsonb_typeof(requirements) = 'array'::text", name: "hindrances_requirements_array"
+    t.check_constraint "severity >= 0 AND severity <= 2", name: "hindrances_severity_range"
   end
 
   create_table "origins", force: :cascade do |t|
