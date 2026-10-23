@@ -108,6 +108,7 @@ export function HindrancesStep() {
       ? `${minimumRemainingPoints} points available to spend on later steps.`
       : `${minimumRemainingPoints}–${maximumRemainingPoints} points available to spend on later steps.`
   const pointsProgress = Math.min((selectedPointRange.maximum / maxHindrancePoints) * 100, 100)
+  const isAtPointMaximum = selectedPointRange.maximum >= maxHindrancePoints
   const toggleSeverity = (hindranceId: string) => {
     const currentSeverity = selectedSeverities[hindranceId] ?? 'minor'
     const nextSeverity = currentSeverity === 'minor' ? 'major' : 'minor'
@@ -137,6 +138,7 @@ export function HindrancesStep() {
       description: hindrance.description || hindrance.requirements_text || undefined,
       backgroundImage: hindranceArtwork(hindrance.slug),
       selected: selectedIds.includes(hindrance.id),
+      disabled: isAtPointMaximum && !selectedIds.includes(hindrance.id),
     }
   })
 

@@ -37,6 +37,7 @@ function TraitCard({
   backgroundImage,
   size = 'md',
   selected = false,
+  disabled = false,
   className,
   type = 'button',
   ...props
@@ -87,6 +88,7 @@ function TraitCard({
             </span>
             <Switch
               checked={eyebrowToggle.pressed}
+              disabled={disabled}
               aria-label={`Set ${title} to ${(eyebrowToggle.pressed ? eyebrowToggle.offLabel : eyebrowToggle.onLabel).toLowerCase()}`}
               onCheckedChange={() => eyebrowToggle.onToggle()}
               onClick={(event) => event.stopPropagation()}
@@ -140,6 +142,7 @@ function TraitCard({
         data-slot="trait-card-trigger"
         aria-pressed={selected}
         aria-label={title}
+        disabled={disabled}
         className="absolute inset-0 z-20 cursor-pointer rounded-xl outline-none disabled:cursor-default"
         {...props}
       />

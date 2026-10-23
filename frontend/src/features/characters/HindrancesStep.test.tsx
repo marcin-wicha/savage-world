@@ -157,6 +157,22 @@ describe('HindrancesStep', () => {
     expect(screen.getByText('0 / 4')).toBeInTheDocument()
   })
 
+  it('disables unselected hindrances when four points are selected', async () => {
+    renderStep()
+    const user = await revealHindrances()
+
+    await user.click(screen.getByRole('button', { name: 'Bloodthirsty' }))
+    await user.click(screen.getByRole('button', { name: 'Next trait' }))
+    await user.click(screen.getByRole('button', { name: 'Yellow' }))
+
+    expect(screen.getByText('4 / 4')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Previous trait' }))
+
+    expect(screen.getByRole('button', { name: 'Clumsy' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Bloodthirsty' })).not.toBeDisabled()
+  })
+
   it('filters hindrances by search and fills from autocomplete suggestions', async () => {
     const user = userEvent.setup()
 

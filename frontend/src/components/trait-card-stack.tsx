@@ -24,7 +24,13 @@ function TraitCardBackArt({ className }: { className?: string }) {
 
 type TraitCardStackTrait = Pick<
   TraitCardProps,
-  'title' | 'eyebrow' | 'eyebrowToggle' | 'description' | 'backgroundImage' | 'selected'
+  | 'title'
+  | 'eyebrow'
+  | 'eyebrowToggle'
+  | 'description'
+  | 'backgroundImage'
+  | 'selected'
+  | 'disabled'
 >
 
 type TraitCardStackProps = Omit<React.ComponentProps<'div'>, 'children' | 'onSelect'> & {
