@@ -70,6 +70,21 @@ describe('NewCharacterRoute', () => {
     expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
   })
 
+  it('keeps the hindrance point balance visible after the Hindrances step', async () => {
+    const user = userEvent.setup()
+
+    renderRoute()
+
+    await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(screen.getByRole('button', { name: /next/i }))
+
+    expect(await screen.findByRole('heading', { name: /assign attributes/i })).toBeInTheDocument()
+    expect(screen.getByText('Hindrance points')).toBeInTheDocument()
+    expect(screen.getByText('0 / 4')).toBeInTheDocument()
+  })
+
   it('returns to the roster from the first step', async () => {
     const user = userEvent.setup()
 

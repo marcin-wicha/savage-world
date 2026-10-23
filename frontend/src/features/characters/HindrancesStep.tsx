@@ -11,6 +11,7 @@ import {
 } from '@/graphql/generated/graphql'
 import { useGraphqlInfiniteQuery } from '@/lib/queries'
 
+import { HindrancePointsBalance } from './HindrancePointsBalance'
 import type { CharacterFormValues } from './character-form'
 
 const severityOptions: FilterOption[] = [
@@ -97,17 +98,16 @@ export function HindrancesStep() {
     },
     { minimum: 0, maximum: 0 },
   )
-  const pointsSummary =
-    selectedPointRange.minimum === selectedPointRange.maximum
-      ? `${selectedPointRange.minimum} / ${maxHindrancePoints}`
-      : `${selectedPointRange.minimum}–${selectedPointRange.maximum} / ${maxHindrancePoints}`
-  const minimumRemainingPoints = Math.max(maxHindrancePoints - selectedPointRange.maximum, 0)
-  const maximumRemainingPoints = Math.max(maxHindrancePoints - selectedPointRange.minimum, 0)
-  const remainingSummary =
-    minimumRemainingPoints === maximumRemainingPoints
-      ? `${minimumRemainingPoints} points available to spend on later steps.`
-      : `${minimumRemainingPoints}–${maximumRemainingPoints} points available to spend on later steps.`
-  const pointsProgress = Math.min((selectedPointRange.maximum / maxHindrancePoints) * 100, 100)
+  useEffect(() => {
+    if (isLoadingAll || isError) return
+
+    const earnedPoints = Math.min(selectedPointRange.maximum, maxHindrancePoints)
+
+    if (form.getValues('hindrance_points_earned') === earnedPoints) return
+
+    form.setValue('hindrance_points_earned', earnedPoints)
+  }, [form, isError, isLoadingAll, selectedPointRange.maximum])
+
   const isAtPointMaximum = selectedPointRange.maximum >= maxHindrancePoints
   const toggleSeverity = (hindranceId: string) => {
     const currentSeverity = selectedSeverities[hindranceId] ?? 'minor'
@@ -163,41 +163,7 @@ export function HindrancesStep() {
         </p>
       </div>
 
-      <div
-        role="status"
-        aria-live="polite"
-        className="border-border bg-muted/20 grid max-w-xl gap-3 rounded-lg border p-4"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="grid gap-1">
-            <p className="text-foreground text-sm font-medium">Hindrance points</p>
-            <p className="text-muted-foreground text-xs leading-5">
-              Earned from selected Hindrances for later creation steps.
-            </p>
-          </div>
-          <p
-            className="text-foreground shrink-0 text-lg font-semibold"
-            data-slot="hindrance-points"
-          >
-            {pointsSummary}
-          </p>
-        </div>
-        <div
-          role="progressbar"
-          aria-label="Hindrance points selected"
-          aria-valuemin={0}
-          aria-valuemax={maxHindrancePoints}
-          aria-valuenow={Math.min(selectedPointRange.maximum, maxHindrancePoints)}
-          aria-valuetext={`${pointsSummary} hindrance points selected`}
-          className="bg-muted h-2 overflow-hidden rounded-full"
-        >
-          <div
-            className="bg-primary h-full rounded-full transition-[width] duration-300"
-            style={{ width: `${pointsProgress}%` }}
-          />
-        </div>
-        <p className="text-muted-foreground text-xs">{remainingSummary}</p>
-      </div>
+      <HindrancePointsBalance earnedPoints={selectedPointRange.maximum} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">

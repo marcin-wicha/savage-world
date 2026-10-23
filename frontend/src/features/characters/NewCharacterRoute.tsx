@@ -6,6 +6,7 @@ import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-f
 import { Card, CardContent } from '@/components/ui/card'
 
 import { ConceptStep } from './ConceptStep'
+import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { HindrancesStep } from './HindrancesStep'
 import {
   type CharacterFormValues,
@@ -70,11 +71,15 @@ const stepDefinitions: StepDefinition[] = [
 function PlaceholderStep({
   heading,
   description,
-}: Pick<StepDefinition, 'heading' | 'description'>) {
+  showHindrancePoints = false,
+}: Pick<StepDefinition, 'heading' | 'description'> & { showHindrancePoints?: boolean }) {
   return (
-    <div className="grid max-w-xl gap-2">
-      <h2 className="text-foreground text-xl font-medium">{heading}</h2>
-      <p className="text-muted-foreground text-sm leading-6">{description}</p>
+    <div className="grid gap-6">
+      {showHindrancePoints ? <HindrancePointsBalance /> : null}
+      <div className="grid max-w-xl gap-2">
+        <h2 className="text-foreground text-xl font-medium">{heading}</h2>
+        <p className="text-muted-foreground text-sm leading-6">{description}</p>
+      </div>
     </div>
   )
 }
@@ -96,7 +101,16 @@ export function NewCharacterRoute() {
       ) : step.id === 'hindrances' ? (
         <HindrancesStep />
       ) : (
-        <PlaceholderStep heading={step.heading} description={step.description} />
+        <PlaceholderStep
+          heading={step.heading}
+          description={step.description}
+          showHindrancePoints={
+            step.id === 'attributes' ||
+            step.id === 'skills' ||
+            step.id === 'gear' ||
+            step.id === 'summary'
+          }
+        />
       ),
   }))
 

@@ -14,6 +14,8 @@ export const characterFormSchema = z.object({
   }),
   hindrances: z.array(z.string()),
   hindrance_severities: z.record(z.string(), selectedHindranceSeveritySchema),
+  hindrance_points_earned: z.number().int().min(0).max(4),
+  hindrance_points_spent: z.number().int().min(0).max(4),
 })
 
 export type CharacterFormValues = z.infer<typeof characterFormSchema>
@@ -25,6 +27,8 @@ export const characterFormDefaults: CharacterFormValues = {
   },
   hindrances: [],
   hindrance_severities: {},
+  hindrance_points_earned: 0,
+  hindrance_points_spent: 0,
 }
 
 export type CharacterStepId =
