@@ -17,8 +17,8 @@ export function HindrancePointsBalance({
   const spentPoints = useWatch({ control: form.control, name: 'hindrance_points_spent' }) ?? 0
   const earnedPoints = Math.min(earnedPointsOverride ?? earnedPointsFromForm, maxHindrancePoints)
   const availablePoints = Math.max(earnedPoints - spentPoints, 0)
-  const pointsSummary = `${earnedPoints} / ${maxHindrancePoints}`
-  const pointsProgress = (earnedPoints / maxHindrancePoints) * 100
+  const pointsSummary = `${availablePoints} / ${maxHindrancePoints}`
+  const pointsProgress = (availablePoints / maxHindrancePoints) * 100
 
   return (
     <div
@@ -31,7 +31,7 @@ export function HindrancePointsBalance({
         <div className="grid gap-1">
           <p className="text-foreground text-sm font-medium">Hindrance points</p>
           <p className="text-muted-foreground text-xs leading-5">
-            Earned from selected Hindrances for later creation steps.
+            Remaining from selected Hindrances for later creation steps.
           </p>
         </div>
         <p className="text-foreground shrink-0 text-lg font-semibold" data-slot="hindrance-points">
@@ -40,11 +40,11 @@ export function HindrancePointsBalance({
       </div>
       <div
         role="progressbar"
-        aria-label="Hindrance points selected"
+        aria-label="Hindrance points available"
         aria-valuemin={0}
         aria-valuemax={maxHindrancePoints}
-        aria-valuenow={earnedPoints}
-        aria-valuetext={`${pointsSummary} hindrance points selected`}
+        aria-valuenow={availablePoints}
+        aria-valuetext={`${pointsSummary} hindrance points available`}
         className="bg-muted h-2 overflow-hidden rounded-full"
       >
         <div
@@ -52,9 +52,6 @@ export function HindrancePointsBalance({
           style={{ width: `${pointsProgress}%` }}
         />
       </div>
-      <p className="text-muted-foreground text-xs">
-        {availablePoints} points available to spend on later steps.
-      </p>
     </div>
   )
 }

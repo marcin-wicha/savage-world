@@ -15,6 +15,8 @@ type SkillDieProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   defaultModifier?: number
   onModifierChange?: (modifier: number) => void
   label?: string
+  showModifier?: boolean
+  maxDie?: SkillDieType | null
   disabled?: boolean
   readOnly?: boolean
 }
@@ -33,6 +35,8 @@ function SkillDie({
   defaultModifier = 0,
   onModifierChange,
   label = 'Skill die',
+  showModifier = true,
+  maxDie = null,
   disabled = false,
   readOnly = false,
   className,
@@ -88,28 +92,35 @@ function SkillDie({
           key={option}
           dice={option}
           pressed={activeDie === option}
-          disabled={disabled}
+          disabled={
+            disabled ||
+            (maxDie !== null && skillDieTypes.indexOf(option) > skillDieTypes.indexOf(maxDie))
+          }
           onPressedChange={(pressed) => {
             if (pressed) changeDie(option)
           }}
         />
       ))}
 
-      <Label htmlFor={modifierId} className="text-muted-foreground ml-2 text-sm">
-        Modifier
-      </Label>
-      <Input
-        id={modifierId}
-        type="number"
-        min={0}
-        step={1}
-        inputMode="numeric"
-        value={currentModifier === 0 ? '' : currentModifier}
-        placeholder="+0"
-        disabled={disabled}
-        onChange={changeModifier}
-        className="h-8 w-20"
-      />
+      {showModifier ? (
+        <>
+          <Label htmlFor={modifierId} className="text-muted-foreground ml-2 text-sm">
+            Modifier
+          </Label>
+          <Input
+            id={modifierId}
+            type="number"
+            min={0}
+            step={1}
+            inputMode="numeric"
+            value={currentModifier === 0 ? '' : currentModifier}
+            placeholder="+0"
+            disabled={disabled}
+            onChange={changeModifier}
+            className="h-8 w-20"
+          />
+        </>
+      ) : null}
     </div>
   )
 }

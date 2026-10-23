@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-flow'
 import { Card, CardContent } from '@/components/ui/card'
 
+import { AttributesStep } from './AttributesStep'
 import { ConceptStep } from './ConceptStep'
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { HindrancesStep } from './HindrancesStep'
@@ -100,16 +101,13 @@ export function NewCharacterRoute() {
         <ConceptStep />
       ) : step.id === 'hindrances' ? (
         <HindrancesStep />
+      ) : step.id === 'attributes' ? (
+        <AttributesStep />
       ) : (
         <PlaceholderStep
           heading={step.heading}
           description={step.description}
-          showHindrancePoints={
-            step.id === 'attributes' ||
-            step.id === 'skills' ||
-            step.id === 'gear' ||
-            step.id === 'summary'
-          }
+          showHindrancePoints={step.id === 'skills' || step.id === 'gear' || step.id === 'summary'}
         />
       ),
   }))

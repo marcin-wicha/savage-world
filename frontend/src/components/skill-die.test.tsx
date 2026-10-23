@@ -136,4 +136,13 @@ describe('SkillDie', () => {
 
     expect(screen.getByRole('spinbutton', { name: 'Modifier' })).toBeDisabled()
   })
+
+  it('disables dice above the maximum die while keeping lower dice available', () => {
+    render(<SkillDie die="d8" maxDie="d8" />)
+
+    expect(screen.getByRole('button', { name: 'Toggle d6' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Toggle d8' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Toggle d10' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Toggle d12' })).toBeDisabled()
+  })
 })

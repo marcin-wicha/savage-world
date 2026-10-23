@@ -2,6 +2,7 @@ import type { FieldPath } from 'react-hook-form'
 import { z } from 'zod'
 
 const selectedHindranceSeveritySchema = z.enum(['minor', 'major'])
+const attributeDieSchema = z.enum(['d4', 'd6', 'd8', 'd10', 'd12'])
 
 export const characterFormSchema = z.object({
   concept: z.object({
@@ -14,6 +15,14 @@ export const characterFormSchema = z.object({
   }),
   hindrances: z.array(z.string()),
   hindrance_severities: z.record(z.string(), selectedHindranceSeveritySchema),
+  attributes: z.object({
+    agility: attributeDieSchema,
+    smarts: attributeDieSchema,
+    spirit: attributeDieSchema,
+    strength: attributeDieSchema,
+    vigor: attributeDieSchema,
+  }),
+  attribute_hindrance_points_spent: z.number().int().min(0).max(4),
   hindrance_points_earned: z.number().int().min(0).max(4),
   hindrance_points_spent: z.number().int().min(0).max(4),
 })
@@ -27,6 +36,14 @@ export const characterFormDefaults: CharacterFormValues = {
   },
   hindrances: [],
   hindrance_severities: {},
+  attributes: {
+    agility: 'd4',
+    smarts: 'd4',
+    spirit: 'd4',
+    strength: 'd4',
+    vigor: 'd4',
+  },
+  attribute_hindrance_points_spent: 0,
   hindrance_points_earned: 0,
   hindrance_points_spent: 0,
 }
@@ -38,7 +55,7 @@ export const characterStepFields: Record<CharacterStepId, FieldPath<CharacterFor
   concept: ['concept.name', 'concept.description'],
   origin: [],
   hindrances: ['hindrances'],
-  attributes: [],
+  attributes: ['attributes'],
   skills: [],
   gear: [],
   summary: [],
