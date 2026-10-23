@@ -14,12 +14,12 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": typeof types.HindrancesDocument,
+    "query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n      description\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": typeof types.HindrancesDocument,
     "query Origins($first: Int, $after: String) {\n  origins(first: $first, after: $after) {\n    nodes {\n      id\n      created_at\n      updated_at\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": typeof types.OriginsDocument,
     "query Viewer {\n  viewer {\n    id\n    email_address\n  }\n}": typeof types.ViewerDocument,
 };
 const documents: Documents = {
-    "query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.HindrancesDocument,
+    "query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n      description\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.HindrancesDocument,
     "query Origins($first: Int, $after: String) {\n  origins(first: $first, after: $after) {\n    nodes {\n      id\n      created_at\n      updated_at\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.OriginsDocument,
     "query Viewer {\n  viewer {\n    id\n    email_address\n  }\n}": types.ViewerDocument,
 };
@@ -41,7 +41,7 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}"): (typeof documents)["query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}"];
+export function graphql(source: "query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n      description\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}"): (typeof documents)["query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n      description\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

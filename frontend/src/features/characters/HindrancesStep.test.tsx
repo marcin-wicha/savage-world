@@ -21,7 +21,14 @@ vi.mock('@/lib/api-client', async (importOriginal) => {
 const graphqlRequestMock = vi.mocked(graphqlRequest)
 
 const hindrances = [
-  { id: '1', name: 'Bad Eyes', slug: 'bad-eyes', severity: 'minor', requirements_text: '' },
+  {
+    id: '1',
+    name: 'Bad Eyes',
+    slug: 'bad-eyes',
+    severity: 'minor',
+    requirements_text: '',
+    description: 'Vision becomes a serious liability.',
+  },
   {
     id: '2',
     name: 'Bloodthirsty',
@@ -104,6 +111,7 @@ describe('HindrancesStep', () => {
     expect(screen.getByRole('button', { name: 'Bad Eyes' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bloodthirsty' })).toBeInTheDocument()
     expect(document.querySelector('img[src="/traits/hindrances/bad-eyes.png"]')).toBeInTheDocument()
+    expect(screen.getByText('Vision becomes a serious liability.')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Severity filter' }))
     await user.click(screen.getByRole('checkbox', { name: 'Minor' }))
@@ -199,13 +207,13 @@ describe('HindrancesStep', () => {
     expect(graphqlRequestMock).toHaveBeenNthCalledWith(
       1,
       expect.anything(),
-      { first: 50, after: null },
+      { first: 40, after: null },
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     )
     expect(graphqlRequestMock).toHaveBeenNthCalledWith(
       2,
       expect.anything(),
-      { first: 50, after: 'cursor-1' },
+      { first: 40, after: 'cursor-1' },
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     )
   })

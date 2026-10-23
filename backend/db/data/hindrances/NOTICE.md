@@ -7,8 +7,11 @@ Foundry Virtual Tabletop system:
 - Copyright: Pinnacle Entertainment Group
 - License: Apache License 2.0 (see `LICENSE`)
 
-The data is limited to hindrance names, severities, requirements, and source
-page references. It does not include rulebook prose or descriptions.
+The tracked `swade.yml` data is limited to hindrance names, severities,
+requirements, and source page references. Licensed descriptions extracted from
+legally owned rulebooks may be placed in the ignored `private/` directory and
+are loaded locally by the same importer. Description-only overlays use a
+`descriptions` array keyed by the mechanical record's `slug`.
 
 Savage Worlds, SWADE, and Fantasy Companion are trademarks of Pinnacle
 Entertainment Group. This project is not affiliated with or endorsed by

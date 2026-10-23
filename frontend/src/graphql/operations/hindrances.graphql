@@ -6,6 +6,7 @@ query Hindrances($first: Int, $after: String) {
       slug
       severity
       requirements_text
+      description
     }
     pageInfo {
       hasNextPage

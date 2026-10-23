@@ -25,7 +25,8 @@ RSpec.describe Hindrances::Importer do
       "severity" => "minor",
       "requirements" => [],
       "source_book" => "SWADE",
-      "source_page" => 22
+      "source_page" => 22,
+      "description" => "A test description."
     }.merge(overrides)
   end
 
@@ -38,6 +39,24 @@ RSpec.describe Hindrances::Importer do
     expect(hindrance.name).to eq("Test Hindrance")
     expect(hindrance.severity).to eq("minor")
     expect(hindrance.source_page).to eq(22)
+    expect(hindrance.description).to eq("A test description.")
+  end
+
+  it "applies description overlays by slug" do
+    base_path = write_data("swade.yml", [ hindrance_attributes("description" => nil) ])
+    overlay_path = File.join(@dir, "private/descriptions.yml")
+    FileUtils.mkdir_p(File.dirname(overlay_path))
+    File.write(
+      overlay_path,
+      YAML.safe_dump(
+        "book" => "SWADE",
+        "descriptions" => [ { "slug" => "test-hindrance", "description" => "An overlay description." } ]
+      )
+    )
+
+    described_class.new(paths: [ base_path, overlay_path ]).call
+
+    expect(Hindrance.find_by!(slug: "test-hindrance").description).to eq("An overlay description.")
   end
 
   it "is idempotent and updates existing hindrances by slug" do

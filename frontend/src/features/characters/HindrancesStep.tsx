@@ -35,7 +35,7 @@ export function HindrancesStep() {
     useGraphqlInfiniteQuery<HindrancesQuery>(
       ['hindrances'],
       HindrancesDocument,
-      (after) => ({ first: 50, after }),
+      (after) => ({ first: 40, after }),
       (page) => (page.hindrances.pageInfo.hasNextPage ? page.hindrances.pageInfo.endCursor : null),
     )
   const isLoadingAll = isPending || hasNextPage
@@ -68,7 +68,7 @@ export function HindrancesStep() {
   const traits: TraitCardStackTrait[] = filteredHindrances.map((hindrance) => ({
     title: hindrance.name,
     eyebrow: severityLabels[hindrance.severity],
-    description: hindrance.requirements_text || undefined,
+    description: hindrance.description || hindrance.requirements_text || undefined,
     backgroundImage: hindranceArtwork(hindrance.slug),
     selected: selectedIds.includes(hindrance.id),
   }))

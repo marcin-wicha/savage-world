@@ -58,6 +58,7 @@ type EdgeEdge {
 }
 
 type Hindrance {
+  description: String
   id: ID!
   name: String!
   requirements: [Requirement!]!

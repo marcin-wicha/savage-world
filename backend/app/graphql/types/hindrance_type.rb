@@ -6,6 +6,7 @@ module Types
     field :severity, Types::HindranceSeverityEnum, null: false
     field :requirements, [ Types::RequirementType ], null: false
     field :requirements_text, String, null: false
+    field :description, String, null: true
     field :source_book, String, null: false
     field :source_page, Integer, null: false
   end

@@ -15,7 +15,8 @@ RSpec.describe "GraphQL hindrances", type: :request do
       severity: "major",
       requirements: [ { "kind" => "arcane_background", "value" => "any" } ],
       source_book: "Fantasy Companion",
-      source_page: 28
+      source_page: 28,
+      description: "A dangerous magical corruption."
     )
 
     execute(<<~GRAPHQL)
@@ -31,6 +32,7 @@ RSpec.describe "GraphQL hindrances", type: :request do
               value
             }
             requirements_text
+            description
             source_book
             source_page
           }
@@ -47,6 +49,7 @@ RSpec.describe "GraphQL hindrances", type: :request do
       "slug" => "corruption",
       "severity" => "major",
       "requirements_text" => "Arcane Background (Any)",
+      "description" => "A dangerous magical corruption.",
       "source_book" => "Fantasy Companion",
       "source_page" => 28
     )
@@ -100,6 +103,27 @@ RSpec.describe "GraphQL hindrances", type: :request do
     )
 
     expect(json.dig("data", "hindrances", "nodes")).to eq([ { "slug" => "zeta" } ])
+  end
+
+  it "accepts the frontend page size with descriptions" do
+    execute(<<~GRAPHQL)
+      {
+        hindrances(first: 40) {
+          nodes {
+            id
+            name
+            slug
+            severity
+            requirements_text
+            description
+          }
+          pageInfo { hasNextPage endCursor }
+        }
+      }
+    GRAPHQL
+
+    expect(response).to have_http_status(:ok)
+    expect(json["errors"]).to be_nil
   end
 
   it "is available without authentication" do
