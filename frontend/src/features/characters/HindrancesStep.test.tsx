@@ -21,11 +21,29 @@ vi.mock('@/lib/api-client', async (importOriginal) => {
 const graphqlRequestMock = vi.mocked(graphqlRequest)
 
 const hindrances = [
-  { id: '1', name: 'Bad Eyes', severity: 'minor', requirements_text: '' },
-  { id: '2', name: 'Bloodthirsty', severity: 'major', requirements_text: '' },
-  { id: '3', name: 'Clumsy', severity: 'minor', requirements_text: '' },
-  { id: '4', name: 'Hard of Hearing', severity: 'minor_or_major', requirements_text: '' },
-  { id: '5', name: 'Yellow', severity: 'major', requirements_text: 'Spirit d4' },
+  { id: '1', name: 'Bad Eyes', slug: 'bad-eyes', severity: 'minor', requirements_text: '' },
+  {
+    id: '2',
+    name: 'Bloodthirsty',
+    slug: 'bloodthirsty',
+    severity: 'major',
+    requirements_text: '',
+  },
+  { id: '3', name: 'Clumsy', slug: 'clumsy', severity: 'minor', requirements_text: '' },
+  {
+    id: '4',
+    name: 'Hard of Hearing',
+    slug: 'hard-of-hearing',
+    severity: 'minor_or_major',
+    requirements_text: '',
+  },
+  {
+    id: '5',
+    name: 'Yellow',
+    slug: 'yellow',
+    severity: 'major',
+    requirements_text: 'Spirit d4',
+  },
 ]
 
 type FormRef = { current: UseFormReturn<CharacterFormValues> | null }
@@ -85,6 +103,7 @@ describe('HindrancesStep', () => {
     expect(screen.getByText('5 hindrances')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bad Eyes' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bloodthirsty' })).toBeInTheDocument()
+    expect(document.querySelector('img[src="/traits/hindrances/bad-eyes.png"]')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Severity filter' }))
     await user.click(screen.getByRole('checkbox', { name: 'Minor' }))

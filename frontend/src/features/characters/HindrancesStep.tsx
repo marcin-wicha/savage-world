@@ -23,6 +23,8 @@ const severityLabels: Record<HindranceSeverity, string> = {
   minor_or_major: 'Minor or Major',
 }
 
+const hindranceArtwork = (slug: string) => `/traits/hindrances/${slug}.png`
+
 export function HindrancesStep() {
   const form = useFormContext<CharacterFormValues>()
   const selectedIds = useWatch({ control: form.control, name: 'hindrances' }) ?? []
@@ -55,6 +57,7 @@ export function HindrancesStep() {
     title: hindrance.name,
     eyebrow: severityLabels[hindrance.severity],
     description: hindrance.requirements_text || undefined,
+    backgroundImage: hindranceArtwork(hindrance.slug),
     selected: selectedIds.includes(hindrance.id),
   }))
 

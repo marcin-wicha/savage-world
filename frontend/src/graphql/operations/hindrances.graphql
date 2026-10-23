@@ -3,6 +3,7 @@ query Hindrances($first: Int, $after: String) {
     nodes {
       id
       name
+      slug
       severity
       requirements_text
     }

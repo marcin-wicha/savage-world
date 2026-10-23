@@ -48,6 +48,9 @@ function TraitCard({
             src={backgroundImage}
             alt=""
             className="h-full w-full object-cover"
+            onError={(event) => {
+              event.currentTarget.hidden = true
+            }}
           />
         ) : null}
 

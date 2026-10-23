@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { TraitCard } from './trait-card'
@@ -43,6 +43,20 @@ describe('TraitCard', () => {
     const artwork = container.querySelector('[data-slot="trait-card-artwork"]')
 
     expect(artwork).toHaveAttribute('src', '/traits/bolster.png')
+  })
+
+  it('hides artwork that fails to load', () => {
+    const { container } = render(
+      <TraitCard title="Bolster" backgroundImage="/traits/missing.png" />,
+    )
+
+    const artwork = container.querySelector('[data-slot="trait-card-artwork"]')
+
+    expect(artwork).toBeInTheDocument()
+
+    fireEvent.error(artwork!)
+
+    expect(artwork).not.toBeVisible()
   })
 
   it('applies hardcoded pixel dimensions for each size', () => {
