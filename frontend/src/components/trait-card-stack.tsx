@@ -27,7 +27,7 @@ type TraitCardStackTrait = Pick<
   'title' | 'eyebrow' | 'description' | 'backgroundImage' | 'selected'
 >
 
-type TraitCardStackProps = Omit<React.ComponentProps<'div'>, 'children'> & {
+type TraitCardStackProps = Omit<React.ComponentProps<'div'>, 'children' | 'onSelect'> & {
   category: string
   traits: TraitCardStackTrait[]
   size?: TraitCardSize

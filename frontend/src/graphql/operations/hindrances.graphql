@@ -1,0 +1,14 @@
+query Hindrances($first: Int, $after: String) {
+  hindrances(first: $first, after: $after) {
+    nodes {
+      id
+      name
+      severity
+      requirements_text
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

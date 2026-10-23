@@ -1,7 +1,10 @@
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery,
+  type InfiniteData,
   type QueryKey,
+  type UseInfiniteQueryOptions,
   type UseMutationOptions,
   type UseQueryOptions,
 } from '@tanstack/react-query'
@@ -12,6 +15,11 @@ import { api, graphqlRequest } from './api-client'
 type QueryOptions<TData> = Omit<
   UseQueryOptions<TData, Error, TData, QueryKey>,
   'queryKey' | 'queryFn'
+>
+
+type InfiniteQueryOptions<TData> = Omit<
+  UseInfiniteQueryOptions<TData, Error, InfiniteData<TData>, QueryKey, string | null>,
+  'queryKey' | 'queryFn' | 'initialPageParam' | 'getNextPageParam'
 >
 
 type MutationOptions<TData, TVariables> = Omit<
@@ -72,5 +80,25 @@ export function useGraphqlQuery<
     ...options,
     queryKey,
     queryFn: ({ signal }) => graphqlRequest<TData, TVariables>(document, variables, { signal }),
+  })
+}
+
+export function useGraphqlInfiniteQuery<
+  TData,
+  TVariables extends Record<string, unknown> = Record<string, unknown>,
+>(
+  queryKey: QueryKey,
+  document: DocumentNode,
+  variablesForCursor: (cursor: string | null) => TVariables,
+  nextCursor: (page: TData) => string | null,
+  options: InfiniteQueryOptions<TData> = {},
+) {
+  return useInfiniteQuery<TData, Error, InfiniteData<TData>, QueryKey, string | null>({
+    ...options,
+    queryKey,
+    initialPageParam: null,
+    queryFn: ({ signal, pageParam }) =>
+      graphqlRequest<TData, TVariables>(document, variablesForCursor(pageParam), { signal }),
+    getNextPageParam: (lastPage) => nextCursor(lastPage),
   })
 }

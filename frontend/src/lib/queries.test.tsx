@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { api, graphqlRequest } from './api-client'
 import { createQueryClient } from './query-client'
-import { useGraphqlQuery, useRestMutation, useRestQuery } from './queries'
+import { useGraphqlInfiniteQuery, useGraphqlQuery, useRestMutation, useRestQuery } from './queries'
 
 vi.mock('./api-client', () => ({
   api: {
@@ -82,6 +82,51 @@ describe('query hooks', () => {
     expect(graphqlRequestMock).toHaveBeenCalledWith(
       document,
       { first: 1 },
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    )
+  })
+
+  it('fetches GraphQL infinite queries page by page', async () => {
+    const document = parse('query Pages { pages { hasNextPage endCursor } }')
+    graphqlRequestMock
+      .mockResolvedValueOnce({
+        pages: { hasNextPage: true, endCursor: 'cursor-1' },
+      })
+      .mockResolvedValueOnce({
+        pages: { hasNextPage: false, endCursor: null },
+      })
+
+    const { result } = renderHook(
+      () =>
+        useGraphqlInfiniteQuery<{
+          pages: { hasNextPage: boolean; endCursor: string | null }
+        }>(
+          ['pages'],
+          document,
+          (after) => ({ first: 25, after }),
+          (page) => (page.pages.hasNextPage ? page.pages.endCursor : null),
+        ),
+      { wrapper },
+    )
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.data?.pages).toHaveLength(1)
+
+    await act(async () => {
+      await result.current.fetchNextPage()
+    })
+
+    await waitFor(() => expect(result.current.data?.pages).toHaveLength(2))
+    expect(graphqlRequestMock).toHaveBeenNthCalledWith(
+      1,
+      document,
+      { first: 25, after: null },
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    )
+    expect(graphqlRequestMock).toHaveBeenNthCalledWith(
+      2,
+      document,
+      { first: 25, after: 'cursor-1' },
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     )
   })

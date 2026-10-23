@@ -6,6 +6,7 @@ import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-f
 import { Card, CardContent } from '@/components/ui/card'
 
 import { ConceptStep } from './ConceptStep'
+import { HindrancesStep } from './HindrancesStep'
 import {
   type CharacterFormValues,
   type CharacterStepId,
@@ -92,6 +93,8 @@ export function NewCharacterRoute() {
     content:
       step.id === 'concept' ? (
         <ConceptStep />
+      ) : step.id === 'hindrances' ? (
+        <HindrancesStep />
       ) : (
         <PlaceholderStep heading={step.heading} description={step.description} />
       ),

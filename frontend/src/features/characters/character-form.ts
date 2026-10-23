@@ -10,6 +10,7 @@ export const characterFormSchema = z.object({
       .max(60, 'Use 60 characters or fewer.'),
     description: z.string().trim().max(500, 'Use 500 characters or fewer.'),
   }),
+  hindrances: z.array(z.string()),
 })
 
 export type CharacterFormValues = z.infer<typeof characterFormSchema>
@@ -19,6 +20,7 @@ export const characterFormDefaults: CharacterFormValues = {
     name: '',
     description: '',
   },
+  hindrances: [],
 }
 
 export type CharacterStepId =
@@ -27,7 +29,7 @@ export type CharacterStepId =
 export const characterStepFields: Record<CharacterStepId, FieldPath<CharacterFormValues>[]> = {
   concept: ['concept.name', 'concept.description'],
   origin: [],
-  hindrances: [],
+  hindrances: ['hindrances'],
   attributes: [],
   skills: [],
   gear: [],
