@@ -12,6 +12,25 @@ describe('TraitCard', () => {
     expect(screen.getByText('Strike with reckless fury.')).toBeInTheDocument()
   })
 
+  it('keeps long descriptions inside a scrollable card body', () => {
+    const { container } = render(
+      <TraitCard
+        title="Arcane Sensitivity"
+        size="lg"
+        description={'A spell gone wrong. '.repeat(100)}
+      />,
+    )
+
+    const description = container.querySelector('[data-slot="trait-card-description"]')
+    const footer = container.querySelector('[data-slot="trait-card-footer"]')
+    const header = container.querySelector('[data-slot="card-header"]')
+
+    expect(footer).toHaveClass('pointer-events-none')
+    expect(description).toHaveClass('pointer-events-auto', 'max-h-72')
+    expect(description?.firstElementChild).toHaveClass('overflow-y-auto')
+    expect(header).toHaveClass('sticky', 'top-0')
+  })
+
   it('selects the whole card on click', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn()

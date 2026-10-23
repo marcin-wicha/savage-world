@@ -112,6 +112,7 @@ describe('HindrancesStep', () => {
     expect(screen.getByRole('button', { name: 'Bloodthirsty' })).toBeInTheDocument()
     expect(document.querySelector('img[src="/traits/hindrances/bad-eyes.png"]')).toBeInTheDocument()
     expect(screen.getByText('Vision becomes a serious liability.')).toBeInTheDocument()
+    expect(document.querySelector('[data-slot="trait-card"][data-size="md"]')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Severity filter' }))
     await user.click(screen.getByRole('checkbox', { name: 'Minor' }))

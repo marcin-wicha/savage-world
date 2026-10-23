@@ -108,7 +108,7 @@ export function NewCharacterRoute() {
   })
 
   return (
-    <section className="mx-auto max-w-5xl">
+    <section className="mx-auto max-w-7xl">
       <p className="text-muted-foreground text-[0.65rem] font-medium tracking-[0.22em] uppercase">
         Character creation
       </p>

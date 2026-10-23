@@ -5,6 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { traitCardSizes, type TraitCardSize } from '@/components/trait-card-sizes'
 import { cn } from '@/lib/utils'
 
+const descriptionMaxHeightClasses: Record<TraitCardSize, string> = {
+  sm: 'max-h-28',
+  md: 'max-h-48',
+  lg: 'max-h-72',
+}
+
 type TraitCardProps = Omit<React.ComponentProps<'button'>, 'title'> & {
   title: string
   eyebrow?: string
@@ -26,6 +32,7 @@ function TraitCard({
   ...props
 }: TraitCardProps) {
   const { width, height } = traitCardSizes[size]
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
 
   return (
     <Card
@@ -66,16 +73,23 @@ function TraitCard({
 
       <div
         data-slot="trait-card-footer"
-        className="border-border/60 bg-card absolute inset-x-0 bottom-0 z-10 border-t"
+        className="border-border/60 bg-card pointer-events-none absolute inset-x-0 bottom-0 z-30 flex max-h-full flex-col overflow-hidden border-t"
       >
-        <CardHeader className="gap-0 px-4 py-3">
+        <CardHeader className="bg-card sticky top-0 z-10 shrink-0 gap-0 px-4 py-3">
           <CardTitle className="font-display text-foreground block text-lg leading-tight">
             {title}
           </CardTitle>
         </CardHeader>
         {description ? (
-          <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out group-focus-within/trait:grid-rows-[1fr] group-hover/trait:grid-rows-[1fr] motion-reduce:transition-none">
-            <div className="overflow-hidden">
+          <div
+            data-slot="trait-card-description"
+            onClick={() => triggerRef.current?.click()}
+            className={cn(
+              'pointer-events-auto grid min-h-0 grid-rows-[0fr] overflow-hidden transition-[grid-template-rows] duration-300 ease-out group-focus-within/trait:grid-rows-[1fr] group-hover/trait:grid-rows-[1fr] motion-reduce:transition-none',
+              descriptionMaxHeightClasses[size],
+            )}
+          >
+            <div className="min-h-0 overflow-y-auto">
               <CardContent className="text-muted-foreground px-4 pt-0 pb-3 text-sm leading-5">
                 {description}
               </CardContent>
@@ -85,6 +99,7 @@ function TraitCard({
       </div>
 
       <button
+        ref={triggerRef}
         type={type}
         data-slot="trait-card-trigger"
         aria-pressed={selected}
