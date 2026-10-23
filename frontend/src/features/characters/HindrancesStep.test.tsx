@@ -141,6 +141,24 @@ describe('HindrancesStep', () => {
     )
   })
 
+  it('filters hindrances by search and fills from autocomplete suggestions', async () => {
+    const user = userEvent.setup()
+
+    renderStep()
+
+    const search = await screen.findByRole('combobox', { name: 'Search hindrances' })
+
+    await user.type(search, 'blo')
+    await user.click(await screen.findByRole('option', { name: 'Bloodthirsty' }))
+
+    expect(await screen.findByText('1 hindrance')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /reveal hindrances traits/i }))
+
+    expect(screen.getByRole('button', { name: 'Bloodthirsty' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Bad Eyes' })).not.toBeInTheDocument()
+  })
+
   it('shows an empty state when the filter excludes every hindrance', async () => {
     graphqlRequestMock.mockResolvedValue({
       hindrances: {
@@ -157,7 +175,7 @@ describe('HindrancesStep', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Major' }))
 
     expect(screen.getByText('0 hindrances')).toBeInTheDocument()
-    expect(screen.getByText('No hindrances match the selected severity.')).toBeInTheDocument()
+    expect(screen.getByText('No hindrances match the selected filters.')).toBeInTheDocument()
   })
 
   it('loads and combines every page without exceeding the query complexity limit', async () => {

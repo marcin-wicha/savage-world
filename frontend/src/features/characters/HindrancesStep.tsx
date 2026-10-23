@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { AutocompleteInput } from '@/components/autocomplete-input'
 import { FilterButton, type FilterOption } from '@/components/filter-button'
 import { TraitCardStack, type TraitCardStackTrait } from '@/components/trait-card-stack'
 import {
@@ -29,6 +30,7 @@ export function HindrancesStep() {
   const form = useFormContext<CharacterFormValues>()
   const selectedIds = useWatch({ control: form.control, name: 'hindrances' }) ?? []
   const [severities, setSeverities] = useState<string[]>([])
+  const [search, setSearch] = useState('')
   const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useGraphqlInfiniteQuery<HindrancesQuery>(
       ['hindrances'],
@@ -47,12 +49,22 @@ export function HindrancesStep() {
   const hindrances = (data?.pages ?? [])
     .flatMap((page) => page.hindrances.nodes ?? [])
     .flatMap((hindrance) => (hindrance ? [hindrance] : []))
-  const filteredHindrances = hindrances.filter((hindrance) => {
+  const severityFilteredHindrances = hindrances.filter((hindrance) => {
     if (severities.length === 0) return true
     if (hindrance.severity === 'minor_or_major') return true
 
     return severities.includes(hindrance.severity)
   })
+  const normalizedSearch = search.trim().toLowerCase()
+  const filteredHindrances = normalizedSearch
+    ? severityFilteredHindrances.filter((hindrance) =>
+        hindrance.name.toLowerCase().includes(normalizedSearch),
+      )
+    : severityFilteredHindrances
+  const searchOptions = severityFilteredHindrances.map((hindrance) => ({
+    value: hindrance.id,
+    label: hindrance.name,
+  }))
   const traits: TraitCardStackTrait[] = filteredHindrances.map((hindrance) => ({
     title: hindrance.name,
     eyebrow: severityLabels[hindrance.severity],
@@ -83,13 +95,23 @@ export function HindrancesStep() {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <FilterButton
-          label="Severity"
-          options={severityOptions}
-          multiple
-          value={severities}
-          onValueChange={setSeverities}
-        />
+        <div className="flex flex-wrap items-center gap-3">
+          <FilterButton
+            label="Severity"
+            options={severityOptions}
+            multiple
+            value={severities}
+            onValueChange={setSeverities}
+          />
+          <AutocompleteInput
+            aria-label="Search hindrances"
+            options={searchOptions}
+            value={search}
+            onValueChange={setSearch}
+            placeholder="Search hindrances"
+            className="w-full sm:w-64"
+          />
+        </div>
         {!isLoadingAll && !isError ? (
           <p className="text-muted-foreground text-sm" aria-live="polite">
             {filteredHindrances.length}{' '}
@@ -107,7 +129,7 @@ export function HindrancesStep() {
       ) : null}
 
       {!isLoadingAll && !isError && filteredHindrances.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No hindrances match the selected severity.</p>
+        <p className="text-muted-foreground text-sm">No hindrances match the selected filters.</p>
       ) : null}
 
       {!isLoadingAll && !isError && filteredHindrances.length > 0 ? (
