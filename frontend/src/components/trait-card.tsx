@@ -23,7 +23,7 @@ type TraitCardProps = Omit<React.ComponentProps<'button'>, 'title'> & {
   title: string
   eyebrow?: string
   eyebrowToggle?: TraitCardEyebrowToggle
-  description?: string
+  description?: React.ReactNode
   backgroundImage?: string
   size?: TraitCardSize
   selected?: boolean

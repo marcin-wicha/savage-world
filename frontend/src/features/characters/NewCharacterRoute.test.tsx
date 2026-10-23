@@ -12,6 +12,7 @@ vi.mock('@/lib/api-client', async (importOriginal) => {
     ...actual,
     graphqlRequest: vi.fn().mockResolvedValue({
       hindrances: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
+      skills: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
     }),
   }
 })

@@ -38,6 +38,8 @@ type TraitCardStackProps = Omit<React.ComponentProps<'div'>, 'children' | 'onSel
   traits: TraitCardStackTrait[]
   size?: TraitCardSize
   revealedCount?: number
+  columns?: number
+  rows?: number
   defaultOpen?: boolean
   onOpenChange?: (open: boolean) => void
   onSelect?: (trait: TraitCardStackTrait, index: number) => void
@@ -48,6 +50,8 @@ function TraitCardStack({
   traits,
   size = 'md',
   revealedCount = 3,
+  columns,
+  rows = 1,
   defaultOpen = false,
   onOpenChange,
   onSelect,
@@ -57,14 +61,19 @@ function TraitCardStack({
   const [open, setOpen] = React.useState(defaultOpen)
   const [page, setPage] = React.useState(0)
   const { width, height } = traitCardSizes[size]
-  const pageSize =
-    traits.length === 0 ? 0 : Math.min(Math.max(Math.floor(revealedCount), 1), traits.length)
+  const columnCount =
+    traits.length === 0
+      ? 0
+      : Math.min(Math.max(Math.floor(columns ?? revealedCount), 1), traits.length)
+  const rowCount = Math.max(Math.floor(rows), 1)
+  const pageSize = columnCount === 0 ? 0 : Math.min(columnCount * rowCount, traits.length)
   const pageCount = pageSize === 0 ? 0 : Math.ceil(traits.length / pageSize)
   const safePage = pageCount === 0 ? 0 : Math.min(page, pageCount - 1)
   const pageStart = safePage * pageSize
   const visibleTraits = traits.slice(pageStart, pageStart + pageSize)
   const rowWidth =
-    pageSize > 0 ? pageSize * width + Math.max(pageSize - 1, 0) * traitCardRowGap : width
+    columnCount > 0 ? columnCount * width + Math.max(columnCount - 1, 0) * traitCardRowGap : width
+  const gridHeight = rowCount * height + Math.max(rowCount - 1, 0) * traitCardRowGap
 
   const reveal = () => {
     if (open) return
@@ -87,9 +96,9 @@ function TraitCardStack({
     <div
       data-slot="trait-card-stack"
       data-open={open}
-      style={{ width: open ? rowWidth : width, height }}
+      style={{ width: open ? rowWidth : width, height: open ? gridHeight : height }}
       className={cn(
-        'relative transition-[width] duration-700 ease-out [perspective:1200px] motion-reduce:transition-none',
+        'relative transition-[width,height] duration-700 ease-out [perspective:1200px] motion-reduce:transition-none',
         className,
       )}
       {...props}
@@ -154,7 +163,11 @@ function TraitCardStack({
             <div
               key={safePage}
               data-slot="trait-card-stack-row"
-              className="animate-in fade-in zoom-in-95 flex h-full w-full items-center justify-center gap-4 duration-300 motion-reduce:animate-none"
+              style={{
+                gridTemplateColumns: `repeat(${columnCount}, ${width}px)`,
+                gridTemplateRows: `repeat(${rowCount}, ${height}px)`,
+              }}
+              className="animate-in fade-in zoom-in-95 grid h-full w-full place-content-center gap-4 duration-300 motion-reduce:animate-none"
             >
               {visibleTraits.map((trait, index) => (
                 <TraitCard

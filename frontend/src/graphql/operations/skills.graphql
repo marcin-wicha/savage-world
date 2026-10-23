@@ -1,0 +1,17 @@
+query Skills($first: Int, $after: String) {
+  skills(first: $first, after: $after) {
+    nodes {
+      id
+      name
+      slug
+      attribute
+      core
+      source_book
+      source_page
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

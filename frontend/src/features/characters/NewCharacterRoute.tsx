@@ -9,6 +9,7 @@ import { AttributesStep } from './AttributesStep'
 import { ConceptStep } from './ConceptStep'
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { HindrancesStep } from './HindrancesStep'
+import { SkillsStep } from './SkillsStep'
 import {
   type CharacterFormValues,
   type CharacterStepId,
@@ -103,11 +104,13 @@ export function NewCharacterRoute() {
         <HindrancesStep />
       ) : step.id === 'attributes' ? (
         <AttributesStep />
+      ) : step.id === 'skills' ? (
+        <SkillsStep />
       ) : (
         <PlaceholderStep
           heading={step.heading}
           description={step.description}
-          showHindrancePoints={step.id === 'skills' || step.id === 'gear' || step.id === 'summary'}
+          showHindrancePoints={step.id === 'gear' || step.id === 'summary'}
         />
       ),
   }))

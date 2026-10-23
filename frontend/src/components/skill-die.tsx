@@ -17,6 +17,7 @@ type SkillDieProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   label?: string
   showModifier?: boolean
   maxDie?: SkillDieType | null
+  disabledDice?: SkillDieType[]
   disabled?: boolean
   readOnly?: boolean
 }
@@ -37,6 +38,7 @@ function SkillDie({
   label = 'Skill die',
   showModifier = true,
   maxDie = null,
+  disabledDice = [],
   disabled = false,
   readOnly = false,
   className,
@@ -94,6 +96,7 @@ function SkillDie({
           pressed={activeDie === option}
           disabled={
             disabled ||
+            disabledDice.includes(option) ||
             (maxDie !== null && skillDieTypes.indexOf(option) > skillDieTypes.indexOf(maxDie))
           }
           onPressedChange={(pressed) => {

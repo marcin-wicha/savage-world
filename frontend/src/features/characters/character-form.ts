@@ -22,7 +22,10 @@ export const characterFormSchema = z.object({
     strength: attributeDieSchema,
     vigor: attributeDieSchema,
   }),
+  skills: z.array(z.string()),
+  skill_dice: z.record(z.string(), attributeDieSchema),
   attribute_hindrance_points_spent: z.number().int().min(0).max(4),
+  skill_hindrance_points_spent: z.number().int().min(0).max(4),
   hindrance_points_earned: z.number().int().min(0).max(4),
   hindrance_points_spent: z.number().int().min(0).max(4),
 })
@@ -43,7 +46,10 @@ export const characterFormDefaults: CharacterFormValues = {
     strength: 'd4',
     vigor: 'd4',
   },
+  skills: [],
+  skill_dice: {},
   attribute_hindrance_points_spent: 0,
+  skill_hindrance_points_spent: 0,
   hindrance_points_earned: 0,
   hindrance_points_spent: 0,
 }
@@ -56,7 +62,7 @@ export const characterStepFields: Record<CharacterStepId, FieldPath<CharacterFor
   origin: [],
   hindrances: ['hindrances'],
   attributes: ['attributes'],
-  skills: [],
+  skills: ['skills'],
   gear: [],
   summary: [],
 }
