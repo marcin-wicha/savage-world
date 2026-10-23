@@ -1,12 +1,6 @@
 import * as React from 'react'
 
-import D4Icon from '@icons/d4_number.svg?react'
-import D6Icon from '@icons/d6_number.svg?react'
-import D8Icon from '@icons/d8_number.svg?react'
-import D10Icon from '@icons/d10_number.svg?react'
-import D12Icon from '@icons/d12_number.svg?react'
-import D20Icon from '@icons/d20_number.svg?react'
-
+import { DiceIcon } from '@/components/dice-icon'
 import { type DiceType } from '@/components/dice-types'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -23,15 +17,6 @@ const iconSizes = {
   icon: 'size-10',
   'icon-lg': 'size-12',
 } satisfies Record<ButtonSize, string>
-
-const diceIcons = {
-  d4: D4Icon,
-  d6: D6Icon,
-  d8: D8Icon,
-  d10: D10Icon,
-  d12: D12Icon,
-  d20: D20Icon,
-} satisfies Record<DiceType, React.ComponentType<React.ComponentProps<'svg'>>>
 
 type DiceToggleProps = Omit<React.ComponentProps<'button'>, 'children'> & {
   dice: DiceType
@@ -56,7 +41,6 @@ function DiceToggle({
 }: DiceToggleProps) {
   const [uncontrolledPressed, setUncontrolledPressed] = React.useState(defaultPressed)
   const isPressed = pressed ?? uncontrolledPressed
-  const Icon = diceIcons[dice]
   const iconSize = iconSizes[size ?? 'icon']
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -88,7 +72,7 @@ function DiceToggle({
       )}
       {...props}
     >
-      <Icon className={iconSize} aria-hidden="true" />
+      <DiceIcon dice={dice} className={iconSize} />
     </Button>
   )
 }

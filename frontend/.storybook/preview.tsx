@@ -25,6 +25,7 @@ const preview: Preview = {
             'Separator',
             'Multi Step Flow',
             'Dice Toggle',
+            'Skill Die',
           ],
         ],
       },
