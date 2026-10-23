@@ -2,15 +2,8 @@ import * as React from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { traitCardSizes, type TraitCardSize } from '@/components/trait-card-sizes'
 import { cn } from '@/lib/utils'
-
-const traitCardSizes = {
-  sm: { width: 160, height: 224 },
-  md: { width: 224, height: 314 },
-  lg: { width: 288, height: 403 },
-} as const
-
-type TraitCardSize = keyof typeof traitCardSizes
 
 type TraitCardProps = Omit<React.ComponentProps<'button'>, 'title'> & {
   title: string
@@ -100,4 +93,4 @@ function TraitCard({
   )
 }
 
-export { TraitCard, type TraitCardProps, type TraitCardSize }
+export { TraitCard, type TraitCardProps }
