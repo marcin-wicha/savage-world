@@ -36,8 +36,9 @@ bin/setup
 bin/dev
 ```
 
-This runs the Rails server on `http://localhost:3000` and the Vite dev server on
-its default port. The Vite dev server proxies `/api` and `/graphql` to Rails so
+This starts the local PostgreSQL server if it is not already running, then runs
+the Rails server on `http://localhost:3000` and the Vite dev server on its
+default port. The Vite dev server proxies `/api` and `/graphql` to Rails so
 session cookies remain same-origin during development.
 
 PostgreSQL must be running before `bin/setup` prepares the database. Configure a

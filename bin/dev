@@ -12,6 +12,49 @@ run_pnpm() {
   fi
 }
 
+start_postgres() {
+  local pg_root pg_data pg_isready pg_ctl
+
+  pg_data="${PGDATA:-$HOME/.local/share/savage-worlds/postgres}"
+
+  if command -v mise >/dev/null 2>&1; then
+    pg_root="$(mise where postgres@17.11 2>/dev/null || true)"
+  fi
+
+  if [ -n "${pg_root:-}" ]; then
+    pg_isready="$pg_root/bin/pg_isready"
+    pg_ctl="$pg_root/bin/pg_ctl"
+  else
+    pg_isready="$(command -v pg_isready || true)"
+    pg_ctl="$(command -v pg_ctl || true)"
+  fi
+
+  if [ -n "$pg_isready" ] && "$pg_isready" -h localhost -p 5432 >/dev/null 2>&1; then
+    return
+  fi
+
+  if [ -z "$pg_ctl" ] || [ ! -d "$pg_data" ]; then
+    echo "PostgreSQL is not running and could not be started automatically." >&2
+    echo "Start it manually or initialize it at $pg_data." >&2
+    return 1
+  fi
+
+  "$pg_ctl" -D "$pg_data" -l "$pg_data.log" -o "-p 5432" start
+
+  for _ in {1..30}; do
+    if "$pg_isready" -h localhost -p 5432 >/dev/null 2>&1; then
+      return
+    fi
+
+    sleep 0.2
+  done
+
+  echo "PostgreSQL did not become ready on localhost:5432." >&2
+  return 1
+}
+
+start_postgres
+
 trap 'kill 0' EXIT INT TERM
 
 "$ROOT/backend/bin/rails" server -p 3000 &

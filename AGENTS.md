@@ -185,7 +185,7 @@ bundle config set --local build.pg \
 
 ```bash
 bin/setup          # Install backend and frontend dependencies
-bin/dev            # Run Rails and Vite together
+bin/dev            # Start PostgreSQL if needed, then run Rails and Vite together
 bin/ci             # Run backend and frontend quality checks
 ```
 
@@ -587,8 +587,9 @@ assets. The entrypoint runs `bin/rails db:prepare` before starting the server.
 
 ## Known constraints and operational notes
 
-- PostgreSQL is not started automatically by `bin/setup` or `bin/ci`. Start it
-  first; otherwise boot/specs fail with `PG::ConnectionBad`.
+- `bin/dev` starts the local PostgreSQL server when it is not already running.
+  `bin/setup` and `bin/ci` do not; start PostgreSQL first, otherwise they fail
+  with `PG::ConnectionBad`.
 - On this workstation, Docker is available as `docker.exe` rather than `docker`
   inside the Linux shell. Docker builds have been verified with that command.
 - The `backend/.bundle/config` file may contain a machine-local `pg` build path.
