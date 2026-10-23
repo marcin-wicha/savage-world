@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Switch } from '@/components/ui/switch'
 import { traitCardSizes, type TraitCardSize } from '@/components/trait-card-sizes'
 import { cn } from '@/lib/utils'
 
@@ -11,9 +12,17 @@ const descriptionMaxHeightClasses: Record<TraitCardSize, string> = {
   lg: 'max-h-72',
 }
 
+type TraitCardEyebrowToggle = {
+  offLabel: string
+  onLabel: string
+  pressed: boolean
+  onToggle: () => void
+}
+
 type TraitCardProps = Omit<React.ComponentProps<'button'>, 'title'> & {
   title: string
   eyebrow?: string
+  eyebrowToggle?: TraitCardEyebrowToggle
   description?: string
   backgroundImage?: string
   size?: TraitCardSize
@@ -23,6 +32,7 @@ type TraitCardProps = Omit<React.ComponentProps<'button'>, 'title'> & {
 function TraitCard({
   title,
   eyebrow,
+  eyebrowToggle,
   description,
   backgroundImage,
   size = 'md',
@@ -48,7 +58,11 @@ function TraitCard({
         className,
       )}
     >
-      <div data-slot="trait-card-art" aria-hidden="true" className="absolute inset-0">
+      <div
+        data-slot="trait-card-art"
+        aria-hidden={eyebrowToggle ? undefined : true}
+        className="absolute inset-0"
+      >
         {backgroundImage ? (
           <img
             data-slot="trait-card-artwork"
@@ -61,7 +75,29 @@ function TraitCard({
           />
         ) : null}
 
-        {eyebrow ? (
+        {eyebrow && eyebrowToggle ? (
+          <div
+            data-slot="trait-card-eyebrow-toggle"
+            className="bg-background/90 text-foreground border-border/60 absolute top-3 left-3 z-30 inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-medium tracking-[0.12em] uppercase backdrop-blur-sm"
+          >
+            <span
+              className={cn('text-muted-foreground', !eyebrowToggle.pressed && 'text-foreground')}
+            >
+              {eyebrowToggle.offLabel}
+            </span>
+            <Switch
+              checked={eyebrowToggle.pressed}
+              aria-label={`Set ${title} to ${(eyebrowToggle.pressed ? eyebrowToggle.offLabel : eyebrowToggle.onLabel).toLowerCase()}`}
+              onCheckedChange={() => eyebrowToggle.onToggle()}
+              onClick={(event) => event.stopPropagation()}
+            />
+            <span
+              className={cn('text-muted-foreground', eyebrowToggle.pressed && 'text-foreground')}
+            >
+              {eyebrowToggle.onLabel}
+            </span>
+          </div>
+        ) : eyebrow ? (
           <Badge
             variant="outline"
             className="bg-background/90 text-foreground border-border/60 absolute top-3 left-3 z-10 tracking-[0.18em] uppercase backdrop-blur-sm"

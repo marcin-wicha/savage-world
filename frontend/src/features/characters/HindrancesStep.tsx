@@ -24,11 +24,19 @@ const severityLabels: Record<HindranceSeverity, string> = {
   minor_or_major: 'Minor or Major',
 }
 
+type ConcreteHindranceSeverity = Exclude<HindranceSeverity, 'minor_or_major'>
+
 const hindranceArtwork = (slug: string) => `/traits/hindrances/${slug}.png`
+const maxHindrancePoints = 4
+const hindrancePointValues: Record<ConcreteHindranceSeverity, number> = {
+  minor: 1,
+  major: 2,
+}
 
 export function HindrancesStep() {
   const form = useFormContext<CharacterFormValues>()
   const selectedIds = useWatch({ control: form.control, name: 'hindrances' }) ?? []
+  const selectedSeverities = useWatch({ control: form.control, name: 'hindrance_severities' }) ?? {}
   const [severities, setSeverities] = useState<string[]>([])
   const [search, setSearch] = useState('')
   const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
@@ -65,13 +73,72 @@ export function HindrancesStep() {
     value: hindrance.id,
     label: hindrance.name,
   }))
-  const traits: TraitCardStackTrait[] = filteredHindrances.map((hindrance) => ({
-    title: hindrance.name,
-    eyebrow: severityLabels[hindrance.severity],
-    description: hindrance.description || hindrance.requirements_text || undefined,
-    backgroundImage: hindranceArtwork(hindrance.slug),
-    selected: selectedIds.includes(hindrance.id),
-  }))
+  const selectedIdSet = new Set(selectedIds)
+  const effectiveSeverityFor = (hindrance: {
+    id: string
+    severity: HindranceSeverity
+  }): ConcreteHindranceSeverity => {
+    if (hindrance.severity === 'minor_or_major') {
+      return selectedSeverities[hindrance.id] ?? 'minor'
+    }
+
+    return hindrance.severity
+  }
+  const selectedPointRange = hindrances.reduce(
+    (range, hindrance) => {
+      if (!selectedIdSet.has(hindrance.id)) return range
+
+      const points = hindrancePointValues[effectiveSeverityFor(hindrance)]
+
+      return {
+        minimum: range.minimum + points,
+        maximum: range.maximum + points,
+      }
+    },
+    { minimum: 0, maximum: 0 },
+  )
+  const pointsSummary =
+    selectedPointRange.minimum === selectedPointRange.maximum
+      ? `${selectedPointRange.minimum} / ${maxHindrancePoints}`
+      : `${selectedPointRange.minimum}–${selectedPointRange.maximum} / ${maxHindrancePoints}`
+  const minimumRemainingPoints = Math.max(maxHindrancePoints - selectedPointRange.maximum, 0)
+  const maximumRemainingPoints = Math.max(maxHindrancePoints - selectedPointRange.minimum, 0)
+  const remainingSummary =
+    minimumRemainingPoints === maximumRemainingPoints
+      ? `${minimumRemainingPoints} points available to spend on later steps.`
+      : `${minimumRemainingPoints}–${maximumRemainingPoints} points available to spend on later steps.`
+  const pointsProgress = Math.min((selectedPointRange.maximum / maxHindrancePoints) * 100, 100)
+  const toggleSeverity = (hindranceId: string) => {
+    const currentSeverity = selectedSeverities[hindranceId] ?? 'minor'
+    const nextSeverity = currentSeverity === 'minor' ? 'major' : 'minor'
+
+    form.setValue(
+      'hindrance_severities',
+      { ...selectedSeverities, [hindranceId]: nextSeverity },
+      { shouldDirty: true, shouldTouch: true },
+    )
+  }
+
+  const traits: TraitCardStackTrait[] = filteredHindrances.map((hindrance) => {
+    const effectiveSeverity = effectiveSeverityFor(hindrance)
+
+    return {
+      title: hindrance.name,
+      eyebrow: severityLabels[effectiveSeverity],
+      eyebrowToggle:
+        hindrance.severity === 'minor_or_major'
+          ? {
+              offLabel: severityLabels.minor,
+              onLabel: severityLabels.major,
+              pressed: effectiveSeverity === 'major',
+              onToggle: () => toggleSeverity(hindrance.id),
+            }
+          : undefined,
+      description: hindrance.description || hindrance.requirements_text || undefined,
+      backgroundImage: hindranceArtwork(hindrance.slug),
+      selected: selectedIds.includes(hindrance.id),
+    }
+  })
 
   const handleSelect = (_trait: TraitCardStackTrait, index: number) => {
     const hindrance = filteredHindrances[index]
@@ -92,6 +159,42 @@ export function HindrancesStep() {
         <p className="text-muted-foreground text-sm leading-6">
           Choose hindrances to earn points for edges, attributes, and skills.
         </p>
+      </div>
+
+      <div
+        role="status"
+        aria-live="polite"
+        className="border-border bg-muted/20 grid max-w-xl gap-3 rounded-lg border p-4"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="grid gap-1">
+            <p className="text-foreground text-sm font-medium">Hindrance points</p>
+            <p className="text-muted-foreground text-xs leading-5">
+              Earned from selected Hindrances for later creation steps.
+            </p>
+          </div>
+          <p
+            className="text-foreground shrink-0 text-lg font-semibold"
+            data-slot="hindrance-points"
+          >
+            {pointsSummary}
+          </p>
+        </div>
+        <div
+          role="progressbar"
+          aria-label="Hindrance points selected"
+          aria-valuemin={0}
+          aria-valuemax={maxHindrancePoints}
+          aria-valuenow={Math.min(selectedPointRange.maximum, maxHindrancePoints)}
+          aria-valuetext={`${pointsSummary} hindrance points selected`}
+          className="bg-muted h-2 overflow-hidden rounded-full"
+        >
+          <div
+            className="bg-primary h-full rounded-full transition-[width] duration-300"
+            style={{ width: `${pointsProgress}%` }}
+          />
+        </div>
+        <p className="text-muted-foreground text-xs">{remainingSummary}</p>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">

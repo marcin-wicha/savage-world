@@ -108,6 +108,7 @@ describe('HindrancesStep', () => {
     const user = await revealHindrances()
 
     expect(screen.getByText('5 hindrances')).toBeInTheDocument()
+    expect(screen.getByText('0 / 4')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bad Eyes' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bloodthirsty' })).toBeInTheDocument()
     expect(document.querySelector('img[src="/traits/hindrances/bad-eyes.png"]')).toBeInTheDocument()
@@ -138,7 +139,12 @@ describe('HindrancesStep', () => {
       expect(formRef.current?.getValues('hindrances')).toEqual(['1'])
     })
     expect(screen.getByRole('button', { name: 'Bad Eyes' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('1 / 4')).toBeInTheDocument()
 
+    await user.click(screen.getByRole('button', { name: 'Bloodthirsty' }))
+    expect(screen.getByText('3 / 4')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Bloodthirsty' }))
     await user.click(screen.getByRole('button', { name: 'Bad Eyes' }))
 
     await waitFor(() => {
@@ -148,6 +154,7 @@ describe('HindrancesStep', () => {
       'aria-pressed',
       'false',
     )
+    expect(screen.getByText('0 / 4')).toBeInTheDocument()
   })
 
   it('filters hindrances by search and fills from autocomplete suggestions', async () => {
@@ -166,6 +173,30 @@ describe('HindrancesStep', () => {
 
     expect(screen.getByRole('button', { name: 'Bloodthirsty' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Bad Eyes' })).not.toBeInTheDocument()
+  })
+
+  it('toggles the severity and points for a Minor-or-Major hindrance', async () => {
+    const formRef = renderStep()
+    const user = userEvent.setup()
+    const search = await screen.findByRole('combobox', { name: 'Search hindrances' })
+
+    await user.type(search, 'hard')
+    await user.click(await screen.findByRole('option', { name: 'Hard of Hearing' }))
+    await user.click(screen.getByRole('button', { name: /reveal hindrances traits/i }))
+
+    expect(screen.getByText('Minor')).toBeInTheDocument()
+    expect(screen.getByText('Major')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('switch', { name: 'Set Hard of Hearing to major' }))
+    expect(screen.getByRole('switch', { name: 'Set Hard of Hearing to minor' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Hard of Hearing' }))
+
+    await waitFor(() => {
+      expect(formRef.current?.getValues('hindrances')).toEqual(['4'])
+      expect(formRef.current?.getValues('hindrance_severities')).toEqual({ '4': 'major' })
+    })
+    expect(screen.getByText('2 / 4')).toBeInTheDocument()
   })
 
   it('shows an empty state when the filter excludes every hindrance', async () => {
