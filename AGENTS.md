@@ -460,6 +460,10 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   conditional class names.
 - Keep light/dark tokens in `src/index.css`; the app is dark by default via the
   `dark` class on `<html>`.
+- Import SVG icons from `frontend/Icons` as React components with the `?react`
+  suffix, for example `import D6Icon from '@icons/d6.svg?react'`. The shared
+  `vite-plugin-svgr` setup normalizes icon fills to `currentColor` and applies
+  a common viewBox.
 - Add a co-located `*.stories.tsx` file for every reusable primitive. Use
   `Design System/<Component>` as the title and `tags: ['autodocs']`.
 - Use `.storybook/preview.tsx` for global decorators and theme behavior.

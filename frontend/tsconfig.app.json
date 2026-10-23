@@ -18,7 +18,8 @@
 
     /* Path aliases */
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@icons/*": ["./Icons/*"]
     },
 
     /* Linting */

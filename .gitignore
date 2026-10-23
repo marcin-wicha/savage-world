@@ -6,6 +6,7 @@
 # OS and editor files
 .DS_Store
 Thumbs.db
+*:Zone.Identifier
 .idea/
 .vscode/
 *.swp

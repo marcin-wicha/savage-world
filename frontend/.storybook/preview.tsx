@@ -24,6 +24,7 @@ const preview: Preview = {
             'Label',
             'Separator',
             'Multi Step Flow',
+            'Dice Toggle',
           ],
         ],
       },
