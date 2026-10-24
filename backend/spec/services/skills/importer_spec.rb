@@ -93,6 +93,20 @@ RSpec.describe Skills::Importer do
     expect(Skill.count).to eq(0)
   end
 
+  it "imports descriptions from an overlay" do
+    skill_path = write_data("swade.yml", [ skill_attributes ])
+    overlay_path = File.join(@dir, "private/descriptions.yml")
+    FileUtils.mkdir_p(File.dirname(overlay_path))
+    File.write(overlay_path, YAML.safe_dump(
+      "book" => "SWADE",
+      "descriptions" => [ { "slug" => "test-skill", "description" => "A skill description." } ]
+    ))
+
+    described_class.new(paths: [ skill_path, overlay_path ]).call
+
+    expect(Skill.find_by!(slug: "test-skill").description).to eq("A skill description.")
+  end
+
   it "rejects invalid skills before writing anything" do
     path = write_data("swade.yml", [ skill_attributes("linked_attribute" => "luck") ])
 

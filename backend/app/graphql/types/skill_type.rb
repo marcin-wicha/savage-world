@@ -5,6 +5,7 @@ module Types
     field :slug, String, null: false
     field :attribute, String, null: false
     field :core, Boolean, null: false
+    field :description, String, null: true
     field :source_book, String, null: false
     field :source_page, Integer, null: false
 

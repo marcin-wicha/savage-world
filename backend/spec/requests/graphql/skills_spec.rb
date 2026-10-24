@@ -15,7 +15,8 @@ RSpec.describe "GraphQL skills", type: :request do
       linked_attribute: "smarts",
       core: true,
       source_book: "SWADE",
-      source_page: 30
+      source_page: 30,
+      description: "General knowledge."
     )
 
     execute(<<~GRAPHQL)
@@ -27,6 +28,7 @@ RSpec.describe "GraphQL skills", type: :request do
             slug
             attribute
             core
+            description
             source_book
             source_page
           }
@@ -43,6 +45,7 @@ RSpec.describe "GraphQL skills", type: :request do
       "slug" => "common-knowledge",
       "attribute" => "smarts",
       "core" => true,
+      "description" => "General knowledge.",
       "source_book" => "SWADE",
       "source_page" => 30
     )

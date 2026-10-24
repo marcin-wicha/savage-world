@@ -1,4 +1,4 @@
-query Skills($first: Int, $after: String) {
+query Skills($first: Int = 25, $after: String) {
   skills(first: $first, after: $after) {
     nodes {
       id
@@ -6,6 +6,7 @@ query Skills($first: Int, $after: String) {
       slug
       attribute
       core
+      description
       source_book
       source_page
     }

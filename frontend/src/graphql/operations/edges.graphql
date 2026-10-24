@@ -1,4 +1,4 @@
-query Edges($first: Int, $after: String) {
+query Edges($first: Int = 14, $after: String) {
   edges(first: $first, after: $after) {
     nodes {
       id
@@ -21,6 +21,7 @@ query Edges($first: Int, $after: String) {
         }
       }
       requirements_text
+      description
       repeatable
     }
     pageInfo {

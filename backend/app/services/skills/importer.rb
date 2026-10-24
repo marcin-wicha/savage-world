@@ -43,22 +43,56 @@ module Skills
       files = data_files
       raise ImportError, "No skill data files found" if files.empty?
 
-      files.flat_map do |file|
+      records = []
+      description_overlays = []
+      files.each do |file|
         document = YAML.safe_load_file(file, permitted_classes: [], aliases: false)
+        if document.is_a?(Hash) && document.key?("descriptions")
+          descriptions = document["descriptions"]
+          unless descriptions.is_a?(Array)
+            raise ImportError, "#{file} must contain a descriptions array"
+          end
+
+          description_overlays.concat(descriptions)
+          next
+        end
+
         skills = document.is_a?(Hash) ? document["skills"] : document
         unless skills.is_a?(Array)
           raise ImportError, "#{file} must contain a skills array"
         end
 
         book = document.is_a?(Hash) ? document["book"] : nil
-        skills.map do |skill|
+        skills.each do |skill|
           unless skill.is_a?(Hash)
             raise ImportError, "#{file} contains a non-object skill entry"
           end
 
           skill["source_book"] ||= book
-          skill
+          records << skill
         end
+      end
+
+      apply_description_overlays!(records, description_overlays)
+      records
+    end
+
+    def apply_description_overlays!(records, overlays)
+      unless overlays.all? { |overlay| overlay.is_a?(Hash) && overlay["slug"].present? && overlay.key?("description") }
+        raise ImportError, "Skill descriptions must include slug and description"
+      end
+
+      duplicates = overlays.group_by { |overlay| overlay["slug"] }
+        .select { |_slug, grouped| grouped.size > 1 }
+        .keys
+      raise ImportError, "Duplicate skill description slugs: #{duplicates.join(', ')}" if duplicates.any?
+
+      records_by_slug = records.index_by { |record| record["slug"] }
+      overlays.each do |overlay|
+        record = records_by_slug[overlay["slug"]]
+        raise ImportError, "Unknown skill description slug: #{overlay["slug"]}" unless record
+
+        record["description"] = overlay["description"]
       end
     end
 

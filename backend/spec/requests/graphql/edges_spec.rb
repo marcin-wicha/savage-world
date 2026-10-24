@@ -25,7 +25,8 @@ RSpec.describe "GraphQL edges", type: :request do
         }
       ],
       source_book: "SWADE",
-      source_page: 41
+      source_page: 41,
+      description: "A precise ranged attack."
     )
 
     execute(<<~GRAPHQL)
@@ -50,6 +51,7 @@ RSpec.describe "GraphQL edges", type: :request do
               clauses { kind skill die }
             }
             requirements_text
+            description
             source_book
             source_page
             repeatable
@@ -68,6 +70,7 @@ RSpec.describe "GraphQL edges", type: :request do
       "category" => "combat",
       "minimum_rank" => "novice",
       "requirements_text" => "Novice, Wild Card, Athletics d8+ or Shooting d8+",
+      "description" => "A precise ranged attack.",
       "source_book" => "SWADE",
       "source_page" => 41,
       "repeatable" => false

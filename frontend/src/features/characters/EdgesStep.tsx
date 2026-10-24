@@ -57,7 +57,7 @@ export function EdgesStep() {
     useGraphqlInfiniteQuery<EdgesQuery>(
       ['edges'],
       EdgesDocument,
-      (after) => ({ first: 15, after }),
+      (after) => ({ first: 14, after }),
       (page) => (page.edges?.pageInfo.hasNextPage ? page.edges.pageInfo.endCursor : null),
     )
   const isLoadingAll = isPending || hasNextPage
@@ -162,7 +162,7 @@ export function EdgesStep() {
     return {
       title: edge.name,
       eyebrow: minimumRankLabel ? `${minimumRankLabel} · ${categoryLabel}` : categoryLabel,
-      description: edge.requirements_text || undefined,
+      description: edge.description || edge.requirements_text || undefined,
       backgroundImage: edgeArtwork(edge.slug),
       selected: isSelected,
       disabled: !isSelected && availableForEdges < edgeHindrancePointCost,

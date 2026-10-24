@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_23_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_24_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,6 +65,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_160000) do
     t.boolean "repeatable", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "description"
     t.index ["category", "minimum_rank"], name: "index_edges_on_category_and_minimum_rank"
     t.index ["slug"], name: "index_edges_on_slug", unique: true
     t.index ["source_book"], name: "index_edges_on_source_book"
@@ -112,6 +113,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_160000) do
     t.integer "source_page", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "description"
     t.index ["linked_attribute"], name: "index_skills_on_linked_attribute"
     t.index ["slug"], name: "index_skills_on_slug", unique: true
     t.index ["source_book"], name: "index_skills_on_source_book"

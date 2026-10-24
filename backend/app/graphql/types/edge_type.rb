@@ -7,6 +7,7 @@ module Types
     field :minimum_rank, Types::RankEnum, null: false
     field :requirements, [ Types::RequirementType ], null: false
     field :requirements_text, String, null: false
+    field :description, String, null: true
     field :source_book, String, null: false
     field :source_page, Integer, null: false
     field :repeatable, Boolean, null: false

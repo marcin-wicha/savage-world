@@ -1,5 +1,6 @@
 type Edge {
   category: EdgeCategory!
+  description: String
   id: ID!
   minimum_rank: Rank!
   name: String!
@@ -312,6 +313,7 @@ enum RequirementKind {
 type Skill {
   attribute: String!
   core: Boolean!
+  description: String
   id: ID!
   name: String!
   slug: String!

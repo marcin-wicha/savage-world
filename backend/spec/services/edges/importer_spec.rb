@@ -130,6 +130,20 @@ RSpec.describe Edges::Importer do
     expect(Edge.count).to eq(0)
   end
 
+  it "imports descriptions from an overlay" do
+    edge_path = write_data("swade.yml", [ edge_attributes ])
+    overlay_path = File.join(@dir, "private/descriptions.yml")
+    FileUtils.mkdir_p(File.dirname(overlay_path))
+    File.write(overlay_path, YAML.safe_dump(
+      "book" => "SWADE",
+      "descriptions" => [ { "slug" => "test-edge", "description" => "An edge description." } ]
+    ))
+
+    described_class.new(paths: [ edge_path, overlay_path ]).call
+
+    expect(Edge.find_by!(slug: "test-edge").description).to eq("An edge description.")
+  end
+
   it "rejects invalid edges before writing anything" do
     path = write_data("swade.yml", [ edge_attributes("category" => "invalid") ])
 

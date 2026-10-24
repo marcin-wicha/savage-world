@@ -64,7 +64,7 @@ export function SkillsStep() {
     useGraphqlInfiniteQuery<SkillsQuery>(
       ['skills'],
       SkillsDocument,
-      (after) => ({ first: 40, after }),
+      (after) => ({ first: 25, after }),
       (page) => (page.skills.pageInfo.hasNextPage ? page.skills.pageInfo.endCursor : null),
     )
   const isLoadingAll = isPending || hasNextPage
@@ -198,16 +198,19 @@ export function SkillsStep() {
       title: skill.name,
       eyebrow: attributeLabel(skill.attribute),
       description: (
-        <SkillDie
-          die={isSelected ? currentDie : null}
-          label={`${skill.name} die`}
-          showModifier={false}
-          maxDie={maxDieFor(skill)}
-          disabledDice={skill.core ? ['d4'] : []}
-          disabled={cardDisabled}
-          onClick={(event) => event.stopPropagation()}
-          onDieChange={(nextDie) => handleDieChange(skill.id, nextDie)}
-        />
+        <div className="grid gap-2">
+          {skill.description ? <p>{skill.description}</p> : null}
+          <SkillDie
+            die={isSelected ? currentDie : null}
+            label={`${skill.name} die`}
+            showModifier={false}
+            maxDie={maxDieFor(skill)}
+            disabledDice={skill.core ? ['d4'] : []}
+            disabled={cardDisabled}
+            onClick={(event) => event.stopPropagation()}
+            onDieChange={(nextDie) => handleDieChange(skill.id, nextDie)}
+          />
+        </div>
       ),
       backgroundImage: skillArtwork(skill.slug),
       selected: isSelected,
