@@ -34,7 +34,7 @@ const categoryLabels: Record<EdgeCategory, string> = {
 
 const dieValues: Record<string, number> = { d4: 4, d6: 6, d8: 8, d10: 10, d12: 12 }
 const edgeArtwork = (slug: string) => `/traits/edges/${slug}.png`
-const edgeHindrancePointCost = 1
+const edgeHindrancePointCost = 2
 
 export function EdgesStep() {
   const form = useFormContext<CharacterFormValues>()
@@ -174,7 +174,7 @@ export function EdgesStep() {
       <div className="grid max-w-xl gap-2">
         <h2 className="text-foreground text-xl font-medium">Choose edges</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          Spend hindrance points to buy edges. Each edge costs one hindrance point.
+          Spend hindrance points to buy edges. Each edge costs two hindrance points.
         </p>
       </div>
 

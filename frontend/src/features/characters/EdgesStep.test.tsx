@@ -164,11 +164,11 @@ describe('EdgesStep', () => {
     await user.click(screen.getByRole('button', { name: 'Ace' }))
     await waitFor(() => {
       expect(formRef.current?.getValues('edges')).toEqual(['2'])
-      expect(formRef.current?.getValues('edge_hindrance_points_spent')).toBe(1)
-      expect(formRef.current?.getValues('hindrance_points_spent')).toBe(1)
+      expect(formRef.current?.getValues('edge_hindrance_points_spent')).toBe(2)
+      expect(formRef.current?.getValues('hindrance_points_spent')).toBe(2)
     })
     expect(screen.getByRole('button', { name: 'Ace' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByText('3 / 4')).toBeInTheDocument()
+    expect(screen.getByText('2 / 4')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Ace' }))
     await waitFor(() => {
