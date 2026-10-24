@@ -109,10 +109,20 @@ export function HindrancesStep() {
     form.setValue('hindrance_points_earned', earnedPoints)
   }, [form, isError, isLoadingAll, selectedPointRange.maximum])
 
-  const isAtPointMaximum = selectedPointRange.maximum >= maxHindrancePoints
   const toggleSeverity = (hindranceId: string) => {
+    const hindrance = hindrances.find((candidate) => candidate.id === hindranceId)
+
+    if (!hindrance) return
+
     const currentSeverity = selectedSeverities[hindranceId] ?? 'minor'
     const nextSeverity = currentSeverity === 'minor' ? 'major' : 'minor'
+    const selected = selectedIdSet.has(hindranceId)
+    const pointsAfterToggle =
+      selectedPointRange.maximum -
+      (selected ? hindrancePointValues[currentSeverity] : 0) +
+      hindrancePointValues[nextSeverity]
+
+    if (pointsAfterToggle > maxHindrancePoints) return
 
     form.setValue(
       'hindrance_severities',
@@ -123,6 +133,15 @@ export function HindrancesStep() {
 
   const traits: TraitCardStackTrait[] = filteredHindrances.map((hindrance) => {
     const effectiveSeverity = effectiveSeverityFor(hindrance)
+    const isSelected = selectedIds.includes(hindrance.id)
+    const pointsIfSelected =
+      selectedPointRange.maximum + (isSelected ? 0 : hindrancePointValues[effectiveSeverity])
+    const severityToggleDisabled =
+      hindrance.severity === 'minor_or_major' &&
+      selectedPointRange.maximum -
+        (isSelected ? hindrancePointValues[effectiveSeverity] : 0) +
+        hindrancePointValues[effectiveSeverity === 'minor' ? 'major' : 'minor'] >
+        maxHindrancePoints
 
     return {
       title: hindrance.name,
@@ -133,13 +152,14 @@ export function HindrancesStep() {
               offLabel: severityLabels.minor,
               onLabel: severityLabels.major,
               pressed: effectiveSeverity === 'major',
+              disabled: severityToggleDisabled,
               onToggle: () => toggleSeverity(hindrance.id),
             }
           : undefined,
       description: hindrance.description || hindrance.requirements_text || undefined,
       backgroundImage: hindranceArtwork(hindrance.slug),
-      selected: selectedIds.includes(hindrance.id),
-      disabled: isAtPointMaximum && !selectedIds.includes(hindrance.id),
+      selected: isSelected,
+      disabled: !isSelected && pointsIfSelected > maxHindrancePoints,
     }
   })
 
@@ -149,6 +169,14 @@ export function HindrancesStep() {
     if (!hindrance) return
 
     const isSelected = selectedIds.includes(hindrance.id)
+    if (
+      !isSelected &&
+      selectedPointRange.maximum + hindrancePointValues[effectiveSeverityFor(hindrance)] >
+        maxHindrancePoints
+    ) {
+      return
+    }
+
     const next = isSelected
       ? selectedIds.filter((id) => id !== hindrance.id)
       : [...selectedIds, hindrance.id]

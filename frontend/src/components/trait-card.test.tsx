@@ -12,6 +12,16 @@ describe('TraitCard', () => {
     expect(screen.getByText('Strike with reckless fury.')).toBeInTheDocument()
   })
 
+  it('renders header content in the sticky card header', () => {
+    const { container } = render(
+      <TraitCard title="Berserk" headerContent={<span>Die controls</span>} />,
+    )
+
+    const header = container.querySelector('[data-slot="card-header"]')
+
+    expect(header).toContainElement(screen.getByText('Die controls'))
+  })
+
   it('keeps long descriptions inside a scrollable card body', () => {
     const { container } = render(
       <TraitCard

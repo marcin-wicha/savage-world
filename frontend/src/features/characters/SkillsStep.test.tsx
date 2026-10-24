@@ -29,6 +29,7 @@ const skills = [
     core: true,
     source_book: 'SWADE',
     source_page: 29,
+    description: 'Run, jump, climb, and swim with athletic skill.',
   },
   {
     id: '2',
@@ -136,6 +137,22 @@ describe('SkillsStep', () => {
       screen.getByRole('button', { name: 'Athletics' }).closest('[data-slot="trait-card"]'),
     ).not.toHaveClass('opacity-50')
     expect(screen.getByText('Agility')).toBeInTheDocument()
+
+    const athleticsCard = screen
+      .getByRole('button', { name: 'Athletics' })
+      .closest('[data-slot="trait-card"]')
+    const athleticsDescription = athleticsCard?.querySelector(
+      '[data-slot="trait-card-description"]',
+    )
+    const athleticsHeader = athleticsCard?.querySelector('[data-slot="card-header"]')
+    const athleticsDice = screen.getByRole('group', { name: 'Athletics die' })
+
+    expect(athleticsDescription).toContainElement(
+      screen.getByText('Run, jump, climb, and swim with athletic skill.'),
+    )
+    expect(athleticsDescription).not.toContainElement(athleticsDice)
+    expect(athleticsHeader).toContainElement(athleticsDice)
+
     expect(
       within(screen.getByRole('group', { name: 'Athletics die' })).getByRole('button', {
         name: 'Toggle d4',

@@ -28,6 +28,7 @@ type TraitCardStackTrait = Pick<
   | 'eyebrow'
   | 'eyebrowToggle'
   | 'description'
+  | 'headerContent'
   | 'backgroundImage'
   | 'selected'
   | 'disabled'

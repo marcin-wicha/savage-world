@@ -16,6 +16,7 @@ type TraitCardEyebrowToggle = {
   offLabel: string
   onLabel: string
   pressed: boolean
+  disabled?: boolean
   onToggle: () => void
 }
 
@@ -24,6 +25,7 @@ type TraitCardProps = Omit<React.ComponentProps<'button'>, 'title'> & {
   eyebrow?: string
   eyebrowToggle?: TraitCardEyebrowToggle
   description?: React.ReactNode
+  headerContent?: React.ReactNode
   backgroundImage?: string
   size?: TraitCardSize
   selected?: boolean
@@ -34,6 +36,7 @@ function TraitCard({
   eyebrow,
   eyebrowToggle,
   description,
+  headerContent,
   backgroundImage,
   size = 'md',
   selected = false,
@@ -88,7 +91,7 @@ function TraitCard({
             </span>
             <Switch
               checked={eyebrowToggle.pressed}
-              disabled={disabled}
+              disabled={eyebrowToggle.disabled ?? disabled}
               aria-label={`Set ${title} to ${(eyebrowToggle.pressed ? eyebrowToggle.offLabel : eyebrowToggle.onLabel).toLowerCase()}`}
               onCheckedChange={() => eyebrowToggle.onToggle()}
               onClick={(event) => event.stopPropagation()}
@@ -117,6 +120,11 @@ function TraitCard({
           <CardTitle className="font-display text-foreground block text-lg leading-tight">
             {title}
           </CardTitle>
+          {headerContent ? (
+            <div className="pointer-events-auto mt-2" onClick={(event) => event.stopPropagation()}>
+              {headerContent}
+            </div>
+          ) : null}
         </CardHeader>
         {description ? (
           <div

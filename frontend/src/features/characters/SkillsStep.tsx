@@ -197,20 +197,18 @@ export function SkillsStep() {
     return {
       title: skill.name,
       eyebrow: attributeLabel(skill.attribute),
-      description: (
-        <div className="grid gap-2">
-          {skill.description ? <p>{skill.description}</p> : null}
-          <SkillDie
-            die={isSelected ? currentDie : null}
-            label={`${skill.name} die`}
-            showModifier={false}
-            maxDie={maxDieFor(skill)}
-            disabledDice={skill.core ? ['d4'] : []}
-            disabled={cardDisabled}
-            onClick={(event) => event.stopPropagation()}
-            onDieChange={(nextDie) => handleDieChange(skill.id, nextDie)}
-          />
-        </div>
+      description: skill.description || undefined,
+      headerContent: (
+        <SkillDie
+          die={isSelected ? currentDie : null}
+          label={`${skill.name} die`}
+          showModifier={false}
+          maxDie={maxDieFor(skill)}
+          disabledDice={skill.core ? ['d4'] : []}
+          disabled={cardDisabled}
+          onClick={(event) => event.stopPropagation()}
+          onDieChange={(nextDie) => handleDieChange(skill.id, nextDie)}
+        />
       ),
       backgroundImage: skillArtwork(skill.slug),
       selected: isSelected,

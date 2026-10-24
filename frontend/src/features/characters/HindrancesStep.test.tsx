@@ -157,20 +157,42 @@ describe('HindrancesStep', () => {
     expect(screen.getByText('0 / 4')).toBeInTheDocument()
   })
 
-  it('disables unselected hindrances when four points are selected', async () => {
+  it('disables hindrances that would exceed four points', async () => {
     renderStep()
     const user = await revealHindrances()
 
+    await user.click(screen.getByRole('button', { name: 'Bad Eyes' }))
     await user.click(screen.getByRole('button', { name: 'Bloodthirsty' }))
-    await user.click(screen.getByRole('button', { name: 'Next trait' }))
-    await user.click(screen.getByRole('button', { name: 'Yellow' }))
 
-    expect(screen.getByText('4 / 4')).toBeInTheDocument()
+    expect(screen.getByText('3 / 4')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Clumsy' })).not.toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: 'Next trait' }))
+
+    expect(screen.getByRole('button', { name: 'Yellow' })).toBeDisabled()
 
     await user.click(screen.getByRole('button', { name: 'Previous trait' }))
 
-    expect(screen.getByRole('button', { name: 'Clumsy' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Clumsy' })).not.toBeDisabled()
     expect(screen.getByRole('button', { name: 'Bloodthirsty' })).not.toBeDisabled()
+  })
+
+  it('prevents a minor-or-major hindrance from toggling past four points', async () => {
+    renderStep()
+    const user = await revealHindrances()
+
+    await user.click(screen.getByRole('button', { name: 'Bad Eyes' }))
+    await user.click(screen.getByRole('button', { name: 'Bloodthirsty' }))
+    await user.click(screen.getByRole('button', { name: 'Next trait' }))
+
+    const majorSwitch = screen.getByRole('switch', { name: 'Set Hard of Hearing to major' })
+
+    expect(majorSwitch).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Hard of Hearing' })).not.toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: 'Hard of Hearing' }))
+
+    expect(screen.getByText('4 / 4')).toBeInTheDocument()
   })
 
   it('filters hindrances by search and fills from autocomplete suggestions', async () => {
