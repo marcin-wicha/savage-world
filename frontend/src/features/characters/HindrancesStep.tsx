@@ -38,6 +38,7 @@ export function HindrancesStep() {
   const form = useFormContext<CharacterFormValues>()
   const selectedIds = useWatch({ control: form.control, name: 'hindrances' }) ?? []
   const selectedSeverities = useWatch({ control: form.control, name: 'hindrance_severities' }) ?? {}
+  const hindranceSlugs = useWatch({ control: form.control, name: 'hindrance_slugs' }) ?? {}
   const [severities, setSeverities] = useState<string[]>([])
   const [search, setSearch] = useState('')
   const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
@@ -147,10 +148,19 @@ export function HindrancesStep() {
 
     if (!hindrance) return
 
-    const next = selectedIds.includes(hindrance.id)
+    const isSelected = selectedIds.includes(hindrance.id)
+    const next = isSelected
       ? selectedIds.filter((id) => id !== hindrance.id)
       : [...selectedIds, hindrance.id]
+    const nextSlugs = { ...hindranceSlugs }
 
+    if (isSelected) {
+      delete nextSlugs[hindrance.id]
+    } else {
+      nextSlugs[hindrance.id] = hindrance.slug
+    }
+
+    form.setValue('hindrance_slugs', nextSlugs, { shouldDirty: true, shouldTouch: true })
     form.setValue('hindrances', next, { shouldDirty: true, shouldTouch: true })
   }
 

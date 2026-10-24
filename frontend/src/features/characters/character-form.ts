@@ -15,6 +15,7 @@ export const characterFormSchema = z.object({
   }),
   hindrances: z.array(z.string()),
   hindrance_severities: z.record(z.string(), selectedHindranceSeveritySchema),
+  hindrance_slugs: z.record(z.string(), z.string()),
   attributes: z.object({
     agility: attributeDieSchema,
     smarts: attributeDieSchema,
@@ -24,8 +25,11 @@ export const characterFormSchema = z.object({
   }),
   skills: z.array(z.string()),
   skill_dice: z.record(z.string(), attributeDieSchema),
+  skill_slugs: z.record(z.string(), z.string()),
+  edges: z.array(z.string()),
   attribute_hindrance_points_spent: z.number().int().min(0).max(4),
   skill_hindrance_points_spent: z.number().int().min(0).max(4),
+  edge_hindrance_points_spent: z.number().int().min(0).max(4),
   hindrance_points_earned: z.number().int().min(0).max(4),
   hindrance_points_spent: z.number().int().min(0).max(4),
 })
@@ -39,6 +43,7 @@ export const characterFormDefaults: CharacterFormValues = {
   },
   hindrances: [],
   hindrance_severities: {},
+  hindrance_slugs: {},
   attributes: {
     agility: 'd4',
     smarts: 'd4',
@@ -48,14 +53,17 @@ export const characterFormDefaults: CharacterFormValues = {
   },
   skills: [],
   skill_dice: {},
+  skill_slugs: {},
+  edges: [],
   attribute_hindrance_points_spent: 0,
   skill_hindrance_points_spent: 0,
+  edge_hindrance_points_spent: 0,
   hindrance_points_earned: 0,
   hindrance_points_spent: 0,
 }
 
 export type CharacterStepId =
-  'concept' | 'origin' | 'hindrances' | 'attributes' | 'skills' | 'gear' | 'summary'
+  'concept' | 'origin' | 'hindrances' | 'attributes' | 'skills' | 'edges' | 'gear' | 'summary'
 
 export const characterStepFields: Record<CharacterStepId, FieldPath<CharacterFormValues>[]> = {
   concept: ['concept.name', 'concept.description'],
@@ -63,6 +71,7 @@ export const characterStepFields: Record<CharacterStepId, FieldPath<CharacterFor
   hindrances: ['hindrances'],
   attributes: ['attributes'],
   skills: ['skills'],
+  edges: ['edges'],
   gear: [],
   summary: [],
 }

@@ -139,9 +139,17 @@ export function SkillsStep() {
     const nextSkillHindrancePointsSpent = Math.max(nextPointsSpent - defaultSkillPoints, 0)
     const nextHindrancePointsSpent =
       otherHindrancePointsSpent + attributeHindrancePointsSpent + nextSkillHindrancePointsSpent
+    const nextSkillSlugs = Object.fromEntries(
+      nextIds.flatMap((id) => {
+        const slug = skillById.get(id)?.slug
+
+        return slug ? [[id, slug]] : []
+      }),
+    )
 
     form.setValue('skills', nextIds, { shouldDirty: true, shouldTouch: true })
     form.setValue('skill_dice', nextDices, { shouldDirty: true, shouldTouch: true })
+    form.setValue('skill_slugs', nextSkillSlugs, { shouldDirty: true, shouldTouch: true })
     form.setValue('skill_hindrance_points_spent', nextSkillHindrancePointsSpent, {
       shouldDirty: true,
       shouldTouch: true,

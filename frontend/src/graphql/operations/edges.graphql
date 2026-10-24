@@ -1,0 +1,31 @@
+query Edges($first: Int, $after: String) {
+  edges(first: $first, after: $after) {
+    nodes {
+      id
+      name
+      slug
+      category
+      minimum_rank
+      requirements {
+        kind
+        attribute
+        die
+        skill
+        slug
+        clauses {
+          kind
+          attribute
+          die
+          skill
+          slug
+        }
+      }
+      requirements_text
+      repeatable
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

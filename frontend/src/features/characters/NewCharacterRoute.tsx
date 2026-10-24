@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 
 import { AttributesStep } from './AttributesStep'
 import { ConceptStep } from './ConceptStep'
+import { EdgesStep } from './EdgesStep'
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { HindrancesStep } from './HindrancesStep'
 import { SkillsStep } from './SkillsStep'
@@ -55,6 +56,12 @@ const stepDefinitions: StepDefinition[] = [
     title: 'Skills',
     heading: 'Choose skills',
     description: 'Spend skill points and pick the skills your character has trained.',
+  },
+  {
+    id: 'edges',
+    title: 'Edges',
+    heading: 'Choose edges',
+    description: 'Spend hindrance points to buy edges the current requirements allow.',
   },
   {
     id: 'gear',
@@ -106,6 +113,8 @@ export function NewCharacterRoute() {
         <AttributesStep />
       ) : step.id === 'skills' ? (
         <SkillsStep />
+      ) : step.id === 'edges' ? (
+        <EdgesStep />
       ) : (
         <PlaceholderStep
           heading={step.heading}

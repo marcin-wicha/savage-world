@@ -14,12 +14,14 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "query Edges($first: Int, $after: String) {\n  edges(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      category\n      minimum_rank\n      requirements {\n        kind\n        attribute\n        die\n        skill\n        slug\n        clauses {\n          kind\n          attribute\n          die\n          skill\n          slug\n        }\n      }\n      requirements_text\n      repeatable\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": typeof types.EdgesDocument,
     "query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n      description\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": typeof types.HindrancesDocument,
     "query Origins($first: Int, $after: String) {\n  origins(first: $first, after: $after) {\n    nodes {\n      id\n      created_at\n      updated_at\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": typeof types.OriginsDocument,
     "query Viewer {\n  viewer {\n    id\n    email_address\n  }\n}": typeof types.ViewerDocument,
     "query Skills($first: Int, $after: String) {\n  skills(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      attribute\n      core\n      source_book\n      source_page\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": typeof types.SkillsDocument,
 };
 const documents: Documents = {
+    "query Edges($first: Int, $after: String) {\n  edges(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      category\n      minimum_rank\n      requirements {\n        kind\n        attribute\n        die\n        skill\n        slug\n        clauses {\n          kind\n          attribute\n          die\n          skill\n          slug\n        }\n      }\n      requirements_text\n      repeatable\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.EdgesDocument,
     "query Hindrances($first: Int, $after: String) {\n  hindrances(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      severity\n      requirements_text\n      description\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.HindrancesDocument,
     "query Origins($first: Int, $after: String) {\n  origins(first: $first, after: $after) {\n    nodes {\n      id\n      created_at\n      updated_at\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}": types.OriginsDocument,
     "query Viewer {\n  viewer {\n    id\n    email_address\n  }\n}": types.ViewerDocument,
@@ -40,6 +42,10 @@ const documents: Documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query Edges($first: Int, $after: String) {\n  edges(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      category\n      minimum_rank\n      requirements {\n        kind\n        attribute\n        die\n        skill\n        slug\n        clauses {\n          kind\n          attribute\n          die\n          skill\n          slug\n        }\n      }\n      requirements_text\n      repeatable\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}"): (typeof documents)["query Edges($first: Int, $after: String) {\n  edges(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      slug\n      category\n      minimum_rank\n      requirements {\n        kind\n        attribute\n        die\n        skill\n        slug\n        clauses {\n          kind\n          attribute\n          die\n          skill\n          slug\n        }\n      }\n      requirements_text\n      repeatable\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

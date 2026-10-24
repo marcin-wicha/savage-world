@@ -44,6 +44,7 @@ describe('NewCharacterRoute', () => {
       'Hindrances',
       'Attributes',
       'Skills',
+      'Edges',
       'Gear',
       'Summary',
     ]) {
@@ -105,7 +106,7 @@ describe('NewCharacterRoute', () => {
     await user.click(screen.getByRole('button', { name: /next/i }))
     expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
 
-    for (let step = 0; step < 5; step += 1) {
+    for (let step = 0; step < 6; step += 1) {
       await user.click(screen.getByRole('button', { name: /next/i }))
     }
     expect(
