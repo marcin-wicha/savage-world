@@ -131,6 +131,10 @@ describe('SkillsStep', () => {
     expect(screen.getByText('0 / 4')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Athletics' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Academics' })).toBeInTheDocument()
+    expect(document.querySelector('img[src="/traits/skills/athletics.png"]')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Athletics' }).closest('[data-slot="trait-card"]'),
+    ).not.toHaveClass('opacity-50')
     expect(screen.getByText('Agility')).toBeInTheDocument()
     expect(
       within(screen.getByRole('group', { name: 'Athletics die' })).getByRole('button', {

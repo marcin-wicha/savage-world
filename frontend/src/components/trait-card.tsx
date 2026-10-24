@@ -55,7 +55,7 @@ function TraitCard({
         'group/trait focus-within:ring-ring/50 relative gap-0 overflow-hidden py-0 transition-[transform,box-shadow] duration-200 focus-within:ring-3',
         'hover:-translate-y-1 hover:shadow-[0_16px_32px_-12px_rgba(0,0,0,0.85)]',
         selected && 'ring-primary/40 -translate-y-0.5 ring-3',
-        'has-[button:disabled]:opacity-50',
+        disabled && 'opacity-50',
         className,
       )}
     >
