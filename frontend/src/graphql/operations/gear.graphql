@@ -1,0 +1,22 @@
+query Gear($first: Int = 20, $after: String) {
+  gear(first: $first, after: $after) {
+    nodes {
+      id
+      name
+      slug
+      category
+      cost
+      cost_text
+      requirements
+      effects
+      description
+      artwork_url
+      source_book
+      source_page
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

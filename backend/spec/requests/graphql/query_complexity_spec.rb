@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.describe "GraphQL frontend query complexity", type: :request do
   FRONTEND_OPERATIONS = {
     "edges.graphql" => { "first" => 14 },
+    "gear.graphql" => { "first" => 20 },
     "skills.graphql" => { "first" => 25 }
   }.freeze
 
