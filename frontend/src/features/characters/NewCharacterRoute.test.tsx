@@ -1,7 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 import { NewCharacterRoute } from './NewCharacterRoute'
 
@@ -24,12 +26,14 @@ function renderRoute() {
 
   render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/characters/new']}>
-        <Routes>
-          <Route path="/characters/new" element={<NewCharacterRoute />} />
-          <Route path="/characters" element={<h1>Characters page</h1>} />
-        </Routes>
-      </MemoryRouter>
+      <TooltipProvider>
+        <MemoryRouter initialEntries={['/characters/new']}>
+          <Routes>
+            <Route path="/characters/new" element={<NewCharacterRoute />} />
+            <Route path="/characters" element={<h1>Characters page</h1>} />
+          </Routes>
+        </MemoryRouter>
+      </TooltipProvider>
     </QueryClientProvider>,
   )
 }
@@ -70,6 +74,7 @@ describe('NewCharacterRoute', () => {
     await user.click(screen.getByRole('button', { name: /next/i }))
 
     expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /derived statistics/i })).toBeInTheDocument()
   })
 
   it('keeps the hindrance point balance visible after the Hindrances step', async () => {
@@ -85,6 +90,26 @@ describe('NewCharacterRoute', () => {
     expect(await screen.findByRole('heading', { name: /assign attributes/i })).toBeInTheDocument()
     expect(screen.getByText('Hindrance points')).toBeInTheDocument()
     expect(screen.getByText('0 / 4')).toBeInTheDocument()
+  })
+
+  it('recalculates Toughness when Vigor changes on the Attributes step', async () => {
+    const user = userEvent.setup()
+
+    renderRoute()
+
+    await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(screen.getByRole('button', { name: /next/i }))
+
+    expect(await screen.findByRole('heading', { name: /assign attributes/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /toughness: 4\(0\)/i })).toBeInTheDocument()
+
+    const vigorGroup = screen.getByRole('group', { name: /vigor die/i })
+    await user.click(within(vigorGroup).getByRole('button', { name: /d6/i }))
+
+    expect(screen.getByRole('button', { name: /toughness: 5\(0\)/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /toughness: 4\(0\)/i })).not.toBeInTheDocument()
   })
 
   it('returns to the roster from the first step', async () => {

@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-flow'
 import { Card, CardContent } from '@/components/ui/card'
 
 import { AttributesStep } from './AttributesStep'
+import { DerivedStatistics } from './DerivedStatistics'
 import { ConceptStep } from './ConceptStep'
 import { EdgesStep } from './EdgesStep'
 import { HindrancePointsBalance } from './HindrancePointsBalance'
@@ -100,11 +101,10 @@ export function NewCharacterRoute() {
     defaultValues: characterFormDefaults,
     mode: 'onTouched',
   })
+  const vigor = useWatch({ control: form.control, name: 'attributes.vigor' })
 
-  const steps: MultiStepFlowStep[] = stepDefinitions.map((step) => ({
-    id: step.id,
-    title: step.title,
-    content:
+  const steps: MultiStepFlowStep[] = stepDefinitions.map((step, index) => {
+    const content =
       step.id === 'concept' ? (
         <ConceptStep />
       ) : step.id === 'hindrances' ? (
@@ -121,8 +121,22 @@ export function NewCharacterRoute() {
           description={step.description}
           showHindrancePoints={step.id === 'gear' || step.id === 'summary'}
         />
-      ),
-  }))
+      )
+
+    return {
+      id: step.id,
+      title: step.title,
+      content:
+        index >= 1 ? (
+          <div className="grid gap-6">
+            <DerivedStatistics vigor={vigor} />
+            {content}
+          </div>
+        ) : (
+          content
+        ),
+    }
+  })
 
   const validateStep = (index: number) =>
     form.trigger(characterStepFields[stepDefinitions[index].id])
