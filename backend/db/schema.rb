@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_24_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_24_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -71,6 +71,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_120000) do
     t.index ["source_book"], name: "index_edges_on_source_book"
     t.check_constraint "jsonb_typeof(requirements) = 'array'::text", name: "edges_requirements_array"
     t.check_constraint "minimum_rank >= 0 AND minimum_rank <= 4", name: "edges_minimum_rank_range"
+  end
+
+  create_table "gears", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "category", null: false
+    t.decimal "cost", precision: 12, scale: 2
+    t.string "cost_text", null: false
+    t.jsonb "requirements", default: [], null: false
+    t.jsonb "effects", default: {}, null: false
+    t.text "description"
+    t.string "artwork_url"
+    t.string "source_book", null: false
+    t.integer "source_page", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category", "name"], name: "index_gears_on_category_and_name"
+    t.index ["slug"], name: "index_gears_on_slug", unique: true
+    t.index ["source_book"], name: "index_gears_on_source_book"
+    t.check_constraint "cost IS NULL OR cost >= 0::numeric", name: "gears_cost_nonnegative"
+    t.check_constraint "jsonb_typeof(effects) = 'object'::text", name: "gears_effects_object"
+    t.check_constraint "jsonb_typeof(requirements) = 'array'::text", name: "gears_requirements_array"
   end
 
   create_table "hindrances", force: :cascade do |t|

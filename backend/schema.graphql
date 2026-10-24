@@ -58,6 +58,80 @@ type EdgeEdge {
   node: Edge
 }
 
+type Gear {
+  artwork_url: String
+  category: GearCategory!
+  cost: Float
+  cost_text: String!
+  description: String
+  effects: JSON!
+  id: ID!
+  name: String!
+  requirements: JSON!
+  slug: String!
+  source_book: String!
+  source_page: Int!
+}
+
+enum GearCategory {
+  alchemical_item
+  ammunition
+  animal
+  armor
+  barding
+  black_powder_weapon
+  cannon
+  clothing
+  food
+  general
+  hireling
+  lifestyle
+  lodging
+  material
+  melee_weapon
+  pack
+  poison
+  ranged_weapon
+  shield
+  siege_engine
+  travel
+}
+
+"""
+The connection type for Gear.
+"""
+type GearConnection {
+  """
+  A list of edges.
+  """
+  edges: [GearEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Gear]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type GearEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Gear
+}
+
 type Hindrance {
   description: String
   id: ID!
@@ -115,6 +189,11 @@ enum HindranceSeverity {
 An ISO 8601-encoded datetime
 """
 scalar ISO8601DateTime @specifiedBy(url: "https://tools.ietf.org/html/rfc3339")
+
+"""
+Represents untyped JSON
+"""
+scalar JSON
 
 type Origin {
   created_at: ISO8601DateTime!
@@ -207,6 +286,29 @@ type Query {
     minimum_rank: Rank
     source_book: String
   ): EdgeConnection!
+  gear(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    category: GearCategory
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+    source_book: String
+  ): GearConnection!
   hindrances(
     """
     Returns the elements in the list that come after the specified cursor.

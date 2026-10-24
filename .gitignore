@@ -45,6 +45,7 @@ backend/storage/*
 backend/db/data/edges/private/
 backend/db/data/hindrances/private/
 backend/db/data/skills/private/
+backend/db/data/gear/private/
 
 # Backend: compiled assets
 backend/public/assets

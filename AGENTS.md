@@ -91,8 +91,9 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 Current gaps, intentionally left for later feature work:
 
 - The SWADE character domain is still skeletal: `Character` stores a name, rank,
-  and edge/hindrance/skill selections, but attributes, powers, gear, and
-  advances are not implemented.
+  and edge/hindrance/skill selections, but attributes, powers, and advances are
+  not implemented. Gear is available as a public reference-data API, but is not
+  yet attached to characters.
 - There is no GraphQL API for characters yet.
 - `Origin` currently has only `id`, `created_at`, and `updated_at`.
 - `Edge` has SWADE core reference data (133 edges) and optional private Fantasy
@@ -101,6 +102,9 @@ Current gaps, intentionally left for later feature work:
   Fantasy Companion data (13 hindrances) loaded by `Hindrances::Importer`.
 - `Skill` has SWADE core reference data (32 skills) and optional private Fantasy
   Companion data (1 skill) loaded by `Skills::Importer`.
+- `Gear` has an optional private Fantasy Companion catalog loaded by
+  `Gears::Importer`; the local catalog includes 292 entries without weights or
+  encumbrance fields.
 - There are no GraphQL mutations yet.
 - There is no password-reset flow or mailer usage.
 - Domain Pundit policies currently cover only character upsert.
@@ -268,7 +272,7 @@ both in the same change when committing.
   Keep seed data idempotent.
 - Current tables are `users`, `sessions`, `characters`, `character_edges`,
   `character_hindrances`, `character_skills`, `origins`, `edges`, `hindrances`,
-  and `skills`.
+  `skills`, and `gears`.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
@@ -283,16 +287,22 @@ both in the same change when committing.
   JSONB requirements, and source book/page.
 - `skills` stores mechanical reference data: name, unique slug, linked
   attribute, core-skill flag, and source book/page.
+- `gears` stores reference data with a unique slug, category, exact display
+  cost plus optional numeric cost, JSONB requirements/effects, description,
+  optional artwork URL, and source book/page. It intentionally has no weight or
+  encumbrance column.
 - Core reference YAML lives in `db/data/edges/swade.yml`,
   `db/data/hindrances/swade.yml`, and `db/data/skills/swade.yml`; it is derived
   from the Apache-2.0 SWADE Foundry system and keeps its `NOTICE.md` and
   `LICENSE`.
 - Private Fantasy Companion YAML lives in the gitignored
-  `db/data/edges/private/`, `db/data/hindrances/private/`, and
-  `db/data/skills/private/` directories. Never commit it.
-- `Edges::Importer`, `Hindrances::Importer`, and `Skills::Importer` load both
-  sources, validate the combined batch, and upsert by slug. `db/seeds.rb`
-  invokes all three and creates an idempotent `admin` / `admin` login.
+  `db/data/edges/private/`, `db/data/hindrances/private/`,
+  `db/data/skills/private/`, and `db/data/gear/private/` directories. Never
+  commit it.
+- `Edges::Importer`, `Hindrances::Importer`, `Skills::Importer`, and
+  `Gears::Importer` load their sources, validate the batch, and upsert by slug.
+  `db/seeds.rb` invokes all four and creates an idempotent `admin` / `admin`
+  login.
 
 ### HTTP API
 
@@ -375,6 +385,10 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   - `skills(attribute, core, source_book, first, after, last, before)` —
     cursor-paginated skills ordered by name and id. It is public and exposes
     each skill's linked attribute and core-skill flag.
+  - `gear(category, source_book, first, after, last, before)` —
+    cursor-paginated gear ordered by name and id. It is public and exposes
+    source pricing, structured requirements/effects, descriptions, and optional
+    artwork URLs.
 - Query limits: max depth `12`, max complexity `300`. Connections default to 25
   items and cap at 100.
 - `GraphQL::Dataloader` is enabled. Add batched source classes for associations
@@ -606,13 +620,13 @@ assets. The entrypoint runs `bin/rails db:prepare` before starting the server.
   `image_processing` is intentionally not included.
 - There are no server-rendered views or mailer templates in the backend. Do not
   reintroduce them for API work.
-- `backend/db/seeds.rb` loads edge, hindrance, and skill reference data through
-  their importers. Add new reference data idempotently as domain models are
-  introduced.
+- `backend/db/seeds.rb` loads edge, hindrance, skill, and optional gear
+  reference data through their importers. Add new reference data idempotently as
+  domain models are introduced.
 - Keep `backend/db/data/edges/private/`,
-  `backend/db/data/hindrances/private/`, and `backend/db/data/skills/private/`
-  out of git. Only the Apache-2.0 SWADE data and its attribution files may be
-  committed.
+  `backend/db/data/hindrances/private/`, `backend/db/data/skills/private/`, and
+  `backend/db/data/gear/private/` out of git. Only data with an appropriate
+  tracked license and attribution may be committed.
 - `backend/schema.graphql` and frontend generated GraphQL types are checked in.
   Regenerate both after schema changes.
 - Root `bin/ci` does not run the frontend codegen-freshness diff; CI does. Run
