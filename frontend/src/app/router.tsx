@@ -23,6 +23,7 @@ export const router = createBrowserRouter([
         children: [
           { path: 'characters', element: <CharactersRoute /> },
           { path: 'characters/new', element: <NewCharacterRoute /> },
+          { path: 'characters/:id/edit', element: <NewCharacterRoute /> },
           {
             element: <RequireAdmin />,
             children: [{ path: 'admin/reference-data', element: <AdminEditorRoute /> }],

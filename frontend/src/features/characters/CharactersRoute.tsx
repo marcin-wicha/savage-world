@@ -1,8 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useRestQuery } from '@/lib/queries'
+import { useRestMutation, useRestQuery } from '@/lib/queries'
 
 const rankLabels: Record<string, string> = {
   novice: 'Novice',
@@ -23,12 +25,35 @@ type CharactersResponse = {
   characters: Character[]
 }
 
+type DeleteCharacterVariables = {
+  id: number
+}
+
 export function CharactersRoute() {
+  const queryClient = useQueryClient()
+  const [deleteError, setDeleteError] = useState(false)
   const { data, isPending, isError } = useRestQuery<CharactersResponse>(
     ['characters'],
     '/api/v1/characters',
   )
   const characters = data?.characters ?? []
+  const deleteMutation = useRestMutation<void, DeleteCharacterVariables>(
+    { path: ({ id }) => `/api/v1/characters/${id}`, method: 'DELETE' },
+    {
+      onSuccess: () => {
+        setDeleteError(false)
+        void queryClient.invalidateQueries({ queryKey: ['characters'] })
+      },
+      onError: () => setDeleteError(true),
+    },
+  )
+
+  const deleteCharacter = (character: Character) => {
+    if (!window.confirm(`Delete ${character.name}?`)) return
+
+    setDeleteError(false)
+    deleteMutation.mutate({ id: character.id })
+  }
 
   return (
     <section>
@@ -66,6 +91,12 @@ export function CharactersRoute() {
         </Card>
       ) : null}
 
+      {deleteError ? (
+        <p className="text-danger mt-6 text-sm" role="alert">
+          Could not delete character. Try again.
+        </p>
+      ) : null}
+
       {!isPending && !isError && characters.length > 0 ? (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {characters.map((character) => (
@@ -88,6 +119,20 @@ export function CharactersRoute() {
                     </dd>
                   </div>
                 </dl>
+                <div className="mt-6 flex gap-2">
+                  <Button asChild size="sm" variant="outline">
+                    <Link to={`/characters/${character.id}/edit`}>Edit</Link>
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => deleteCharacter(character)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

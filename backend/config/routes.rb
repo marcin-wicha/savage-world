@@ -4,7 +4,9 @@ Rails.application.routes.draw do
       resource :session, only: %i[show create destroy]
       get "characters", to: "characters#index", as: :characters_index
       post "characters", to: "characters#create", as: :characters
+      get "characters/:id", to: "characters#show", as: :character_show
       put "characters/:id", to: "characters#upsert", as: :character
+      delete "characters/:id", to: "characters#destroy", as: :character_destroy
       get "admin/reference_data", to: "admin/reference_data#index"
       get "admin/:resource", to: "admin/reference_data#show"
       post "admin/:resource", to: "admin/reference_data#create"

@@ -64,6 +64,37 @@ RSpec.describe "Characters", type: :request do
     end
   end
 
+  describe "GET /api/v1/characters/:id" do
+    it "returns the current user's character" do
+      character = create(:character, user: user, name: "Katarina Voss", origin: origin)
+      character.edges << edge
+
+      get "/api/v1/characters/#{character.id}", headers: json_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(json).to eq(
+        "character" => {
+          "id" => character.id,
+          "name" => "Katarina Voss",
+          "rank" => "novice",
+          "origin_id" => origin.id,
+          "origin_name" => origin.name,
+          "edge_ids" => [ edge.id ],
+          "hindrance_ids" => [],
+          "skill_ids" => []
+        }
+      )
+    end
+
+    it "does not expose another user's character" do
+      character = create(:character)
+
+      get "/api/v1/characters/#{character.id}", headers: json_headers
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   describe "POST /api/v1/characters" do
     it "creates a character without requiring a client-generated id" do
       expect {
@@ -327,6 +358,28 @@ RSpec.describe "Characters", type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(json["error"]).to eq("Invalid request")
+    end
+  end
+
+  describe "DELETE /api/v1/characters/:id" do
+    it "deletes the current user's character" do
+      character = create(:character, user: user)
+
+      expect {
+        delete "/api/v1/characters/#{character.id}", headers: json_headers
+      }.to change(user.characters, :count).by(-1)
+
+      expect(response).to have_http_status(:no_content)
+    end
+
+    it "does not delete another user's character" do
+      character = create(:character)
+
+      expect {
+        delete "/api/v1/characters/#{character.id}", headers: json_headers
+      }.not_to change(Character, :count)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 

@@ -16,6 +16,19 @@ module Api
         save_character(character, require_hindrance_balance: true)
       end
 
+      def show
+        character = Character.find(character_id)
+        authorize character, :show?
+        render json: { character: character_payload(character).merge(origin_name: character.origin&.name) }
+      end
+
+      def destroy
+        character = Character.find(character_id)
+        authorize character, :destroy?
+        character.destroy!
+        head :no_content
+      end
+
       def upsert
         character = Character.find_by(id: character_id)
         character ||= Current.user.characters.new(id: character_id)

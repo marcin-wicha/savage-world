@@ -1,12 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-flow'
 import { Card, CardContent } from '@/components/ui/card'
 import { ApiError } from '@/lib/api-client'
-import { useRestMutation } from '@/lib/queries'
+import { useRestMutation, useRestQuery } from '@/lib/queries'
 
 import { AttributesStep } from './AttributesStep'
 import { DerivedStatistics } from './DerivedStatistics'
@@ -50,6 +51,19 @@ type CharacterSaveRequest = {
 type CharacterSaveResponse = {
   character: {
     id: number
+  }
+}
+
+type CharacterResponse = {
+  character: {
+    id: number
+    name: string
+    rank: CharacterFormValues['rank']
+    origin_id: number | null
+    origin_name: string | null
+    edge_ids: number[]
+    hindrance_ids: number[]
+    skill_ids: number[]
   }
 }
 
@@ -128,12 +142,37 @@ const stepDefinitions: StepDefinition[] = [
 
 export function NewCharacterRoute() {
   const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
+  const isEditing = Boolean(id)
+  const characterQuery = useRestQuery<CharacterResponse>(
+    ['character', id],
+    `/api/v1/characters/${id ?? ''}`,
+    { enabled: isEditing },
+  )
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(characterFormSchema),
     defaultValues: characterFormDefaults,
     mode: 'onTouched',
   })
+  useEffect(() => {
+    const character = characterQuery.data?.character
+    if (!character) return
+
+    form.reset({
+      ...characterFormDefaults,
+      concept: { name: character.name, description: '' },
+      rank: character.rank,
+      origin: character.origin_id === null ? '' : String(character.origin_id),
+      origin_name: character.origin_name ?? '',
+      edges: character.edge_ids.map(String),
+      hindrances: character.hindrance_ids.map(String),
+      skills: character.skill_ids.map(String),
+      hindrance_severities: Object.fromEntries(
+        character.hindrance_ids.map((hindranceId) => [String(hindranceId), 'minor']),
+      ),
+    })
+  }, [characterQuery.data, form])
   const vigor = useWatch({ control: form.control, name: 'attributes.vigor' })
   const earnedHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_earned' }) ?? 0
@@ -142,8 +181,8 @@ export function NewCharacterRoute() {
   const hindrancePointsBalanced = earnedHindrancePoints === spentHindrancePoints
   const saveMutation = useRestMutation<CharacterSaveResponse, CharacterSaveRequest>(
     {
-      path: '/api/v1/characters',
-      method: 'POST',
+      path: isEditing ? `/api/v1/characters/${id}` : '/api/v1/characters',
+      method: isEditing ? 'PUT' : 'POST',
     },
     {
       onSuccess: () => {
@@ -152,6 +191,18 @@ export function NewCharacterRoute() {
       },
     },
   )
+
+  if (isEditing && characterQuery.isPending) {
+    return <p className="text-muted-foreground text-sm">Loading character…</p>
+  }
+
+  if (isEditing && characterQuery.isError) {
+    return (
+      <p className="text-danger text-sm" role="alert">
+        Could not load character. Try again.
+      </p>
+    )
+  }
 
   const steps: MultiStepFlowStep[] = stepDefinitions.map((step, index) => {
     const content =
@@ -216,16 +267,20 @@ export function NewCharacterRoute() {
   return (
     <section className="mx-auto max-w-7xl">
       <p className="text-muted-foreground text-[0.65rem] font-medium tracking-[0.22em] uppercase">
-        Character creation
+        {isEditing ? 'Character editing' : 'Character creation'}
       </p>
-      <h1 className="text-foreground mt-2 text-4xl">Create a character</h1>
+      <h1 className="text-foreground mt-2 text-4xl">
+        {isEditing ? 'Edit character' : 'Create a character'}
+      </h1>
 
       <Card className="mt-6">
         <CardContent>
           <FormProvider {...form}>
             <MultiStepFlow
               steps={steps}
-              completeLabel={saveMutation.isPending ? 'Saving…' : 'Save character'}
+              completeLabel={
+                saveMutation.isPending ? 'Saving…' : isEditing ? 'Save changes' : 'Save character'
+              }
               onBack={() => navigate('/characters')}
               onBeforeNext={(_step, index) => validateStep(index)}
               canAdvance={(_step, index) =>

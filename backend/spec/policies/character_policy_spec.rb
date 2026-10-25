@@ -10,6 +10,8 @@ RSpec.describe CharacterPolicy do
   it { is_expected.to be_upsert }
   it { is_expected.to be_create }
   it { is_expected.to be_update }
+  it { is_expected.to be_show }
+  it { is_expected.to be_destroy }
 
   context "when the user does not own the character" do
     let(:user) { create(:user) }
@@ -17,6 +19,8 @@ RSpec.describe CharacterPolicy do
     it { is_expected.not_to be_upsert }
     it { is_expected.not_to be_create }
     it { is_expected.not_to be_update }
+    it { is_expected.not_to be_show }
+    it { is_expected.not_to be_destroy }
   end
 
   context "without a user" do

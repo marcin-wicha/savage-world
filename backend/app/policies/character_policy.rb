@@ -5,4 +5,6 @@ class CharacterPolicy < ApplicationPolicy
 
   alias create? upsert?
   alias update? upsert?
+  alias show? upsert?
+  alias destroy? upsert?
 end
