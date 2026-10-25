@@ -202,15 +202,17 @@ function GearArtwork({ item }: { item: GearItem }) {
   const artworkUrl = item.artwork_url || `/gear/${item.slug}.webp`
 
   return (
-    <img
-      data-slot="gear-artwork"
-      src={artworkUrl}
-      alt=""
-      className="h-32 w-full object-cover"
-      onError={(event) => {
-        event.currentTarget.hidden = true
-      }}
-    />
+    <div className="bg-card pb-4">
+      <img
+        data-slot="gear-artwork"
+        src={artworkUrl}
+        alt=""
+        className="h-32 w-full object-cover"
+        onError={(event) => {
+          event.currentTarget.hidden = true
+        }}
+      />
+    </div>
   )
 }
 
@@ -416,7 +418,7 @@ export function GearStep() {
         <div
           role="tablist"
           aria-label="Gear categories"
-          className="border-border flex gap-1 overflow-x-auto border-b pb-2"
+          className="border-border flex flex-wrap gap-1 border-b pb-2"
         >
           {categoryOptions.map((option) => (
             <button
@@ -452,7 +454,7 @@ export function GearStep() {
 
       {!isLoadingAll && !isError && filteredGear.length > 0 ? (
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="columns-1 gap-4 sm:columns-2 xl:columns-3">
             {filteredGear.map((item) => {
               const quantity = quantities[item.id] ?? 0
               const canAdd = item.cost !== null && spent + item.cost <= startingMoney
@@ -463,7 +465,7 @@ export function GearStep() {
                   data-slot="gear-shop-item"
                   data-selected={activeItem?.id === item.id || quantity > 0}
                   className={cn(
-                    'overflow-hidden transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md',
+                    'mb-4 break-inside-avoid overflow-hidden transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md',
                     activeItem?.id === item.id && 'ring-primary/50 ring-2',
                   )}
                 >
