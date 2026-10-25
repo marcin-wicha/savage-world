@@ -7,6 +7,8 @@ import { useGraphqlInfiniteQuery } from '@/lib/queries'
 
 import type { CharacterFormValues } from './character-form'
 
+const originArtwork = (slug: string) => `/origins/${slug}.webp`
+
 export function OriginStep() {
   const form = useFormContext<CharacterFormValues>()
   const selectedId = useWatch({ control: form.control, name: 'origin' })
@@ -67,6 +69,7 @@ export function OriginStep() {
               key={origin.id}
               title={origin.name}
               description={origin.description}
+              backgroundImage={originArtwork(origin.slug)}
               selected={origin.id === selectedId}
               size="md"
               className="justify-self-center"

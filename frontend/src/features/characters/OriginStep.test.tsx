@@ -87,6 +87,7 @@ describe('OriginStep', () => {
     expect(await screen.findByRole('button', { name: 'Dunestriders' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Greenbloods' })).toBeInTheDocument()
     expect(screen.getByText('Keepers of the Old Faith.')).toBeInTheDocument()
+    expect(document.querySelector('img[src="/origins/dunestriders.webp"]')).toBeInTheDocument()
     expect(
       document.querySelector('.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3'),
     ).toBeInTheDocument()
