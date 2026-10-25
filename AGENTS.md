@@ -79,8 +79,9 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
   `origins`, and filtered `edges`, `hindrances`, and `skills` queries.
 - Session-cookie authentication with REST session endpoints, CSRF protection,
   CORS, Pundit authorization, and rate-limited sign-in.
-- Authenticated REST character creation at `POST /api/v1/characters` and upsert at
-  `PUT /api/v1/characters/:id`, including final hindrance-point validation.
+- Authenticated REST character listing and creation at `GET`/`POST
+  /api/v1/characters`, plus upsert at `PUT /api/v1/characters/:id`, including
+  final hindrance-point validation.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
 - React 19/Vite frontend with TanStack Query, a fetch-based REST/GraphQL client,
   generated GraphQL operation types, shadcn/ui primitives, and Storybook.
@@ -318,6 +319,8 @@ Routes are defined in `backend/config/routes.rb`:
   credentials, and `429` when rate limited.
 - `DELETE /api/v1/session` — authenticated; destroys the session and returns
   `204`.
+- `GET /api/v1/characters` — authenticated; returns the current user's
+  characters with their origin name and selected reference IDs.
 - `POST /api/v1/characters` — authenticated; creates the current user's
   character. JSON body:
   `{ "character": { "name": "...", "rank": "novice", "origin_id": 1, "edge_ids": [1], "hindrance_ids": [2], "skill_ids": [3], "hindrance_severities": { "2": "minor" }, "hindrance_points_earned": 1, "hindrance_points_spent": 1 } }`.

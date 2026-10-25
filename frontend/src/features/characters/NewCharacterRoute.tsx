@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
@@ -127,6 +128,7 @@ const stepDefinitions: StepDefinition[] = [
 
 export function NewCharacterRoute() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(characterFormSchema),
     defaultValues: characterFormDefaults,
@@ -138,10 +140,18 @@ export function NewCharacterRoute() {
   const spentHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_spent' }) ?? 0
   const hindrancePointsBalanced = earnedHindrancePoints === spentHindrancePoints
-  const saveMutation = useRestMutation<CharacterSaveResponse, CharacterSaveRequest>({
-    path: '/api/v1/characters',
-    method: 'POST',
-  })
+  const saveMutation = useRestMutation<CharacterSaveResponse, CharacterSaveRequest>(
+    {
+      path: '/api/v1/characters',
+      method: 'POST',
+    },
+    {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: ['characters'] })
+        navigate('/characters')
+      },
+    },
+  )
 
   const steps: MultiStepFlowStep[] = stepDefinitions.map((step, index) => {
     const content =
@@ -187,22 +197,19 @@ export function NewCharacterRoute() {
     void form.handleSubmit((values) => {
       if (values.hindrance_points_earned !== values.hindrance_points_spent) return
 
-      saveMutation.mutate(
-        {
-          character: {
-            name: values.concept.name,
-            rank: values.rank,
-            origin_id: Number(values.origin),
-            edge_ids: ids(values.edges),
-            hindrance_ids: ids(values.hindrances),
-            skill_ids: ids(values.skills),
-            hindrance_severities: values.hindrance_severities,
-            hindrance_points_earned: values.hindrance_points_earned,
-            hindrance_points_spent: values.hindrance_points_spent,
-          },
+      saveMutation.mutate({
+        character: {
+          name: values.concept.name,
+          rank: values.rank,
+          origin_id: Number(values.origin),
+          edge_ids: ids(values.edges),
+          hindrance_ids: ids(values.hindrances),
+          skill_ids: ids(values.skills),
+          hindrance_severities: values.hindrance_severities,
+          hindrance_points_earned: values.hindrance_points_earned,
+          hindrance_points_spent: values.hindrance_points_spent,
         },
-        { onSuccess: () => navigate('/characters') },
-      )
+      })
     })()
   }
 

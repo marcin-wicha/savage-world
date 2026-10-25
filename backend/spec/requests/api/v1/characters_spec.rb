@@ -27,6 +27,43 @@ RSpec.describe "Characters", type: :request do
       headers: json_headers
   end
 
+  describe "GET /api/v1/characters" do
+    it "lists only the current user's characters" do
+      character = create(
+        :character,
+        user: user,
+        name: "Katarina Voss",
+        rank: "seasoned",
+        origin: origin
+      )
+      create(:character, name: "Someone Else")
+
+      get "/api/v1/characters", headers: json_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(json["characters"]).to contain_exactly(
+        hash_including(
+          "id" => character.id,
+          "name" => "Katarina Voss",
+          "rank" => "seasoned",
+          "origin_id" => origin.id,
+          "origin_name" => origin.name,
+          "edge_ids" => [],
+          "hindrance_ids" => [],
+          "skill_ids" => []
+        )
+      )
+    end
+
+    it "requires authentication" do
+      delete "/api/v1/session", headers: json_headers
+
+      get "/api/v1/characters", headers: json_headers
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
   describe "POST /api/v1/characters" do
     it "creates a character without requiring a client-generated id" do
       expect {

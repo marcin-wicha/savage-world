@@ -1,6 +1,15 @@
 module Api
   module V1
     class CharactersController < ApplicationController
+      def index
+        characters = Current.user.characters.order(updated_at: :desc, id: :desc)
+        render json: {
+          characters: characters.map do |character|
+            character_payload(character).merge(origin_name: character.origin&.name)
+          end
+        }
+      end
+
       def create
         character = Current.user.characters.new
         authorize character, :create?
