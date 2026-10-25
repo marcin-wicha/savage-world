@@ -91,8 +91,16 @@ const edges = [
 
 type FormRef = { current: UseFormReturn<CharacterFormValues> | null }
 
-function Harness({ formRef }: { formRef: FormRef }) {
-  const form = useForm<CharacterFormValues>({ defaultValues: characterFormDefaults })
+function Harness({
+  formRef,
+  initialValues,
+}: {
+  formRef: FormRef
+  initialValues?: Partial<CharacterFormValues>
+}) {
+  const form = useForm<CharacterFormValues>({
+    defaultValues: { ...characterFormDefaults, ...initialValues },
+  })
 
   useEffect(() => {
     formRef.current = form
@@ -105,7 +113,7 @@ function Harness({ formRef }: { formRef: FormRef }) {
   )
 }
 
-function renderStep() {
+function renderStep(initialValues?: Partial<CharacterFormValues>) {
   const formRef: FormRef = { current: null }
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -113,7 +121,7 @@ function renderStep() {
 
   render(
     <QueryClientProvider client={queryClient}>
-      <Harness formRef={formRef} />
+      <Harness formRef={formRef} initialValues={initialValues} />
     </QueryClientProvider>,
   )
 
@@ -137,6 +145,19 @@ describe('EdgesStep', () => {
         pageInfo: { hasNextPage: false, endCursor: null },
       },
     })
+  })
+
+  it('starts expanded when an edge is already selected', async () => {
+    const formRef = renderStep({ edges: ['2'] })
+
+    expect(await screen.findByText('5 edges')).toBeInTheDocument()
+    expect(formRef.current?.getValues('edges')).toEqual(['2'])
+    expect(document.querySelector('[data-slot="trait-card-stack"]')).toHaveAttribute(
+      'data-open',
+      'true',
+    )
+    expect(screen.getByRole('button', { name: 'Alertness' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Ace' })).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('shows every edge and records the selection against hindrance points', async () => {

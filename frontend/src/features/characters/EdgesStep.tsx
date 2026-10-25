@@ -38,7 +38,11 @@ const edgeHindrancePointCost = 2
 
 export function EdgesStep() {
   const form = useFormContext<CharacterFormValues>()
-  const selectedIds = useWatch({ control: form.control, name: 'edges' }) ?? []
+  const watchedSelectedIds = useWatch({ control: form.control, name: 'edges' })
+  const selectedIds =
+    watchedSelectedIds && watchedSelectedIds.length > 0
+      ? watchedSelectedIds
+      : (form.getValues('edges') ?? [])
   const attributes = useWatch({ control: form.control, name: 'attributes' })
   const skillIds = useWatch({ control: form.control, name: 'skills' }) ?? []
   const skillDices = useWatch({ control: form.control, name: 'skill_dice' }) ?? {}
@@ -270,6 +274,7 @@ export function EdgesStep() {
           columns={3}
           rows={2}
           onSelect={handleSelect}
+          defaultOpen={selectedIds.length > 0}
           className="mx-auto"
         />
       ) : null}

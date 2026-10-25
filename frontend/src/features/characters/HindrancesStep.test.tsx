@@ -55,8 +55,16 @@ const hindrances = [
 
 type FormRef = { current: UseFormReturn<CharacterFormValues> | null }
 
-function Harness({ formRef }: { formRef: FormRef }) {
-  const form = useForm<CharacterFormValues>({ defaultValues: characterFormDefaults })
+function Harness({
+  formRef,
+  initialValues,
+}: {
+  formRef: FormRef
+  initialValues?: Partial<CharacterFormValues>
+}) {
+  const form = useForm<CharacterFormValues>({
+    defaultValues: { ...characterFormDefaults, ...initialValues },
+  })
 
   useEffect(() => {
     formRef.current = form
@@ -69,7 +77,7 @@ function Harness({ formRef }: { formRef: FormRef }) {
   )
 }
 
-function renderStep() {
+function renderStep(initialValues?: Partial<CharacterFormValues>) {
   const formRef: FormRef = { current: null }
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -77,7 +85,7 @@ function renderStep() {
 
   render(
     <QueryClientProvider client={queryClient}>
-      <Harness formRef={formRef} />
+      <Harness formRef={formRef} initialValues={initialValues} />
     </QueryClientProvider>,
   )
 
@@ -101,6 +109,18 @@ describe('HindrancesStep', () => {
         pageInfo: { hasNextPage: false, endCursor: null },
       },
     })
+  })
+
+  it('starts expanded when a hindrance is already selected', async () => {
+    const formRef = renderStep({ hindrances: ['1'] })
+
+    expect(await screen.findByText('5 hindrances')).toBeInTheDocument()
+    expect(formRef.current?.getValues('hindrances')).toEqual(['1'])
+    expect(document.querySelector('[data-slot="trait-card-stack"]')).toHaveAttribute(
+      'data-open',
+      'true',
+    )
+    expect(screen.getByRole('button', { name: 'Bad Eyes' })).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('shows every hindrance when no severity is selected and filters by severity', async () => {

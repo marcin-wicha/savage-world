@@ -36,7 +36,11 @@ const hindrancePointValues: Record<ConcreteHindranceSeverity, number> = {
 
 export function HindrancesStep() {
   const form = useFormContext<CharacterFormValues>()
-  const selectedIds = useWatch({ control: form.control, name: 'hindrances' }) ?? []
+  const watchedSelectedIds = useWatch({ control: form.control, name: 'hindrances' })
+  const selectedIds =
+    watchedSelectedIds && watchedSelectedIds.length > 0
+      ? watchedSelectedIds
+      : (form.getValues('hindrances') ?? [])
   const selectedSeverities = useWatch({ control: form.control, name: 'hindrance_severities' }) ?? {}
   const hindranceSlugs = useWatch({ control: form.control, name: 'hindrance_slugs' }) ?? {}
   const hindranceNames = useWatch({ control: form.control, name: 'hindrance_names' }) ?? {}
@@ -269,6 +273,7 @@ export function HindrancesStep() {
           size="md"
           revealedCount={3}
           onSelect={handleSelect}
+          defaultOpen={selectedIds.length > 0}
           className="mx-auto"
         />
       ) : null}
