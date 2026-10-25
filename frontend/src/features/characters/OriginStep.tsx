@@ -32,7 +32,12 @@ export function OriginStep() {
     .flatMap((origin) => (origin ? [origin] : []))
 
   const handleSelect = (originId: string) => {
+    const origin = origins.find((candidate) => candidate.id === originId)
+
+    if (!origin) return
+
     form.setValue('origin', originId, { shouldDirty: true, shouldTouch: true })
+    form.setValue('origin_name', origin.name, { shouldDirty: true, shouldTouch: true })
   }
 
   return (

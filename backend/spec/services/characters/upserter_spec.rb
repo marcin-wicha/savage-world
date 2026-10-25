@@ -113,6 +113,63 @@ RSpec.describe Characters::Upserter do
     expect(character.origin).to eq(origin)
   end
 
+  it "rejects unspent hindrance points" do
+    character = user.characters.new
+
+    upserter = described_class.new(
+      character: character,
+      attributes: {
+        name: "Nathan Drake",
+        hindrance_ids: [ hindrance.id ],
+        hindrance_points_earned: 1,
+        hindrance_points_spent: 0
+      }
+    )
+
+    expect(upserter.call).to be(false)
+    expect(upserter.errors[:hindrance_points_spent]).to eq(
+      [ "must spend all earned hindrance points before saving" ]
+    )
+    expect(character).not_to be_persisted
+  end
+
+  it "accepts a minor-or-major hindrance when all earned points are spent" do
+    flexible_hindrance = create(:hindrance, severity: :minor_or_major)
+    character = user.characters.new
+
+    upserter = described_class.new(
+      character: character,
+      attributes: {
+        name: "Nathan Drake",
+        hindrance_ids: [ flexible_hindrance.id ],
+        hindrance_severities: { flexible_hindrance.id.to_s => "major" },
+        hindrance_points_earned: 2,
+        hindrance_points_spent: 2
+      }
+    )
+
+    expect(upserter.call).to be(true)
+    expect(character.hindrances).to contain_exactly(flexible_hindrance)
+  end
+
+  it "defaults a minor-or-major hindrance to minor when no severity is supplied" do
+    flexible_hindrance = create(:hindrance, severity: :minor_or_major)
+    character = user.characters.new
+
+    upserter = described_class.new(
+      character: character,
+      attributes: {
+        name: "Nathan Drake",
+        hindrance_ids: [ flexible_hindrance.id ],
+        hindrance_points_earned: 1,
+        hindrance_points_spent: 1
+      }
+    )
+
+    expect(upserter.call).to be(true)
+    expect(upserter.errors).to be_empty
+  end
+
   it "returns model validation errors" do
     character = user.characters.new
 

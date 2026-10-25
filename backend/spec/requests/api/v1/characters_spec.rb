@@ -27,6 +27,80 @@ RSpec.describe "Characters", type: :request do
       headers: json_headers
   end
 
+  describe "POST /api/v1/characters" do
+    it "creates a character without requiring a client-generated id" do
+      expect {
+        post "/api/v1/characters",
+          params: {
+            character: {
+              name: "Nathan Drake",
+              rank: "novice",
+              origin_id: origin.id,
+              edge_ids: [ edge.id ],
+              hindrance_ids: [ hindrance.id ],
+              skill_ids: [ skill.id ],
+              hindrance_points_earned: 1,
+              hindrance_points_spent: 1
+            }
+          }.to_json,
+          headers: json_headers
+      }.to change(user.characters, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+      expect(json.dig("character", "id")).to be_present
+      expect(json.dig("character", "name")).to eq("Nathan Drake")
+    end
+
+    it "requires hindrance point totals when creating a character" do
+      post "/api/v1/characters",
+        params: { character: { name: "Nathan Drake", hindrance_ids: [ hindrance.id ] } }.to_json,
+        headers: json_headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "hindrance_points")).to eq(
+        [ "must include earned and spent hindrance points" ]
+      )
+      expect(user.characters).to be_empty
+    end
+
+    it "requires authentication" do
+      delete "/api/v1/session", headers: json_headers
+
+      post "/api/v1/characters",
+        params: {
+          character: {
+            name: "Nathan Drake",
+            hindrance_points_earned: 0,
+            hindrance_points_spent: 0
+          }
+        }.to_json,
+        headers: json_headers
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(user.characters).to be_empty
+    end
+
+    it "rejects a character with unspent hindrance points" do
+      post "/api/v1/characters",
+        params: {
+          character: {
+            name: "Nathan Drake",
+            rank: "novice",
+            hindrance_ids: [ hindrance.id ],
+            hindrance_points_earned: 1,
+            hindrance_points_spent: 0
+          }
+        }.to_json,
+        headers: json_headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "hindrance_points_spent")).to eq(
+        [ "must spend all earned hindrance points before saving" ]
+      )
+      expect(user.characters).to be_empty
+    end
+  end
+
   describe "PUT /api/v1/characters/:id" do
     it "creates a character with selections" do
       expect {

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { api } from '@/lib/api-client'
 
 import { NewCharacterRoute } from './NewCharacterRoute'
 
@@ -12,6 +13,10 @@ vi.mock('@/lib/api-client', async (importOriginal) => {
 
   return {
     ...actual,
+    api: {
+      ...actual.api,
+      post: vi.fn().mockResolvedValue({ character: { id: 1 } }),
+    },
     graphqlRequest: vi.fn().mockResolvedValue({
       origins: {
         nodes: [
@@ -60,7 +65,12 @@ function renderRoute() {
   )
 }
 
+const apiPostMock = vi.mocked(api.post)
+
 describe('NewCharacterRoute', () => {
+  beforeEach(() => {
+    apiPostMock.mockClear()
+  })
   it('renders every creation step and starts on the concept step', () => {
     renderRoute()
 
@@ -183,6 +193,19 @@ describe('NewCharacterRoute', () => {
 
     await user.click(screen.getByRole('button', { name: /save character/i }))
 
+    expect(apiPostMock).toHaveBeenCalledWith('/api/v1/characters', {
+      character: {
+        name: 'Katarina Voss',
+        rank: 'novice',
+        origin_id: 1,
+        edge_ids: [],
+        hindrance_ids: [],
+        skill_ids: [],
+        hindrance_severities: {},
+        hindrance_points_earned: 0,
+        hindrance_points_spent: 0,
+      },
+    })
     expect(screen.getByRole('heading', { name: /characters page/i })).toBeInTheDocument()
   })
 })

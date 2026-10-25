@@ -44,6 +44,9 @@ export function EdgesStep() {
   const skillDices = useWatch({ control: form.control, name: 'skill_dice' }) ?? {}
   const skillSlugs = useWatch({ control: form.control, name: 'skill_slugs' }) ?? {}
   const hindranceSlugs = useWatch({ control: form.control, name: 'hindrance_slugs' }) ?? {}
+  const edgeNames = useWatch({ control: form.control, name: 'edge_names' }) ?? {}
+  const edgeSlugs = useWatch({ control: form.control, name: 'edge_slugs' }) ?? {}
+  const edgeDescriptions = useWatch({ control: form.control, name: 'edge_descriptions' }) ?? {}
   const earnedHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_earned' }) ?? 0
   const attributeHindrancePointsSpent =
@@ -141,17 +144,48 @@ export function EdgesStep() {
     const isSelected = selectedIds.includes(edge.id)
 
     if (isSelected) {
+      const nextNames = { ...edgeNames }
+      const nextSlugs = { ...edgeSlugs }
+      delete nextNames[edge.id]
+      delete nextSlugs[edge.id]
+      const nextDescriptions = { ...edgeDescriptions }
+      delete nextDescriptions[edge.id]
+
       form.setValue(
         'edges',
         selectedIds.filter((id) => id !== edge.id),
         { shouldDirty: true, shouldTouch: true },
       )
+      form.setValue('edge_names', nextNames, { shouldDirty: true, shouldTouch: true })
+      form.setValue('edge_slugs', nextSlugs, { shouldDirty: true, shouldTouch: true })
+      form.setValue('edge_descriptions', nextDescriptions, {
+        shouldDirty: true,
+        shouldTouch: true,
+      })
       return
     }
 
     if (availableForEdges < edgeHindrancePointCost) return
 
     form.setValue('edges', [...selectedIds, edge.id], { shouldDirty: true, shouldTouch: true })
+    form.setValue(
+      'edge_names',
+      { ...edgeNames, [edge.id]: edge.name },
+      { shouldDirty: true, shouldTouch: true },
+    )
+    form.setValue(
+      'edge_slugs',
+      { ...edgeSlugs, [edge.id]: edge.slug },
+      { shouldDirty: true, shouldTouch: true },
+    )
+    form.setValue(
+      'edge_descriptions',
+      {
+        ...edgeDescriptions,
+        [edge.id]: edge.description || edge.requirements_text || 'No description available.',
+      },
+      { shouldDirty: true, shouldTouch: true },
+    )
   }
 
   const traits: TraitCardStackTrait[] = filteredEdges.map((edge) => {

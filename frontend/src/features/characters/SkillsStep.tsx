@@ -51,6 +51,7 @@ export function SkillsStep() {
   const form = useFormContext<CharacterFormValues>()
   const selectedIds = useWatch({ control: form.control, name: 'skills' }) ?? []
   const skillDices = useWatch({ control: form.control, name: 'skill_dice' }) ?? {}
+
   const earnedHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_earned' }) ?? 0
   const hindrancePointsSpent =
@@ -146,10 +147,25 @@ export function SkillsStep() {
         return slug ? [[id, slug]] : []
       }),
     )
+    const nextSkillNames = Object.fromEntries(
+      nextIds.flatMap((id) => {
+        const name = skillById.get(id)?.name
+
+        return name ? [[id, name]] : []
+      }),
+    )
+    const nextSkillDescriptions = Object.fromEntries(
+      nextIds.map((id) => [id, skillById.get(id)?.description || 'No description available.']),
+    )
 
     form.setValue('skills', nextIds, { shouldDirty: true, shouldTouch: true })
     form.setValue('skill_dice', nextDices, { shouldDirty: true, shouldTouch: true })
     form.setValue('skill_slugs', nextSkillSlugs, { shouldDirty: true, shouldTouch: true })
+    form.setValue('skill_names', nextSkillNames, { shouldDirty: true, shouldTouch: true })
+    form.setValue('skill_descriptions', nextSkillDescriptions, {
+      shouldDirty: true,
+      shouldTouch: true,
+    })
     form.setValue('skill_hindrance_points_spent', nextSkillHindrancePointsSpent, {
       shouldDirty: true,
       shouldTouch: true,

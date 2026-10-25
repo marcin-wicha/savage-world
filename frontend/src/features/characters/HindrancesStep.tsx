@@ -39,6 +39,9 @@ export function HindrancesStep() {
   const selectedIds = useWatch({ control: form.control, name: 'hindrances' }) ?? []
   const selectedSeverities = useWatch({ control: form.control, name: 'hindrance_severities' }) ?? {}
   const hindranceSlugs = useWatch({ control: form.control, name: 'hindrance_slugs' }) ?? {}
+  const hindranceNames = useWatch({ control: form.control, name: 'hindrance_names' }) ?? {}
+  const hindranceDescriptions =
+    useWatch({ control: form.control, name: 'hindrance_descriptions' }) ?? {}
   const [severities, setSeverities] = useState<string[]>([])
   const [search, setSearch] = useState('')
   const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
@@ -181,14 +184,32 @@ export function HindrancesStep() {
       ? selectedIds.filter((id) => id !== hindrance.id)
       : [...selectedIds, hindrance.id]
     const nextSlugs = { ...hindranceSlugs }
+    const nextNames = { ...hindranceNames }
+    const nextDescriptions = { ...hindranceDescriptions }
+    const nextSeverities = { ...selectedSeverities }
 
     if (isSelected) {
       delete nextSlugs[hindrance.id]
+      delete nextNames[hindrance.id]
+      delete nextDescriptions[hindrance.id]
+      delete nextSeverities[hindrance.id]
     } else {
       nextSlugs[hindrance.id] = hindrance.slug
+      nextNames[hindrance.id] = hindrance.name
+      nextDescriptions[hindrance.id] =
+        hindrance.description || hindrance.requirements_text || 'No description available.'
+      if (hindrance.severity === 'minor_or_major' && !nextSeverities[hindrance.id]) {
+        nextSeverities[hindrance.id] = 'minor'
+      }
     }
 
     form.setValue('hindrance_slugs', nextSlugs, { shouldDirty: true, shouldTouch: true })
+    form.setValue('hindrance_names', nextNames, { shouldDirty: true, shouldTouch: true })
+    form.setValue('hindrance_descriptions', nextDescriptions, {
+      shouldDirty: true,
+      shouldTouch: true,
+    })
+    form.setValue('hindrance_severities', nextSeverities, { shouldDirty: true, shouldTouch: true })
     form.setValue('hindrances', next, { shouldDirty: true, shouldTouch: true })
   }
 

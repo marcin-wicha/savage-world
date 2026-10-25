@@ -306,6 +306,7 @@ function GearDetails({
 export function GearStep() {
   const form = useFormContext<CharacterFormValues>()
   const quantities = useWatch({ control: form.control, name: 'gear' }) ?? {}
+  const gearNames = useWatch({ control: form.control, name: 'gear_names' }) ?? {}
   const [category, setCategory] = useState<GearCategoryFilter>(allCategories)
   const [search, setSearch] = useState('')
   const [activeGearId, setActiveGearId] = useState<string | null>(null)
@@ -358,13 +359,18 @@ export function GearStep() {
   const setQuantity = (item: GearItem, quantity: number) => {
     const nextQuantities = { ...quantities }
 
+    const nextNames = { ...gearNames }
+
     if (quantity > 0) {
       nextQuantities[item.id] = quantity
+      nextNames[item.id] = item.name
     } else {
       delete nextQuantities[item.id]
+      delete nextNames[item.id]
     }
 
     form.setValue('gear', nextQuantities, { shouldDirty: true, shouldTouch: true })
+    form.setValue('gear_names', nextNames, { shouldDirty: true, shouldTouch: true })
   }
 
   const addItem = (item: GearItem) => {

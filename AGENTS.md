@@ -79,7 +79,8 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
   `origins`, and filtered `edges`, `hindrances`, and `skills` queries.
 - Session-cookie authentication with REST session endpoints, CSRF protection,
   CORS, Pundit authorization, and rate-limited sign-in.
-- Authenticated REST character upsert at `PUT /api/v1/characters/:id`.
+- Authenticated REST character creation at `POST /api/v1/characters` and upsert at
+  `PUT /api/v1/characters/:id`, including final hindrance-point validation.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
 - React 19/Vite frontend with TanStack Query, a fetch-based REST/GraphQL client,
   generated GraphQL operation types, shadcn/ui primitives, and Storybook.
@@ -317,13 +318,16 @@ Routes are defined in `backend/config/routes.rb`:
   credentials, and `429` when rate limited.
 - `DELETE /api/v1/session` — authenticated; destroys the session and returns
   `204`.
+- `POST /api/v1/characters` — authenticated; creates the current user's
+  character. JSON body:
+  `{ "character": { "name": "...", "rank": "novice", "origin_id": 1, "edge_ids": [1], "hindrance_ids": [2], "skill_ids": [3], "hindrance_severities": { "2": "minor" }, "hindrance_points_earned": 1, "hindrance_points_spent": 1 } }`.
+  Returns `201` on success, `401` unauthenticated, and `422` for validation,
+  reference, or unspent hindrance points.
 - `PUT /api/v1/characters/:id` — authenticated; creates or updates the current
-  user's character. JSON body:
-  `{ "character": { "name": "...", "rank": "novice", "edge_ids": [1], "hindrance_ids": [2], "skill_ids": [3] } }`.
-  Returns `201` on create, `200` on update, `401` unauthenticated, `403` for
-  another user's character, and `422` for validation or reference errors.
-  Omitted selection arrays are left unchanged; provided arrays replace the
-  selection.
+  user's character. It accepts the same character fields. Returns `201` on
+  create, `200` on update, `401` unauthenticated, `403` for another user's
+  character, and `422` for validation or reference errors. Omitted selection
+  arrays are left unchanged; provided arrays replace the selection.
 - `POST /graphql` — GraphQL endpoint. There is intentionally no GET route.
 
 The sign-in endpoint is rate limited to 10 attempts per 3 minutes.

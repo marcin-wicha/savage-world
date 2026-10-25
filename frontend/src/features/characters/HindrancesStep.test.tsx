@@ -213,6 +213,21 @@ describe('HindrancesStep', () => {
     expect(screen.queryByRole('button', { name: 'Bad Eyes' })).not.toBeInTheDocument()
   })
 
+  it('records minor as the default severity for a Minor-or-Major hindrance', async () => {
+    const formRef = renderStep()
+    const user = await userEvent.setup()
+    const search = await screen.findByRole('combobox', { name: 'Search hindrances' })
+
+    await user.type(search, 'hard')
+    await user.click(await screen.findByRole('option', { name: 'Hard of Hearing' }))
+    await user.click(screen.getByRole('button', { name: /reveal hindrances traits/i }))
+    await user.click(screen.getByRole('button', { name: 'Hard of Hearing' }))
+
+    await waitFor(() => {
+      expect(formRef.current?.getValues('hindrance_severities')).toEqual({ '4': 'minor' })
+    })
+  })
+
   it('toggles the severity and points for a Minor-or-Major hindrance', async () => {
     const formRef = renderStep()
     const user = userEvent.setup()
