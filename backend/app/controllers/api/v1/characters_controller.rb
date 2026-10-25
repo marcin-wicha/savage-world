@@ -74,6 +74,8 @@ module Api
           edge_ids: [],
           hindrance_ids: [],
           skill_ids: [],
+          attributes: {},
+          skill_dice: {},
           hindrance_severities: {}
         ).to_h.symbolize_keys
       end
@@ -86,7 +88,12 @@ module Api
           origin_id: character.origin_id,
           edge_ids: character.edge_ids,
           hindrance_ids: character.hindrance_ids,
-          skill_ids: character.skill_ids
+          skill_ids: character.skill_ids,
+          attributes: character.attribute_dice,
+          skill_dice: character.character_skills.each_with_object({}) do |selection, dice|
+            dice[selection.skill_id] = selection.die
+          end,
+          effective_traits: Characters::EffectiveTraits.new(character).as_json
         }
       end
     end

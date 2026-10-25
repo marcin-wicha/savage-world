@@ -42,6 +42,8 @@ type CharacterSaveRequest = {
     edge_ids: number[]
     hindrance_ids: number[]
     skill_ids: number[]
+    attributes: CharacterFormValues['attributes']
+    skill_dice: Record<string, CharacterFormValues['skill_dice'][string]>
     hindrance_severities: Record<string, 'minor' | 'major'>
     hindrance_points_earned: number
     hindrance_points_spent: number
@@ -64,6 +66,12 @@ type CharacterResponse = {
     edge_ids: number[]
     hindrance_ids: number[]
     skill_ids: number[]
+    attributes: CharacterFormValues['attributes']
+    skill_dice: Record<string, CharacterFormValues['skill_dice'][string]>
+    effective_traits: {
+      attributes: Record<string, { base_die: string; die: string; modifier: number }>
+      skills: Record<string, { base_die: string; die: string; modifier: number }>
+    }
   }
 }
 
@@ -168,6 +176,10 @@ export function NewCharacterRoute() {
       edges: character.edge_ids.map(String),
       hindrances: character.hindrance_ids.map(String),
       skills: character.skill_ids.map(String),
+      attributes: character.attributes,
+      skill_dice: Object.fromEntries(
+        Object.entries(character.skill_dice).map(([skillId, die]) => [String(skillId), die]),
+      ),
       hindrance_severities: Object.fromEntries(
         character.hindrance_ids.map((hindranceId) => [String(hindranceId), 'minor']),
       ),
@@ -256,6 +268,8 @@ export function NewCharacterRoute() {
           edge_ids: ids(values.edges),
           hindrance_ids: ids(values.hindrances),
           skill_ids: ids(values.skills),
+          attributes: values.attributes,
+          skill_dice: values.skill_dice,
           hindrance_severities: values.hindrance_severities,
           hindrance_points_earned: values.hindrance_points_earned,
           hindrance_points_spent: values.hindrance_points_spent,

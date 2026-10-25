@@ -49,7 +49,7 @@ describe('LoginRoute', () => {
   it('submits credentials and redirects to characters', async () => {
     const user = userEvent.setup()
     apiPostMock.mockResolvedValue({
-      user: { id: 1, email_address: 'admin' },
+      user: { id: 1, email_address: 'admin', role: 'admin' },
     } as never)
 
     const queryClient = renderLogin()
@@ -67,7 +67,7 @@ describe('LoginRoute', () => {
 
     expect(await screen.findByRole('heading', { name: /characters page/i })).toBeInTheDocument()
     expect(queryClient.getQueryData(sessionQueryKey)).toEqual({
-      user: { id: 1, email_address: 'admin' },
+      user: { id: 1, email_address: 'admin', role: 'admin' },
       csrf_token: '',
     })
   })

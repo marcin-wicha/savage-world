@@ -72,8 +72,8 @@ RSpec.describe "Characters", type: :request do
       get "/api/v1/characters/#{character.id}", headers: json_headers
 
       expect(response).to have_http_status(:ok)
-      expect(json).to eq(
-        "character" => {
+      expect(json).to include(
+        "character" => hash_including(
           "id" => character.id,
           "name" => "Katarina Voss",
           "rank" => "novice",
@@ -81,8 +81,12 @@ RSpec.describe "Characters", type: :request do
           "origin_name" => origin.name,
           "edge_ids" => [ edge.id ],
           "hindrance_ids" => [],
-          "skill_ids" => []
-        }
+          "skill_ids" => [],
+          "attributes" => hash_including("agility" => "d4"),
+          "effective_traits" => hash_including("attributes" => hash_including("agility" => {
+            "base_die" => "d4", "die" => "d4", "modifier" => 0, "effects" => []
+          }))
+        )
       )
     end
 
@@ -184,14 +188,16 @@ RSpec.describe "Characters", type: :request do
       }.to change(user.characters, :count).by(1)
 
       expect(response).to have_http_status(:created)
-      expect(json["character"]).to eq(
+      expect(json["character"]).to include(
         "id" => character_id,
         "name" => "Nathan Drake",
         "rank" => "seasoned",
         "origin_id" => origin.id,
         "edge_ids" => [ edge.id ],
         "hindrance_ids" => [ hindrance.id ],
-        "skill_ids" => [ skill.id ]
+        "skill_ids" => [ skill.id ],
+        "attributes" => hash_including("agility" => "d4"),
+        "skill_dice" => { skill.id.to_s => "d4" }
       )
 
       character = user.characters.find(character_id)
@@ -199,6 +205,41 @@ RSpec.describe "Characters", type: :request do
       expect(character.edges).to contain_exactly(edge)
       expect(character.hindrances).to contain_exactly(hindrance)
       expect(character.skills).to contain_exactly(skill)
+    end
+
+    it "persists base traits and applies selected edge effects to effective traits" do
+      notice = create(:skill, name: "Notice", slug: "notice", core: true)
+      alertness = create(
+        :edge,
+        name: "Alertness",
+        effects: [
+          { "kind" => "trait_modifier", "target" => "skill", "trait" => "notice", "modifier" => 2 },
+          { "kind" => "trait_die_step", "target" => "attribute", "trait" => "agility", "steps" => 1 },
+          { "kind" => "trait_modifier", "target" => "damage", "trait" => "all", "modifier" => 1 }
+        ]
+      )
+
+      put_character(
+        character_id,
+        name: "Scout",
+        attributes: { agility: "d8", smarts: "d6", spirit: "d4", strength: "d4", vigor: "d6" },
+        skill_ids: [ notice.id ],
+        skill_dice: { notice.id.to_s => "d8" },
+        edge_ids: [ alertness.id ]
+      )
+
+      expect(response).to have_http_status(:created)
+      expect(json.dig("character", "attributes", "agility")).to eq("d8")
+      expect(json.dig("character", "effective_traits", "attributes", "agility", "die")).to eq("d10")
+      expect(json.dig("character", "skill_dice", notice.id.to_s)).to eq("d8")
+      expect(json.dig("character", "effective_traits", "damage", "all", "modifier")).to eq(1)
+      expect(json.dig("character", "effective_traits", "skills", "notice")).to eq(
+        "base_die" => "d8",
+        "die" => "d8",
+        "modifier" => 2,
+        "effects" => [ { "edge_name" => "Alertness", "kind" => "trait_modifier", "amount" => 2 } ]
+      )
+      expect(Character.find(character_id).attribute_dice["agility"]).to eq("d8")
     end
 
     it "updates an existing character and replaces provided selections" do

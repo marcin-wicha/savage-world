@@ -22,11 +22,16 @@ module Characters
       prepare_hindrance_points
       return false if errors.any?
 
+      prepare_skill_dice
+      return false if errors.any?
+
       Character.transaction do
         character.assign_attributes(@attributes.slice(:name, :rank))
+        character.attribute_dice = @attributes[:attributes] if @attributes.key?(:attributes)
         character.origin = @origin if @origin_provided
         character.save!
         apply_selections
+        apply_skill_dice
       end
 
       true
@@ -60,6 +65,32 @@ module Characters
         end
 
         @selections[key] = ids
+      end
+    end
+
+    def prepare_skill_dice
+      return unless @attributes.key?(:skill_dice)
+
+      dice = @attributes[:skill_dice]
+      unless dice.is_a?(Hash)
+        errors[:skill_dice] = [ "must be an object keyed by skill id" ]
+        return
+      end
+
+      selected_ids = @selections.fetch(:skill_ids, character.skill_ids)
+      @skill_dice = {}
+      dice.each do |raw_id, die|
+        id = Integer(raw_id, exception: false)
+        if id.nil? || !selected_ids.include?(id)
+          errors[:skill_dice] = [ "may only include selected skill ids" ]
+          return
+        end
+        unless CharacterSkill::DICE.include?(die)
+          errors[:skill_dice] = [ "must use d4, d6, d8, d10, or d12" ]
+          return
+        end
+
+        @skill_dice[id] = die
       end
     end
 
@@ -146,6 +177,19 @@ module Characters
       @selections.each do |key, ids|
         character.public_send(:"#{key}=", ids)
       end
+    end
+
+    def apply_skill_dice
+      return unless @selections.key?(:skill_ids) || @attributes.key?(:skill_dice)
+
+      character.character_skills.includes(:skill).each do |selection|
+        selection.die = @skill_dice&.fetch(selection.skill_id, nil) || default_die(selection.skill)
+        selection.save!
+      end
+    end
+
+    def default_die(skill)
+      skill.core? ? "d6" : "d4"
     end
   end
 end

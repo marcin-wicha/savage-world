@@ -3,6 +3,20 @@ import { z } from 'zod'
 
 const selectedHindranceSeveritySchema = z.enum(['minor', 'major'])
 const attributeDieSchema = z.enum(['d4', 'd6', 'd8', 'd10', 'd12'])
+const edgeEffectSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('trait_modifier'),
+    target: z.enum(['attribute', 'skill', 'damage']),
+    trait: z.string(),
+    modifier: z.number().int(),
+  }),
+  z.object({
+    kind: z.literal('trait_die_step'),
+    target: z.enum(['attribute', 'skill', 'damage']),
+    trait: z.string(),
+    steps: z.number().int(),
+  }),
+])
 
 export const characterFormSchema = z.object({
   concept: z.object({
@@ -37,6 +51,7 @@ export const characterFormSchema = z.object({
   edge_slugs: z.record(z.string(), z.string()),
   edge_names: z.record(z.string(), z.string()),
   edge_descriptions: z.record(z.string(), z.string()),
+  edge_effects: z.record(z.string(), z.array(edgeEffectSchema)),
   gear: z.record(z.string(), z.number().int().min(1).max(99)),
   gear_names: z.record(z.string(), z.string()),
   attribute_hindrance_points_spent: z.number().int().min(0).max(4),
@@ -77,6 +92,7 @@ export const characterFormDefaults: CharacterFormValues = {
   edge_slugs: {},
   edge_names: {},
   edge_descriptions: {},
+  edge_effects: {},
   gear: {},
   gear_names: {},
   attribute_hindrance_points_spent: 0,

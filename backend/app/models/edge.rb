@@ -14,6 +14,7 @@ class Edge < ApplicationRecord
   validates :source_book, presence: true, inclusion: { in: SOURCE_BOOKS }
   validates :source_page, numericality: { only_integer: true, greater_than: 0 }
   validate :requirements_are_valid
+  validate :effects_are_valid
 
   def requirements_text
     Edges::RequirementsText.new(self).to_s
@@ -28,6 +29,12 @@ class Edge < ApplicationRecord
   def requirements_are_valid
     Edges::RequirementsValidator.new(requirements).errors.each do |message|
       errors.add(:requirements, message)
+    end
+  end
+
+  def effects_are_valid
+    Edges::EffectsValidator.new(effects).errors.each do |message|
+      errors.add(:effects, message)
     end
   end
 end

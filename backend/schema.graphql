@@ -1,6 +1,7 @@
 type Edge {
   category: EdgeCategory!
   description: String
+  effects: JSON!
   id: ID!
   minimum_rank: Rank!
   name: String!

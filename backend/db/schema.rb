@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_25_100500) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_25_111000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -39,6 +39,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_100500) do
     t.bigint "skill_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "die", default: "d4", null: false
     t.index ["character_id", "skill_id"], name: "index_character_skills_on_character_id_and_skill_id", unique: true
     t.index ["character_id"], name: "index_character_skills_on_character_id"
     t.index ["skill_id"], name: "index_character_skills_on_skill_id"
@@ -51,6 +52,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_100500) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "origin_id"
+    t.jsonb "attribute_dice", default: {"vigor" => "d4", "smarts" => "d4", "spirit" => "d4", "agility" => "d4", "strength" => "d4"}, null: false
     t.index ["origin_id"], name: "index_characters_on_origin_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
     t.check_constraint "rank >= 0 AND rank <= 4", name: "characters_rank_range"
@@ -68,9 +70,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_100500) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
+    t.jsonb "effects", default: [], null: false
     t.index ["category", "minimum_rank"], name: "index_edges_on_category_and_minimum_rank"
     t.index ["slug"], name: "index_edges_on_slug", unique: true
     t.index ["source_book"], name: "index_edges_on_source_book"
+    t.check_constraint "jsonb_typeof(effects) = 'array'::text", name: "edges_effects_array"
     t.check_constraint "jsonb_typeof(requirements) = 'array'::text", name: "edges_requirements_array"
     t.check_constraint "minimum_rank >= 0 AND minimum_rank <= 4", name: "edges_minimum_rank_range"
   end

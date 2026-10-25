@@ -16,4 +16,16 @@ class Character < ApplicationRecord
   normalizes :name, with: ->(name) { name.strip }
 
   validates :name, presence: true
+  validate :attributes_are_valid
+
+  private
+
+  def attributes_are_valid
+    expected = %w[agility smarts spirit strength vigor]
+    valid_dice = CharacterSkill::DICE
+    unless self[:attribute_dice].is_a?(Hash) && self[:attribute_dice].stringify_keys.keys.sort == expected.sort &&
+        self[:attribute_dice].values.all? { |die| valid_dice.include?(die) }
+      errors.add(:attributes, "must contain valid dice for all five attributes")
+    end
+  end
 end

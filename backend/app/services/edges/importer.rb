@@ -71,6 +71,7 @@ module Edges
           end
 
           edge["source_book"] ||= book
+          edge["effects"] ||= []
           records << edge
         end
       end

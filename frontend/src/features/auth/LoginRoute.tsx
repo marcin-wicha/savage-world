@@ -30,6 +30,7 @@ type LoginResponse = {
   user: {
     id: number
     email_address: string
+    role: 'user' | 'admin'
   }
 }
 

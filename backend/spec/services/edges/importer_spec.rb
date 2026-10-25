@@ -144,6 +144,18 @@ RSpec.describe Edges::Importer do
     expect(Edge.find_by!(slug: "test-edge").description).to eq("An edge description.")
   end
 
+  it "rejects malformed effects before writing anything" do
+    path = write_data(
+      "swade.yml",
+      [ edge_attributes("effects" => [ { "kind" => "execute", "target" => "skill" } ]) ]
+    )
+
+    expect {
+      described_class.new(paths: [ path ]).call
+    }.to raise_error(described_class::ImportError, /Effects effect 1 has an unsupported kind/)
+    expect(Edge.count).to eq(0)
+  end
+
   it "rejects invalid edges before writing anything" do
     path = write_data("swade.yml", [ edge_attributes("category" => "invalid") ])
 

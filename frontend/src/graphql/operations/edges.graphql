@@ -21,6 +21,7 @@ query Edges($first: Int = 14, $after: String) {
         }
       }
       requirements_text
+      effects
       description
       repeatable
     }

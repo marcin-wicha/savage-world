@@ -83,6 +83,32 @@ describe('CharacterSummaryStep', () => {
     expect(screen.getByText('All hindrance points have been spent.')).toBeInTheDocument()
   })
 
+  it('shows edge-adjusted trait dice and modifiers in the sheet summary', () => {
+    render(
+      <SummaryHarness
+        values={{
+          ...characterFormDefaults,
+          skills: ['7'],
+          skill_names: { '7': 'Notice' },
+          skill_slugs: { '7': 'notice' },
+          skill_dice: { '7': 'd6' },
+          edges: ['8'],
+          edge_names: { '8': 'Alertness' },
+          edge_effects: {
+            '8': [
+              { kind: 'trait_modifier', target: 'skill', trait: 'notice', modifier: 2 },
+              { kind: 'trait_modifier', target: 'damage', trait: 'all', modifier: 1 },
+            ],
+          },
+        }}
+      />,
+    )
+
+    expect(screen.getByRole('img', { name: 'Notice die: d6+2' })).toBeInTheDocument()
+    expect(screen.getByText('Alertness: Notice +2')).toBeInTheDocument()
+    expect(screen.getByText('Alertness: Damage +1')).toBeInTheDocument()
+  })
+
   it.each([
     ['Bloodthirsty (minor)', 'A dangerous hunger for violence.'],
     ['Fighting', 'The ability to fight in close combat.'],

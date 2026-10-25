@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
+import { applyEdgeEffects, describeEdgeEffect, parseEdgeEffects } from './edge-effects'
 import type { CharacterFormValues } from './character-form'
 
 const attributeLabels: Record<keyof CharacterFormValues['attributes'], string> = {
@@ -104,7 +105,7 @@ function SummaryItemList({ items }: { items: SummaryItem[] }) {
 function SkillSummaryList({
   skills,
 }: {
-  skills: (SummaryItem & { die: CharacterFormValues['skill_dice'][string] })[]
+  skills: (SummaryItem & { die: CharacterFormValues['skill_dice'][string]; modifier: number })[]
 }) {
   if (skills.length === 0) {
     return <p className="text-muted-foreground text-sm">None selected.</p>
@@ -115,7 +116,12 @@ function SkillSummaryList({
       {skills.map((skill) => (
         <li key={skill.id} className="flex items-center justify-between gap-3">
           <SummaryItemTooltip item={skill} />
-          <SkillDie readOnly die={skill.die} showModifier={false} label={`${skill.name} die`} />
+          <SkillDie
+            readOnly
+            die={skill.die}
+            modifier={skill.modifier}
+            label={`${skill.name} die`}
+          />
         </li>
       ))}
     </ul>
@@ -149,6 +155,8 @@ export function CharacterSummaryStep() {
   const skillDices = values.skill_dice ?? {}
   const selectedEdges = values.edges ?? []
   const edgeNames = values.edge_names ?? {}
+  const edgeEffects = values.edge_effects ?? {}
+  const selectedEffects = selectedEdges.flatMap((id) => parseEdgeEffects(edgeEffects[id]))
   const edgeSlugs = values.edge_slugs ?? {}
   const edgeDescriptions = values.edge_descriptions ?? {}
   const gearNames = values.gear_names ?? {}
@@ -163,7 +171,7 @@ export function CharacterSummaryStep() {
     id,
     name: skillNames[id] ?? humanize(skillSlugs[id] ?? id),
     description: skillDescriptions[id] ?? 'No description available.',
-    die: skillDices[id] ?? 'd4',
+    ...applyEdgeEffects(skillDices[id] ?? 'd4', selectedEffects, 'skill', skillSlugs[id] ?? ''),
   }))
   const edges = selectedEdges.map((id) => ({
     id,
@@ -226,7 +234,17 @@ export function CharacterSummaryStep() {
               (attribute) => (
                 <div key={attribute}>
                   <dt className="text-muted-foreground text-sm">{attributeLabels[attribute]}</dt>
-                  <dd className="text-foreground font-medium">{attributes[attribute]}</dd>
+                  <dd className="text-foreground font-medium">
+                    {(() => {
+                      const effective = applyEdgeEffects(
+                        attributes[attribute] ?? 'd4',
+                        selectedEffects,
+                        'attribute',
+                        attribute,
+                      )
+                      return `${effective.die}${effective.modifier > 0 ? `+${effective.modifier}` : ''}`
+                    })()}
+                  </dd>
                 </div>
               ),
             )}
@@ -242,7 +260,20 @@ export function CharacterSummaryStep() {
         </SummarySection>
 
         <SummarySection title="Edges" description={`${edges.length} selected`}>
-          <SummaryItemList items={edges} />
+          <div className="grid gap-2">
+            <SummaryItemList items={edges} />
+            {selectedEffects.length > 0 ? (
+              <ul className="text-muted-foreground border-border grid gap-1 border-t pt-2 text-sm">
+                {selectedEdges.flatMap((id) =>
+                  parseEdgeEffects(edgeEffects[id]).map((effect, index) => (
+                    <li key={`${id}-${index}`}>
+                      {edgeNames[id] ?? 'Edge'}: {describeEdgeEffect(effect)}
+                    </li>
+                  )),
+                )}
+              </ul>
+            ) : null}
+          </div>
         </SummarySection>
 
         <SummarySection title="Gear" description={`${gear.length} selected`}>

@@ -6,6 +6,7 @@ module Types
     field :category, Types::EdgeCategoryEnum, null: false
     field :minimum_rank, Types::RankEnum, null: false
     field :requirements, [ Types::RequirementType ], null: false
+    field :effects, GraphQL::Types::JSON, null: false
     field :requirements_text, String, null: false
     field :description, String, null: true
     field :source_book, String, null: false

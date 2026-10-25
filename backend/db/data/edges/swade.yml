@@ -32,6 +32,11 @@ edges:
   category: background
   minimum_rank: novice
   requirements: []
+  effects:
+  - kind: trait_modifier
+    target: skill
+    trait: notice
+    modifier: 2
   source_book: SWADE
   source_page: 37
   repeatable: false

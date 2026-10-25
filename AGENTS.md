@@ -92,10 +92,10 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 
 Current gaps, intentionally left for later feature work:
 
-- The SWADE character domain is still skeletal: `Character` stores a name, rank,
-  and edge/hindrance/skill selections, but attributes, powers, and advances are
-  not implemented. Gear is available as a public reference-data API, but is not
-  yet attached to characters.
+- The SWADE character domain is still partial: characters persist attribute
+  dice, selected edges/hindrances/skills, and skill dice; supported Edge effects
+  are applied to effective traits for the character API and creation summary.
+  Powers, advances, and character-owned gear are not implemented.
 - There is no GraphQL API for characters yet.
 - `Origin` currently has only `id`, `created_at`, and `updated_at`.
 - `Edge` has SWADE core reference data (133 edges) and optional private Fantasy
@@ -278,13 +278,16 @@ both in the same change when committing.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
-- `characters` belongs to `users` and stores a name and rank. Its selected
-  edges, hindrances, and skills are normalized through `character_edges`,
-  `character_hindrances`, and `character_skills`, each with a unique
-  character/reference pair.
+- `characters` belongs to `users` and stores a name, rank, and JSONB
+  `attribute_dice`. Its selected edges, hindrances, and skills are normalized
+  through `character_edges`, `character_hindrances`, and `character_skills`, each
+  with a unique character/reference pair; `character_skills` also stores each
+  selected skill's base die.
 - `origins` is still a skeleton table with timestamps only.
 - `edges` stores mechanical reference data: name, unique slug, category,
-  minimum rank, JSONB requirements, source book/page, and repeatable.
+  minimum rank, JSONB requirements and validated JSONB effects, source book/page,
+  and repeatable. Currently supported effects are trait die steps or numeric
+  modifiers for an attribute/skill, and numeric damage modifiers.
 - `hindrances` stores mechanical reference data: name, unique slug, severity,
   JSONB requirements, and source book/page.
 - `skills` stores mechanical reference data: name, unique slug, linked
@@ -323,9 +326,11 @@ Routes are defined in `backend/config/routes.rb`:
   characters with their origin name and selected reference IDs.
 - `POST /api/v1/characters` — authenticated; creates the current user's
   character. JSON body:
-  `{ "character": { "name": "...", "rank": "novice", "origin_id": 1, "edge_ids": [1], "hindrance_ids": [2], "skill_ids": [3], "hindrance_severities": { "2": "minor" }, "hindrance_points_earned": 1, "hindrance_points_spent": 1 } }`.
-  Returns `201` on success, `401` unauthenticated, and `422` for validation,
-  reference, or unspent hindrance points.
+  `{ "character": { "name": "...", "rank": "novice", "origin_id": 1, "attributes": { "agility": "d6", "smarts": "d4", "spirit": "d4", "strength": "d4", "vigor": "d4" }, "edge_ids": [1], "hindrance_ids": [2], "skill_ids": [3], "skill_dice": { "3": "d6" }, "hindrance_severities": { "2": "minor" }, "hindrance_points_earned": 1, "hindrance_points_spent": 1 } }`.
+  The response includes base attributes/skill dice and calculated
+  `effective_traits` with effect attribution. Returns `201` on success, `401`
+  unauthenticated, and `422` for validation, reference, or unspent hindrance
+  points.
 - `PUT /api/v1/characters/:id` — authenticated; creates or updates the current
   user's character. It accepts the same character fields. Returns `201` on
   create, `200` on update, `401` unauthenticated, `403` for another user's

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { AutocompleteInput } from '@/components/autocomplete-input'
@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { meetsEdgeRequirements, type EdgeRequirementCharacter } from './edge-requirements'
+import { parseEdgeEffects } from './edge-effects'
 import type { CharacterFormValues } from './character-form'
 
 const rankOptions: FilterOption[] = [
@@ -39,10 +40,13 @@ const edgeHindrancePointCost = 2
 export function EdgesStep() {
   const form = useFormContext<CharacterFormValues>()
   const watchedSelectedIds = useWatch({ control: form.control, name: 'edges' })
-  const selectedIds =
-    watchedSelectedIds && watchedSelectedIds.length > 0
-      ? watchedSelectedIds
-      : (form.getValues('edges') ?? [])
+  const selectedIds = useMemo(
+    () =>
+      watchedSelectedIds && watchedSelectedIds.length > 0
+        ? watchedSelectedIds
+        : (form.getValues('edges') ?? []),
+    [form, watchedSelectedIds],
+  )
   const attributes = useWatch({ control: form.control, name: 'attributes' })
   const skillIds = useWatch({ control: form.control, name: 'skills' }) ?? []
   const skillDices = useWatch({ control: form.control, name: 'skill_dice' }) ?? {}
@@ -51,6 +55,8 @@ export function EdgesStep() {
   const edgeNames = useWatch({ control: form.control, name: 'edge_names' }) ?? {}
   const edgeSlugs = useWatch({ control: form.control, name: 'edge_slugs' }) ?? {}
   const edgeDescriptions = useWatch({ control: form.control, name: 'edge_descriptions' }) ?? {}
+  const watchedEdgeEffects = useWatch({ control: form.control, name: 'edge_effects' })
+  const edgeEffects = useMemo(() => watchedEdgeEffects ?? {}, [watchedEdgeEffects])
   const earnedHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_earned' }) ?? 0
   const attributeHindrancePointsSpent =
@@ -78,7 +84,21 @@ export function EdgesStep() {
   const edges = (data?.pages ?? [])
     .flatMap((page) => page.edges?.nodes ?? [])
     .flatMap((edge) => (edge ? [edge] : []))
-  const edgeById = new Map(edges.map((edge) => [edge.id, edge]))
+  const edgeById = useMemo(() => new Map(edges.map((edge) => [edge.id, edge])), [edges])
+
+  useEffect(() => {
+    if (isLoadingAll || isError) return
+
+    const nextEffects = { ...edgeEffects }
+    let changed = false
+    selectedIds.forEach((id) => {
+      const edge = edgeById.get(id)
+      if (!edge || nextEffects[id]) return
+      nextEffects[id] = parseEdgeEffects(edge.effects)
+      changed = true
+    })
+    if (changed) form.setValue('edge_effects', nextEffects)
+  }, [edgeById, edgeEffects, form, isError, isLoadingAll, selectedIds])
   const selectedEdgeSlugs = new Set(
     selectedIds.flatMap((id) => {
       const slug = edgeById.get(id)?.slug
@@ -154,6 +174,8 @@ export function EdgesStep() {
       delete nextSlugs[edge.id]
       const nextDescriptions = { ...edgeDescriptions }
       delete nextDescriptions[edge.id]
+      const nextEffects = { ...edgeEffects }
+      delete nextEffects[edge.id]
 
       form.setValue(
         'edges',
@@ -166,6 +188,7 @@ export function EdgesStep() {
         shouldDirty: true,
         shouldTouch: true,
       })
+      form.setValue('edge_effects', nextEffects, { shouldDirty: true, shouldTouch: true })
       return
     }
 
@@ -180,6 +203,11 @@ export function EdgesStep() {
     form.setValue(
       'edge_slugs',
       { ...edgeSlugs, [edge.id]: edge.slug },
+      { shouldDirty: true, shouldTouch: true },
+    )
+    form.setValue(
+      'edge_effects',
+      { ...edgeEffects, [edge.id]: parseEdgeEffects(edge.effects) },
       { shouldDirty: true, shouldTouch: true },
     )
     form.setValue(
