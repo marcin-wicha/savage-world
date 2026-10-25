@@ -1,0 +1,28 @@
+origins:
+  - name: Dunestriders
+    slug: dunestriders
+    description: "Keepers of the Old Faith who guide pilgrims across the burning central desert to the Spire. Masters of arid survival. A playable human origin."
+  - name: Greenbloods
+    slug: greenbloods
+    description: "People of the venomous jungle whose bodies neutralize all known toxins. Chemists, medics, and poisoners. A playable human origin."
+  - name: Stepperiders
+    slug: stepperiders
+    description: "Nomadic riders and archers of the open plains, bound to their herds and horses. A playable human origin."
+  - name: The Darkfolk
+    slug: the-darkfolk
+    description: "The people of The City inside The Dark — Aznar's lingering shadow. Dark-sighted, sound-adapted, lightblind. Descended from fugitives. A playable human origin."
+  - name: The Emberborn
+    slug: the-emberborn
+    description: "The fire-cult people of the Emberfall — a closed, obsidian-working people who await their god's breaking free. Ruled by the Ear and the Hand, and made honest by the living rock. A playable human origin."
+  - name: The Leagueborn
+    slug: the-leagueborn
+    description: "Citizens of the League — a federation of free-cities bound by canals, roads, and contracts. Every citizen must wander the world to learn their craft before proving a masterwork to their city. A playable human origin."
+  - name: The Mirrorfolk
+    slug: the-mirrorfolk
+    description: "Hidden herders of the high plateau, descendants of escaped prisoners of war who broke out and hid behind the mirrorwood. Masters of camouflage and mirrorwood craft. A playable human origin."
+  - name: The Shieldborn
+    slug: the-shieldborn
+    description: "The warrior aristocracy of the Iron Dominion, ruled by a king who united the highlander clans centuries ago. Children are taken at seven to be forged into soldiers in the Shield-Grounds. The king is a god hiding among mortals. A playable human origin."
+  - name: Wind-wall Barbarians
+    slug: wind-wall-barbarians
+    description: "The Stormfolk of the world's edge, where the wind wall never relents. Hardened by cold and wind-driven dust, loud of voice, and fearless of death. A playable human origin."

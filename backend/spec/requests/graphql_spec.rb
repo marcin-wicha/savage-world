@@ -7,14 +7,17 @@ RSpec.describe "GraphQL", type: :request do
       headers: json_headers
   end
 
-  it "returns origins with snake_case fields" do
-    origin = create(:origin)
+  it "returns origins with their selectable fields" do
+    origin = create(:origin, name: "The Mirrorfolk", slug: "the-mirrorfolk", description: "Hidden herders.")
 
-    execute("{ origins(first: 10) { nodes { id created_at updated_at } } }")
+    execute("{ origins(first: 10) { nodes { id name slug description created_at updated_at } } }")
 
     expect(response).to have_http_status(:ok)
     expect(json.dig("data", "origins", "nodes")).to contain_exactly(
       "id" => origin.id.to_s,
+      "name" => "The Mirrorfolk",
+      "slug" => "the-mirrorfolk",
+      "description" => "Hidden herders.",
       "created_at" => origin.created_at.iso8601,
       "updated_at" => origin.updated_at.iso8601
     )

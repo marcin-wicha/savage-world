@@ -13,6 +13,7 @@ export const characterFormSchema = z.object({
       .max(60, 'Use 60 characters or fewer.'),
     description: z.string().trim().max(500, 'Use 500 characters or fewer.'),
   }),
+  origin: z.string().min(1, 'Choose an origin.'),
   hindrances: z.array(z.string()),
   hindrance_severities: z.record(z.string(), selectedHindranceSeveritySchema),
   hindrance_slugs: z.record(z.string(), z.string()),
@@ -42,6 +43,7 @@ export const characterFormDefaults: CharacterFormValues = {
     name: '',
     description: '',
   },
+  origin: '',
   hindrances: [],
   hindrance_severities: {},
   hindrance_slugs: {},
@@ -69,7 +71,7 @@ export type CharacterStepId =
 
 export const characterStepFields: Record<CharacterStepId, FieldPath<CharacterFormValues>[]> = {
   concept: ['concept.name', 'concept.description'],
-  origin: [],
+  origin: ['origin'],
   hindrances: ['hindrances'],
   attributes: ['attributes'],
   skills: ['skills'],

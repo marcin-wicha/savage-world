@@ -197,7 +197,10 @@ scalar JSON
 
 type Origin {
   created_at: ISO8601DateTime!
+  description: String!
   id: ID!
+  name: String!
+  slug: String!
   updated_at: ISO8601DateTime!
 }
 

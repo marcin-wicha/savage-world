@@ -103,6 +103,18 @@ describe('GearStep', () => {
     expect(screen.getAllByText('Light Radius:', { exact: false })).toHaveLength(2)
   })
 
+  it('uses local slug artwork when the API does not provide artwork', async () => {
+    renderStep()
+
+    await screen.findByText('2 items')
+
+    const artwork = document.querySelectorAll('[data-slot="gear-artwork"]')
+
+    expect(artwork).toHaveLength(3)
+    expect(artwork[0]).toHaveAttribute('src', '/gear/torch.webp')
+    expect(artwork[1]).toHaveAttribute('src', '/gear/sword-long.webp')
+  })
+
   it('filters by category and search', async () => {
     const user = userEvent.setup()
     renderStep()

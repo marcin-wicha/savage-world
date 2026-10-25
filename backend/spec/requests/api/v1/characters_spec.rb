@@ -5,6 +5,7 @@ RSpec.describe "Characters", type: :request do
   let(:edge) { create(:edge) }
   let(:hindrance) { create(:hindrance) }
   let(:skill) { create(:skill) }
+  let(:origin) { create(:origin) }
   let(:character_id) { 12_345 }
 
   before { sign_in(user) }
@@ -33,6 +34,7 @@ RSpec.describe "Characters", type: :request do
           character_id,
           name: "Nathan Drake",
           rank: "seasoned",
+          origin_id: origin.id,
           edge_ids: [ edge.id ],
           hindrance_ids: [ hindrance.id ],
           skill_ids: [ skill.id ]
@@ -44,12 +46,14 @@ RSpec.describe "Characters", type: :request do
         "id" => character_id,
         "name" => "Nathan Drake",
         "rank" => "seasoned",
+        "origin_id" => origin.id,
         "edge_ids" => [ edge.id ],
         "hindrance_ids" => [ hindrance.id ],
         "skill_ids" => [ skill.id ]
       )
 
       character = user.characters.find(character_id)
+      expect(character.origin).to eq(origin)
       expect(character.edges).to contain_exactly(edge)
       expect(character.hindrances).to contain_exactly(hindrance)
       expect(character.skills).to contain_exactly(skill)
@@ -74,6 +78,7 @@ RSpec.describe "Characters", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(json.dig("character", "name")).to eq("New Name")
+      expect(json.dig("character", "origin_id")).to be_nil
       expect(character.reload.rank).to eq("veteran")
       expect(character.edges).to contain_exactly(new_edge)
       expect(character.hindrances).to contain_exactly(hindrance)
@@ -96,6 +101,40 @@ RSpec.describe "Characters", type: :request do
       expect(response).to have_http_status(:ok)
       expect(character.reload.edges).to be_empty
       expect(character.hindrances).to contain_exactly(hindrance)
+    end
+
+    it "updates, preserves, and clears an origin" do
+      character = create(:character, user: user, origin: origin)
+      replacement = create(:origin)
+
+      put_character(character.id, origin_id: replacement.id)
+      expect(response).to have_http_status(:ok)
+      expect(json.dig("character", "origin_id")).to eq(replacement.id)
+      expect(character.reload.origin).to eq(replacement)
+
+      put_character(character.id, name: "Updated Name")
+      expect(response).to have_http_status(:ok)
+      expect(json.dig("character", "origin_id")).to eq(replacement.id)
+
+      put_character(character.id, origin_id: nil)
+      expect(response).to have_http_status(:ok)
+      expect(json.dig("character", "origin_id")).to be_nil
+      expect(character.reload.origin).to be_nil
+    end
+
+    it "rejects invalid origin ids without changing the character" do
+      character = create(:character, user: user, origin: origin, name: "Original")
+
+      put_character(character.id, name: "Changed", origin_id: "not-an-id")
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "origin_id")).to eq([ "must be an integer id or null" ])
+      expect(character.reload.name).to eq("Original")
+      expect(character.origin).to eq(origin)
+
+      put_character(character.id, origin_id: 0)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "origin_id")).to eq([ "contains unknown id: 0" ])
     end
 
     it "is idempotent for repeated upserts" do

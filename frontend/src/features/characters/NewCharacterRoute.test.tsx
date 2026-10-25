@@ -13,6 +13,27 @@ vi.mock('@/lib/api-client', async (importOriginal) => {
   return {
     ...actual,
     graphqlRequest: vi.fn().mockResolvedValue({
+      origins: {
+        nodes: [
+          {
+            id: '1',
+            name: 'Dunestriders',
+            slug: 'dunestriders',
+            description: 'Keepers of the Old Faith.',
+            created_at: '',
+            updated_at: '',
+          },
+          {
+            id: '2',
+            name: 'Greenbloods',
+            slug: 'greenbloods',
+            description: 'People of the venomous jungle.',
+            created_at: '',
+            updated_at: '',
+          },
+        ],
+        pageInfo: { hasNextPage: false, endCursor: null },
+      },
       hindrances: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
       skills: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
       gear: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
@@ -78,6 +99,24 @@ describe('NewCharacterRoute', () => {
     expect(screen.getByRole('region', { name: /derived statistics/i })).toBeInTheDocument()
   })
 
+  it('blocks advancing until an origin is selected', async () => {
+    const user = userEvent.setup()
+
+    renderRoute()
+
+    await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    expect(screen.getByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
+    expect(screen.getByText(/choose an origin/i)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Dunestriders' }))
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    expect(await screen.findByRole('heading', { name: /take hindrances/i })).toBeInTheDocument()
+  })
+
   it('keeps the hindrance point balance visible after the Hindrances step', async () => {
     const user = userEvent.setup()
 
@@ -85,6 +124,7 @@ describe('NewCharacterRoute', () => {
 
     await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
     await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(await screen.findByRole('button', { name: 'Dunestriders' }))
     await user.click(screen.getByRole('button', { name: /next/i }))
     await user.click(screen.getByRole('button', { name: /next/i }))
 
@@ -100,6 +140,7 @@ describe('NewCharacterRoute', () => {
 
     await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
     await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(await screen.findByRole('button', { name: 'Dunestriders' }))
     await user.click(screen.getByRole('button', { name: /next/i }))
     await user.click(screen.getByRole('button', { name: /next/i }))
 
@@ -131,6 +172,7 @@ describe('NewCharacterRoute', () => {
     await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
     await user.click(screen.getByRole('button', { name: /next/i }))
     expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
+    await user.click(await screen.findByRole('button', { name: 'Dunestriders' }))
 
     for (let step = 0; step < 6; step += 1) {
       await user.click(screen.getByRole('button', { name: /next/i }))

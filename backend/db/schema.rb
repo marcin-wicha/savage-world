@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_24_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_24_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,6 +50,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_130000) do
     t.integer "rank", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "origin_id"
+    t.index ["origin_id"], name: "index_characters_on_origin_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
     t.check_constraint "rank >= 0 AND rank <= 4", name: "characters_rank_range"
   end
@@ -115,6 +117,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_130000) do
   create_table "origins", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description", null: false
+    t.index ["slug"], name: "index_origins_on_slug", unique: true
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -156,6 +162,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_130000) do
   add_foreign_key "character_hindrances", "hindrances"
   add_foreign_key "character_skills", "characters"
   add_foreign_key "character_skills", "skills"
+  add_foreign_key "characters", "origins"
   add_foreign_key "characters", "users"
   add_foreign_key "sessions", "users"
 end

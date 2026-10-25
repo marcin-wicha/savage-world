@@ -2,6 +2,9 @@ query Origins($first: Int, $after: String) {
   origins(first: $first, after: $after) {
     nodes {
       id
+      name
+      slug
+      description
       created_at
       updated_at
     }

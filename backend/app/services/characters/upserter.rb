@@ -17,10 +17,12 @@ module Characters
 
     def call
       prepare_selections
+      prepare_origin
       return false if errors.any?
 
       Character.transaction do
         character.assign_attributes(@attributes.slice(:name, :rank))
+        character.origin = @origin if @origin_provided
         character.save!
         apply_selections
       end
@@ -57,6 +59,24 @@ module Characters
 
         @selections[key] = ids
       end
+    end
+
+    def prepare_origin
+      return unless @attributes.key?(:origin_id)
+
+      @origin_provided = true
+      return if @attributes[:origin_id].nil?
+
+      origin_id = Integer(@attributes[:origin_id], exception: false)
+      if origin_id.nil?
+        errors[:origin_id] = [ "must be an integer id or null" ]
+        return
+      end
+
+      @origin = Origin.find_by(id: origin_id)
+      return if @origin
+
+      errors[:origin_id] = [ "contains unknown id: #{origin_id}" ]
     end
 
     def normalize_ids(value)

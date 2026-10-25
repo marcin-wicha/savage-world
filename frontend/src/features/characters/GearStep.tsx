@@ -199,19 +199,18 @@ function GearMoneyBalance({ spent }: { spent: number }) {
 }
 
 function GearArtwork({ item }: { item: GearItem }) {
-  return item.artwork_url ? (
+  const artworkUrl = item.artwork_url || `/gear/${item.slug}.webp`
+
+  return (
     <img
-      src={item.artwork_url}
+      data-slot="gear-artwork"
+      src={artworkUrl}
       alt=""
       className="h-32 w-full object-cover"
       onError={(event) => {
         event.currentTarget.hidden = true
       }}
     />
-  ) : (
-    <div className="bg-muted/30 text-muted-foreground flex h-32 items-center justify-center">
-      <PackageOpen className="size-9 opacity-60" aria-hidden="true" />
-    </div>
   )
 }
 

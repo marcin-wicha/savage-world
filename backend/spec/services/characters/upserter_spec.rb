@@ -5,6 +5,7 @@ RSpec.describe Characters::Upserter do
   let(:edge) { create(:edge) }
   let(:hindrance) { create(:hindrance) }
   let(:skill) { create(:skill) }
+  let(:origin) { create(:origin) }
 
   it "creates a character with selections" do
     character = user.characters.new
@@ -14,6 +15,7 @@ RSpec.describe Characters::Upserter do
       attributes: {
         name: "Nathan Drake",
         rank: "seasoned",
+        origin_id: origin.id,
         edge_ids: [ edge.id ],
         hindrance_ids: [ hindrance.id ],
         skill_ids: [ skill.id ]
@@ -24,6 +26,7 @@ RSpec.describe Characters::Upserter do
     expect(upserter).to be_created
     expect(upserter.errors).to be_empty
     expect(character).to be_persisted
+    expect(character.origin).to eq(origin)
     expect(character.edges).to contain_exactly(edge)
     expect(character.hindrances).to contain_exactly(hindrance)
     expect(character.skills).to contain_exactly(skill)
@@ -62,6 +65,52 @@ RSpec.describe Characters::Upserter do
     expect(character.name).to eq("Original")
     expect(character.rank).to eq("novice")
     expect(character.edges).to contain_exactly(edge)
+  end
+
+  it "updates and clears an existing origin when requested" do
+    character = create(:character, user: user, origin: origin)
+    replacement = create(:origin)
+
+    expect(described_class.new(character: character, attributes: { origin_id: replacement.id }).call).to be(true)
+    expect(character.reload.origin).to eq(replacement)
+
+    expect(described_class.new(character: character, attributes: { origin_id: nil }).call).to be(true)
+    expect(character.reload.origin).to be_nil
+  end
+
+  it "leaves an omitted origin unchanged" do
+    character = create(:character, user: user, origin: origin)
+
+    expect(described_class.new(character: character, attributes: { name: "Updated" }).call).to be(true)
+    expect(character.reload.origin).to eq(origin)
+  end
+
+  it "returns origin reference errors before changing the character" do
+    character = create(:character, user: user, origin: origin, name: "Original")
+
+    upserter = described_class.new(
+      character: character,
+      attributes: { name: "Changed", origin_id: "not-an-id" }
+    )
+
+    expect(upserter.call).to be(false)
+    expect(upserter.errors[:origin_id]).to eq([ "must be an integer id or null" ])
+    expect(character.reload.name).to eq("Original")
+    expect(character.origin).to eq(origin)
+  end
+
+  it "rejects unknown origin ids before changing the character" do
+    character = create(:character, user: user, origin: origin, name: "Original")
+
+    upserter = described_class.new(
+      character: character,
+      attributes: { name: "Changed", origin_id: 0 }
+    )
+
+    expect(upserter.call).to be(false)
+    expect(upserter.errors[:origin_id]).to eq([ "contains unknown id: 0" ])
+    expect(character.reload.name).to eq("Original")
+    expect(character.origin).to eq(origin)
   end
 
   it "returns model validation errors" do

@@ -33,6 +33,7 @@ module Api
         params.require(:character).permit(
           :name,
           :rank,
+          :origin_id,
           edge_ids: [],
           hindrance_ids: [],
           skill_ids: []
@@ -44,6 +45,7 @@ module Api
           id: character.id,
           name: character.name,
           rank: character.rank,
+          origin_id: character.origin_id,
           edge_ids: character.edge_ids,
           hindrance_ids: character.hindrance_ids,
           skill_ids: character.skill_ids

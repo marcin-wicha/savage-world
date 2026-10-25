@@ -9,6 +9,7 @@ import { AttributesStep } from './AttributesStep'
 import { DerivedStatistics } from './DerivedStatistics'
 import { ConceptStep } from './ConceptStep'
 import { EdgesStep } from './EdgesStep'
+import { OriginStep } from './OriginStep'
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { HindrancesStep } from './HindrancesStep'
 import { GearStep } from './GearStep'
@@ -108,6 +109,8 @@ export function NewCharacterRoute() {
     const content =
       step.id === 'concept' ? (
         <ConceptStep />
+      ) : step.id === 'origin' ? (
+        <OriginStep />
       ) : step.id === 'hindrances' ? (
         <HindrancesStep />
       ) : step.id === 'attributes' ? (

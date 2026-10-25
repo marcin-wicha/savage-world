@@ -2,6 +2,7 @@ class Character < ApplicationRecord
   enum :rank, { novice: 0, seasoned: 1, veteran: 2, heroic: 3, legendary: 4 }, validate: true
 
   belongs_to :user
+  belongs_to :origin, optional: true
 
   has_many :character_edges, dependent: :destroy
   has_many :edges, through: :character_edges
