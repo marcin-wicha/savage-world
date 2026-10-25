@@ -33,7 +33,7 @@ module Api
       def user_payload(user)
         return nil unless user
 
-        { id: user.id, email_address: user.email_address }
+        { id: user.id, email_address: user.email_address, role: user.role }
       end
     end
   end

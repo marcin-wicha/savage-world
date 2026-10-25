@@ -21,7 +21,7 @@ RSpec.describe "Sessions", type: :request do
       get "/api/v1/session", headers: json_headers
 
       expect(response).to have_http_status(:ok)
-      expect(json["user"]).to eq("id" => user.id, "email_address" => user.email_address)
+      expect(json["user"]).to eq("id" => user.id, "email_address" => user.email_address, "role" => "user")
     end
   end
 
@@ -55,7 +55,7 @@ RSpec.describe "Sessions", type: :request do
       }.to change(Session, :count).by(1)
 
       expect(response).to have_http_status(:created)
-      expect(json["user"]).to eq("id" => user.id, "email_address" => user.email_address)
+      expect(json["user"]).to eq("id" => user.id, "email_address" => user.email_address, "role" => "user")
       expect(response.cookies["session_id"]).to be_present
       expect(response.headers["Set-Cookie"].join).to include("httponly")
       expect(response.cookies["sw_authenticated"]).to eq("1")

@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { buttonVariants } from '@/components/ui/button'
 import { useAuthHint } from '@/features/auth/auth-hint'
 import { LogoutButton } from '@/features/auth/LogoutButton'
+import { useSession } from '@/features/auth/use-session'
 import { cn } from '@/lib/utils'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -13,6 +14,8 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function AppShell() {
   const authenticated = useAuthHint()
+  const session = useSession({ enabled: authenticated })
+  const isAdmin = session.data?.user?.role === 'admin'
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -31,6 +34,11 @@ export function AppShell() {
                 <NavLink to="/characters" className={navLinkClass}>
                   Characters
                 </NavLink>
+                {isAdmin ? (
+                  <NavLink to="/admin/reference-data" className={navLinkClass}>
+                    Admin
+                  </NavLink>
+                ) : null}
                 <LogoutButton />
               </>
             ) : (

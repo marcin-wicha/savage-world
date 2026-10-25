@@ -3,6 +3,7 @@ import { useRestQuery } from '@/lib/queries'
 export type SessionUser = {
   id: number
   email_address: string
+  role: 'user' | 'admin'
 }
 
 export type SessionResponse = {
