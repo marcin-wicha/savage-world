@@ -3,6 +3,7 @@ Edges::Importer.new.call
 Hindrances::Importer.new.call
 Skills::Importer.new.call
 Gears::Importer.new.call
+Powers::Importer.new.call
 
 Edge.where(slug: %w[
   silent-caster home-ground fey-blood arcane-resistance improved-arcane-resistance

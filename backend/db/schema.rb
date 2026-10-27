@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_25_111000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -125,6 +125,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_111000) do
     t.string "slug", null: false
     t.text "description", null: false
     t.index ["slug"], name: "index_origins_on_slug", unique: true
+  end
+
+  create_table "powers", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.integer "rank", null: false
+    t.string "power_points", null: false
+    t.string "duration", null: false
+    t.string "range", null: false
+    t.text "summary", null: false
+    t.string "source_book", null: false
+    t.integer "source_page", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["rank", "name"], name: "index_powers_on_rank_and_name"
+    t.index ["slug"], name: "index_powers_on_slug", unique: true
+    t.index ["source_book"], name: "index_powers_on_source_book"
+    t.check_constraint "rank >= 0 AND rank <= 4", name: "powers_rank_range"
   end
 
   create_table "sessions", force: :cascade do |t|

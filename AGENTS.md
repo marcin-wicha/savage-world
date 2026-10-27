@@ -95,7 +95,8 @@ Current gaps, intentionally left for later feature work:
 - The SWADE character domain is still partial: characters persist attribute
   dice, selected edges/hindrances/skills, and skill dice; supported Edge effects
   are applied to effective traits for the character API and creation summary.
-  Powers, advances, and character-owned gear are not implemented.
+  Character-owned powers, advances, and gear are not implemented; the Power
+  reference catalog is available through a paginated GraphQL query.
 - There is no GraphQL API for characters yet.
 - `Origin` currently has only `id`, `created_at`, and `updated_at`.
 - `Edge` has SWADE core reference data (133 edges) and optional private Fantasy
@@ -274,7 +275,7 @@ both in the same change when committing.
   Keep seed data idempotent.
 - Current tables are `users`, `sessions`, `characters`, `character_edges`,
   `character_hindrances`, `character_skills`, `origins`, `edges`, `hindrances`,
-  `skills`, and `gears`.
+  `skills`, `gears`, and `powers`.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
@@ -296,18 +297,20 @@ both in the same change when committing.
   cost plus optional numeric cost, JSONB requirements/effects, description,
   optional artwork URL, and source book/page. It intentionally has no weight or
   encumbrance column.
+- `powers` stores reference entries with a unique slug, rank, power-point cost,
+  duration, range, summary, and source book/page.
 - Core reference YAML lives in `db/data/edges/swade.yml`,
   `db/data/hindrances/swade.yml`, and `db/data/skills/swade.yml`; it is derived
   from the Apache-2.0 SWADE Foundry system and keeps its `NOTICE.md` and
   `LICENSE`.
 - Private Fantasy Companion YAML lives in the gitignored
   `db/data/edges/private/`, `db/data/hindrances/private/`,
-  `db/data/skills/private/`, and `db/data/gear/private/` directories. Never
-  commit it.
-- `Edges::Importer`, `Hindrances::Importer`, `Skills::Importer`, and
-  `Gears::Importer` load their sources, validate the batch, and upsert by slug.
-  `db/seeds.rb` invokes all four and creates an idempotent `admin` / `admin`
-  login.
+  `db/data/skills/private/`, `db/data/gear/private/`, and
+  `db/data/powers/private/` directories. Never commit it.
+- `Edges::Importer`, `Hindrances::Importer`, `Skills::Importer`,
+  `Gears::Importer`, and `Powers::Importer` load their sources, validate the
+  batch, and upsert by slug. `db/seeds.rb` invokes all five and creates an
+  idempotent `admin` / `admin` login.
 
 ### HTTP API
 
@@ -401,6 +404,9 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
     cursor-paginated gear ordered by name and id. It is public and exposes
     source pricing, structured requirements/effects, descriptions, and optional
     artwork URLs.
+  - `powers(rank, source_book, first, after, last, before)` — cursor-paginated
+    powers ordered by name and id. It is public and exposes rank, power-point
+    cost, duration, range, summary, and source book/page.
 - Query limits: max depth `12`, max complexity `300`. Connections default to 25
   items and cap at 100.
 - `GraphQL::Dataloader` is enabled. Add batched source classes for associations

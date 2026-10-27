@@ -14,6 +14,10 @@ module Types
       argument :source_book, String, required: false
     end
     field :origins, Types::OriginType.connection_type, null: false, max_page_size: 100, default_page_size: 25
+    field :powers, Types::PowerType.connection_type, null: false, max_page_size: 100, default_page_size: 25 do
+      argument :rank, Types::RankEnum, required: false
+      argument :source_book, String, required: false
+    end
     field :skills, Types::SkillType.connection_type, null: false, max_page_size: 100, default_page_size: 25 do
       argument :attribute, String, required: false
       argument :core, Boolean, required: false
@@ -45,6 +49,13 @@ module Types
 
     def origins
       Origin.order(:id)
+    end
+
+    def powers(rank: nil, source_book: nil)
+      scope = Power.order(:name, :id)
+      scope = scope.where(rank: rank) if rank
+      scope = scope.where(source_book: source_book) if source_book
+      scope
     end
 
     def skills(attribute: nil, core: nil, source_book: nil)
