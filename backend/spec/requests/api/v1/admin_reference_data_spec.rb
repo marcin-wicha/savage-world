@@ -14,6 +14,7 @@ RSpec.describe "Admin reference data", type: :request do
     it "lists the editable resources for admins" do
       create(:origin)
       create(:hindrance)
+      create(:power)
 
       get "/api/v1/admin/reference_data", headers: json_headers
 
@@ -23,7 +24,8 @@ RSpec.describe "Admin reference data", type: :request do
         { "key" => "hindrances", "label" => "Hindrances", "count" => 1 },
         { "key" => "edges", "label" => "Edges", "count" => 0 },
         { "key" => "skills", "label" => "Skills", "count" => 0 },
-        { "key" => "gears", "label" => "Gear", "count" => 0 }
+        { "key" => "gears", "label" => "Gear", "count" => 0 },
+        { "key" => "powers", "label" => "Powers", "count" => 1 }
       )
     end
 
@@ -82,6 +84,10 @@ RSpec.describe "Admin reference data", type: :request do
 
       get "/api/v1/admin/edges", headers: json_headers
       expect(json["records"].find { |record| record["id"] == edge.id }["minimum_rank"]).to eq("veteran")
+
+      power = create(:power, rank: :heroic)
+      get "/api/v1/admin/powers", headers: json_headers
+      expect(json["records"].find { |record| record["id"] == power.id }["rank"]).to eq("heroic")
     end
 
     it "rejects invalid records with field details" do

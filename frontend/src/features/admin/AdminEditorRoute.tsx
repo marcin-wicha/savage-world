@@ -184,6 +184,35 @@ const resourceFieldDefinitions: Record<string, FieldDefinition[]> = {
     { key: 'source_page', label: 'Source page', kind: 'number', required: true },
     { key: 'description', label: 'Description', kind: 'textarea' },
   ],
+  powers: [
+    { key: 'name', label: 'Name', kind: 'text', required: true },
+    { key: 'slug', label: 'Slug', kind: 'text' },
+    {
+      key: 'rank',
+      label: 'Rank',
+      kind: 'select',
+      required: true,
+      options: [
+        { value: 'novice', label: 'Novice' },
+        { value: 'seasoned', label: 'Seasoned' },
+        { value: 'veteran', label: 'Veteran' },
+        { value: 'heroic', label: 'Heroic' },
+        { value: 'legendary', label: 'Legendary' },
+      ],
+    },
+    { key: 'power_points', label: 'Power points', kind: 'text', required: true },
+    { key: 'duration', label: 'Duration', kind: 'text', required: true },
+    { key: 'range', label: 'Range', kind: 'text', required: true },
+    { key: 'summary', label: 'Summary', kind: 'textarea', required: true },
+    {
+      key: 'source_book',
+      label: 'Source book',
+      kind: 'select',
+      required: true,
+      options: sourceBookOptions,
+    },
+    { key: 'source_page', label: 'Source page', kind: 'number', required: true },
+  ],
   gear: [
     { key: 'name', label: 'Name', kind: 'text', required: true },
     { key: 'slug', label: 'Slug', kind: 'text' },
@@ -616,7 +645,7 @@ export function AdminEditorRoute() {
       ) : null}
 
       {!referenceData.isPending && !referenceData.isError ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5" aria-label="Reference resources">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6" aria-label="Reference resources">
           {resources.map((resource) => (
             <button
               key={resource.key}

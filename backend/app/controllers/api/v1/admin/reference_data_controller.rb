@@ -7,14 +7,16 @@ module Api
           "hindrances" => Hindrance,
           "edges" => Edge,
           "skills" => Skill,
-          "gears" => Gear
+          "gears" => Gear,
+          "powers" => Power
         }.freeze
         RESOURCE_LABELS = {
           "origins" => "Origins",
           "hindrances" => "Hindrances",
           "edges" => "Edges",
           "skills" => "Skills",
-          "gears" => "Gear"
+          "gears" => "Gear",
+          "powers" => "Powers"
         }.freeze
 
         before_action :authorize_admin
@@ -86,6 +88,7 @@ module Api
           attributes = record.attributes.except("created_at", "updated_at")
           attributes["severity"] = record.severity if record.is_a?(Hindrance)
           attributes["minimum_rank"] = record.minimum_rank if record.is_a?(Edge)
+          attributes["rank"] = record.rank if record.is_a?(Power)
           attributes
         end
 

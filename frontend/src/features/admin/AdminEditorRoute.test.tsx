@@ -98,6 +98,54 @@ describe('AdminEditorRoute', () => {
     expect(screen.getByText('Berserk')).toBeInTheDocument()
   })
 
+  it('shows powers and their reference fields in the Powers resource', async () => {
+    const user = userEvent.setup()
+    useRestQueryMock.mockImplementation((_key, path) => {
+      if (path === '/api/v1/admin/reference_data') {
+        return {
+          data: {
+            resources: [{ key: 'powers', label: 'Powers', count: 1 }],
+          },
+          isPending: false,
+          isError: false,
+        } as never
+      }
+
+      return {
+        data: {
+          resource: 'powers',
+          records: [
+            {
+              id: 1,
+              name: 'Arcane Bolt',
+              slug: 'arcane-bolt',
+              rank: 'novice',
+              power_points: '1',
+              duration: 'Instant',
+              range: 'Smarts×2',
+              summary: 'A ranged arcane attack.',
+              source_book: 'Fantasy Companion',
+              source_page: 146,
+            },
+          ],
+        },
+        isPending: false,
+        isError: false,
+      } as never
+    })
+
+    renderEditor()
+    await user.click(screen.getByRole('button', { name: /powers/i }))
+
+    expect(screen.getByText('Arcane Bolt')).toBeInTheDocument()
+    expect(screen.getByText('Smarts×2')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /edit/i }))
+    expect(screen.getByRole('combobox', { name: 'Rank' })).toHaveValue('novice')
+    expect(screen.getByRole('textbox', { name: 'Power points' })).toHaveValue('1')
+    expect(screen.getByRole('textbox', { name: 'Duration' })).toHaveValue('Instant')
+    expect(screen.getByRole('textbox', { name: 'Summary' })).toHaveValue('A ranged arcane attack.')
+  })
+
   it('opens the selected record form in a modal over the table', async () => {
     const user = userEvent.setup()
 
