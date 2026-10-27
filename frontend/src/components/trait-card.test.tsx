@@ -25,7 +25,7 @@ describe('TraitCard', () => {
   it('keeps long descriptions inside a scrollable card body', () => {
     const { container } = render(
       <TraitCard
-        title="Arcane Sensitivity"
+        title="Long Hindrance"
         size="lg"
         description={'A spell gone wrong. '.repeat(100)}
       />,

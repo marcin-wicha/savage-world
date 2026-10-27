@@ -22,9 +22,9 @@ RSpec.describe "SWADE edge seed data" do
     end
   end
 
-  it "contains 133 unique edges" do
-    expect(edges.size).to eq(133)
-    expect(edges.map { |edge| edge["slug"] }.uniq.size).to eq(133)
+  it "contains 131 unique edges" do
+    expect(edges.size).to eq(131)
+    expect(edges.map { |edge| edge["slug"] }.uniq.size).to eq(131)
   end
 
   it "contains only valid edges" do
@@ -37,7 +37,7 @@ RSpec.describe "SWADE edge seed data" do
   it "preserves the core category counts" do
     expect(edges.map { |edge| edge["category"] }.tally).to eq(
       "combat" => 44,
-      "background" => 24,
+      "background" => 22,
       "power" => 14,
       "social" => 14,
       "professional" => 12,

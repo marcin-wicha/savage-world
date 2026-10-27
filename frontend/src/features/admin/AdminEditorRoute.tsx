@@ -5,6 +5,7 @@ import { useForm, type UseFormRegister } from 'react-hook-form'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
+import { FilterButton } from '@/components/filter-button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -448,6 +449,8 @@ export function AdminEditorRoute() {
   const [editingRecord, setEditingRecord] = useState<AdminRecord | undefined>()
   const [formOpen, setFormOpen] = useState(false)
   const [deleteError, setDeleteError] = useState<string | undefined>()
+  const [search, setSearch] = useState('')
+  const [recordFilters, setRecordFilters] = useState<Record<string, string[]>>({})
   const referenceData = useRestQuery<ReferenceDataResponse>(
     ['admin-reference-data'],
     '/api/v1/admin/reference_data',
@@ -464,6 +467,20 @@ export function AdminEditorRoute() {
   )
   const records = useMemo(() => recordsQuery.data?.records ?? [], [recordsQuery.data])
   const fields = useMemo(() => fieldsForResource(activeKey, records), [activeKey, records])
+  const categoricalFields = fields.filter((field) => field.kind === 'select')
+  const normalizedSearch = search.trim().toLowerCase()
+  const visibleRecords = records.filter((record) => {
+    const matchesSearch =
+      !normalizedSearch ||
+      Object.values(record).some((value) =>
+        displayValue(value).toLowerCase().includes(normalizedSearch),
+      )
+    const matchesFilters = categoricalFields.every((field) => {
+      const selected = recordFilters[field.key] ?? []
+      return selected.length === 0 || selected.includes(displayValue(record[field.key]))
+    })
+    return matchesSearch && matchesFilters
+  })
   const formSchema = useMemo(() => buildSchema(fields), [fields])
   const form = useForm<AdminFormValues>({
     resolver: zodResolver(formSchema),
@@ -516,6 +533,8 @@ export function AdminEditorRoute() {
 
   const chooseResource = (key: string) => {
     setSelectedKey(key)
+    setSearch('')
+    setRecordFilters({})
     setEditingRecord(undefined)
     setFormOpen(false)
     setDeleteError(undefined)
@@ -625,10 +644,40 @@ export function AdminEditorRoute() {
             <CardDescription>
               {recordsQuery.isPending
                 ? 'Loading records…'
-                : `${records.length} records in this catalog.`}
+                : `${visibleRecords.length} of ${records.length} records shown.`}
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {!recordsQuery.isError ? (
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <Input
+                  aria-label={`Search ${selectedResource.label}`}
+                  placeholder={`Search ${selectedResource.label.toLowerCase()}…`}
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  className="max-w-sm"
+                />
+                {categoricalFields.map((field) => {
+                  const options = Array.from(
+                    new Set(records.map((record) => displayValue(record[field.key]))),
+                  )
+                    .filter((value) => value.length > 0)
+                    .sort((left, right) => left.localeCompare(right))
+                    .map((value) => ({ value, label: value }))
+                  return options.length > 1 ? (
+                    <FilterButton
+                      key={field.key}
+                      label={field.label}
+                      options={options}
+                      value={recordFilters[field.key] ?? []}
+                      onValueChange={(value) =>
+                        setRecordFilters((current) => ({ ...current, [field.key]: value }))
+                      }
+                    />
+                  ) : null
+                })}
+              </div>
+            ) : null}
             {recordsQuery.isError ? (
               <p className="text-danger" role="alert">
                 Could not load {selectedResource.label.toLowerCase()}.
@@ -640,6 +689,10 @@ export function AdminEditorRoute() {
                   Add the first record
                 </Button>
               </div>
+            ) : visibleRecords.length === 0 && !recordsQuery.isPending ? (
+              <p className="text-muted-foreground py-6 text-center text-sm">
+                No records match the current search and filters.
+              </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-2xl text-left text-sm">
@@ -650,45 +703,50 @@ export function AdminEditorRoute() {
                           {field.label}
                         </th>
                       ))}
-                      <th className="px-3 py-3 text-right font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {records.map((record, index) => (
+                    {visibleRecords.map((record, index) => (
                       <tr
                         key={String(record.id ?? index)}
-                        className="border-border border-b last:border-0"
+                        className="group border-border border-b last:border-0"
                       >
-                        {tableFields.map((field) => (
+                        {tableFields.map((field, fieldIndex) => (
                           <td
                             key={field.key}
-                            className="max-w-56 truncate px-3 py-3"
+                            className="max-w-56 px-3 py-3"
                             title={displayValue(record[field.key])}
                           >
-                            {displayValue(record[field.key])}
+                            {fieldIndex === 0 ? (
+                              <div className="flex items-center gap-3">
+                                <span className="truncate">{displayValue(record[field.key])}</span>
+                                <div className="flex shrink-0 gap-2 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => openEdit(record)}
+                                  >
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => deleteRecord(record)}
+                                    disabled={deleteMutation.isPending}
+                                  >
+                                    Delete
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="block truncate">
+                                {displayValue(record[field.key])}
+                              </span>
+                            )}
                           </td>
                         ))}
-                        <td className="px-3 py-3">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="outline"
-                              onClick={() => openEdit(record)}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deleteRecord(record)}
-                              disabled={deleteMutation.isPending}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -705,45 +763,52 @@ export function AdminEditorRoute() {
       ) : null}
 
       {formOpen ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {editingRecord
-                ? `Edit ${selectedResource?.label.replace(/s$/, '')}`
-                : `Add ${selectedResource?.label.replace(/s$/, '')}`}
-            </CardTitle>
-            <CardDescription>
-              Enter the complete record. JSON fields must contain a valid array or object.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-6" onSubmit={submit} noValidate>
-              <div className="grid gap-5 md:grid-cols-2">
-                {fields.map((field) => (
-                  <RecordField
-                    key={field.key}
-                    field={field}
-                    register={form.register}
-                    message={form.formState.errors[field.key]?.message}
-                  />
-                ))}
-              </div>
-              {form.formState.errors.root?.message ? (
-                <p className="text-danger" role="alert">
-                  {form.formState.errors.root.message}
-                </p>
-              ) : null}
-              <div className="flex flex-wrap justify-end gap-2">
-                <Button type="button" variant="ghost" onClick={closeForm}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSaving}>
-                  {isSaving ? 'Saving…' : editingRecord ? 'Save changes' : 'Create record'}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+        <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <Card
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reference-record-form-title"
+            className="max-h-[min(90vh,48rem)] w-full max-w-4xl overflow-y-auto shadow-xl"
+          >
+            <CardHeader>
+              <CardTitle id="reference-record-form-title">
+                {editingRecord
+                  ? `Edit ${selectedResource?.label.replace(/s$/, '')}`
+                  : `Add ${selectedResource?.label.replace(/s$/, '')}`}
+              </CardTitle>
+              <CardDescription>
+                Enter the complete record. JSON fields must contain a valid array or object.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form className="space-y-6" onSubmit={submit} noValidate>
+                <div className="grid gap-5 md:grid-cols-2">
+                  {fields.map((field) => (
+                    <RecordField
+                      key={field.key}
+                      field={field}
+                      register={form.register}
+                      message={form.formState.errors[field.key]?.message}
+                    />
+                  ))}
+                </div>
+                {form.formState.errors.root?.message ? (
+                  <p className="text-danger" role="alert">
+                    {form.formState.errors.root.message}
+                  </p>
+                ) : null}
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button type="button" variant="ghost" onClick={closeForm}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Saving…' : editingRecord ? 'Save changes' : 'Create record'}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       ) : null}
     </section>
   )

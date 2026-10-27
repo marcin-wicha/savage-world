@@ -10,13 +10,13 @@ RSpec.describe "GraphQL hindrances", type: :request do
   it "returns hindrances with snake_case fields and structured requirements" do
     hindrance = create(
       :hindrance,
-      name: "Corruption",
-      slug: "corruption",
-      severity: "major",
-      requirements: [ { "kind" => "arcane_background", "value" => "any" } ],
+      name: "Amorous",
+      slug: "amorous",
+      severity: "minor",
+      requirements: [],
       source_book: "Fantasy Companion",
       source_page: 28,
-      description: "A dangerous magical corruption."
+      description: "Easily enamored with a pretty face."
     )
 
     execute(<<~GRAPHQL)
@@ -45,18 +45,15 @@ RSpec.describe "GraphQL hindrances", type: :request do
 
     expect(node).to include(
       "id" => hindrance.id.to_s,
-      "name" => "Corruption",
-      "slug" => "corruption",
-      "severity" => "major",
-      "requirements_text" => "Arcane Background (Any)",
-      "description" => "A dangerous magical corruption.",
+      "name" => "Amorous",
+      "slug" => "amorous",
+      "severity" => "minor",
+      "requirements_text" => "",
+      "description" => "Easily enamored with a pretty face.",
       "source_book" => "Fantasy Companion",
       "source_page" => 28
     )
-    expect(node.dig("requirements", 0)).to eq(
-      "kind" => "arcane_background",
-      "value" => "any"
-    )
+    expect(node["requirements"]).to eq([])
   end
 
   it "filters by severity and source book" do

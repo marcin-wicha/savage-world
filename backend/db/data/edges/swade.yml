@@ -59,17 +59,7 @@ edges:
   source_book: SWADE
   source_page: 37
   repeatable: false
-- name: Arcane Resistance
-  slug: arcane-resistance
-  category: background
-  minimum_rank: novice
-  requirements:
-  - kind: attribute
-    attribute: spirit
-    die: 8
-  source_book: SWADE
-  source_page: 37
-  repeatable: false
+
 - name: Aristocrat
   slug: aristocrat
   category: background
@@ -673,16 +663,7 @@ edges:
   source_book: SWADE
   source_page: 50
   repeatable: false
-- name: Improved Arcane Resistance
-  slug: improved-arcane-resistance
-  category: background
-  minimum_rank: novice
-  requirements:
-  - kind: edge
-    slug: arcane-resistance
-  source_book: SWADE
-  source_page: 37
-  repeatable: false
+
 - name: Improved Block
   slug: improved-block
   category: combat
