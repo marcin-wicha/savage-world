@@ -90,6 +90,10 @@ describe('NewCharacterRoute', () => {
     expect(screen.getByLabelText(/character name/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/^concept$/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /back/i })).toBeEnabled()
+    expect(document.querySelector('[data-slot="multi-step-flow-footer"]')).toHaveClass(
+      'sticky',
+      'bottom-0',
+    )
   })
 
   it('blocks advancing until the concept step is valid', async () => {

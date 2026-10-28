@@ -289,11 +289,12 @@ export function NewCharacterRoute() {
         {t(isEditing ? 'Edit character' : 'Create a character')}
       </h1>
 
-      <Card className="mt-6">
+      <Card className="mt-6 overflow-visible">
         <CardContent>
           <FormProvider {...form}>
             <MultiStepFlow
               steps={steps}
+              footerClassName="sticky bottom-0 z-10 bg-card/95 py-4 backdrop-blur"
               completeLabel={
                 saveMutation.isPending
                   ? t('Saving…')
