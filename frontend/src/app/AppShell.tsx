@@ -21,7 +21,7 @@ export function AppShell() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <header className="border-border bg-background/95 border-b backdrop-blur">
+      <header className="border-border bg-background/95 border-b backdrop-blur print:hidden">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <NavLink to="/" className="text-foreground font-display text-2xl tracking-wide">
             {t('Savage Worlds Builder')}
@@ -64,7 +64,7 @@ export function AppShell() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-12">
+      <main className="mx-auto max-w-7xl px-6 py-12 print:max-w-none print:p-0">
         <Outlet />
       </main>
     </div>

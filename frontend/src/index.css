@@ -122,6 +122,137 @@
   --sidebar-ring: oklch(0.94 0.008 90 / 70%);
 }
 
+@layer components {
+  .sheet-section {
+    border: 1px solid black;
+    padding: 0.55rem;
+    break-inside: avoid;
+  }
+
+  .sheet-section-title {
+    margin: -0.55rem -0.55rem 0.55rem;
+    border-bottom: 1px solid black;
+    background: black;
+    padding: 0.28rem 0.5rem;
+    color: white;
+    font-family: var(--font-sans);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .sheet-info-box {
+    display: grid;
+    min-height: 2.65rem;
+    align-content: end;
+    border: 1px solid black;
+    padding: 0.3rem 0.45rem;
+  }
+
+  .sheet-info-box span,
+  .sheet-stat-box span {
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .sheet-info-box strong {
+    min-height: 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .sheet-die-box {
+    display: flex;
+    min-height: 2.2rem;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid black;
+    padding: 0.25rem 0.45rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .sheet-die-box strong {
+    font-size: 1.15rem;
+    font-weight: 900;
+  }
+
+  .sheet-stat-box {
+    display: grid;
+    min-height: 3.1rem;
+    align-content: center;
+    border: 1px solid black;
+    padding: 0.2rem;
+  }
+
+  .sheet-stat-box strong {
+    font-size: 1rem;
+    font-weight: 900;
+  }
+
+  .sheet-skill-row,
+  .sheet-list-row,
+  .sheet-blank-line {
+    min-height: 1.45rem;
+    border-bottom: 1px solid #777;
+  }
+
+  .sheet-skill-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem;
+    font-size: 0.67rem;
+  }
+
+  .sheet-skill-row strong {
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .sheet-list-row {
+    padding-top: 0.2rem;
+    font-size: 0.7rem;
+  }
+
+  .sheet-table-head {
+    display: grid;
+    grid-template-columns: 1.5fr 0.8fr 1fr 0.5fr;
+    gap: 0.25rem;
+    border-bottom: 1px solid black;
+    padding: 0.25rem 0;
+    font-size: 0.52rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+}
+
+@media print {
+  @page {
+    size: letter portrait;
+    margin: 0.35in;
+  }
+
+  body {
+    background: white !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .character-sheet {
+    width: 100%;
+    max-width: none;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

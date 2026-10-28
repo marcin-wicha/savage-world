@@ -2,7 +2,7 @@ module Api
   module V1
     class CharactersController < ApplicationController
       def index
-        characters = Current.user.characters.order(updated_at: :desc, id: :desc)
+        characters = Current.user.characters.includes(:origin, :edges, :hindrances, character_skills: :skill).order(updated_at: :desc, id: :desc)
         render json: {
           characters: characters.map do |character|
             character_payload(character)
@@ -92,8 +92,13 @@ module Api
           rank: character.rank,
           origin_id: character.origin_id,
           edge_ids: character.edge_ids,
+          edges: character.edges.map { |edge| { id: edge.id, name: edge.name } },
           hindrance_ids: character.hindrance_ids,
+          hindrances: character.hindrances.map { |hindrance| { id: hindrance.id, name: hindrance.name } },
           skill_ids: character.skill_ids,
+          skills: character.character_skills.map do |selection|
+            { id: selection.skill_id, name: selection.skill.name, attribute: selection.skill.linked_attribute, die: selection.die }
+          end,
           attributes: character.attribute_dice,
           skill_dice: character.character_skills.each_with_object({}) do |selection, dice|
             dice[selection.skill_id] = selection.die

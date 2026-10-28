@@ -130,6 +130,9 @@ export function CharactersRoute() {
                 </dl>
                 <div className="mt-6 flex gap-2">
                   <Button asChild size="sm" variant="outline">
+                    <Link to={`/characters/${character.id}/sheet`}>{t('Sheet')}</Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
                     <Link to={`/characters/${character.id}/edit`}>{t('Edit')}</Link>
                   </Button>
                   <Button

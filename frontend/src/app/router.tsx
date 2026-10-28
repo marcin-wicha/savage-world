@@ -5,6 +5,7 @@ import { RequireAdmin } from '@/features/auth/RequireAdmin'
 import { RequireAuth } from '@/features/auth/RequireAuth'
 import { AdminEditorRoute } from '@/features/admin/AdminEditorRoute'
 import { CharactersRoute } from '@/features/characters/CharactersRoute'
+import { CharacterSheetRoute } from '@/features/characters/CharacterSheetRoute'
 import { NewCharacterRoute } from '@/features/characters/NewCharacterRoute'
 import { HomeRoute } from '@/routes/HomeRoute'
 import { NotFoundRoute } from '@/routes/NotFoundRoute'
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
           { path: 'characters', element: <CharactersRoute /> },
           { path: 'characters/new', element: <NewCharacterRoute /> },
           { path: 'characters/:id/edit', element: <NewCharacterRoute /> },
+          { path: 'characters/:id/sheet', element: <CharacterSheetRoute /> },
           {
             element: <RequireAdmin />,
             children: [{ path: 'admin/reference-data', element: <AdminEditorRoute /> }],

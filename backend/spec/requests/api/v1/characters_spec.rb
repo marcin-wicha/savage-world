@@ -90,6 +90,7 @@ RSpec.describe "Characters", type: :request do
           "origin_id" => origin.id,
           "origin_name" => origin.name,
           "edge_ids" => [ edge.id ],
+          "edges" => [ { "id" => edge.id, "name" => edge.name } ],
           "hindrance_ids" => [],
           "skill_ids" => [],
           "attributes" => hash_including("agility" => "d4"),
