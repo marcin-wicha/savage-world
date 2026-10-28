@@ -8,7 +8,7 @@ gem "puma", ">= 5.0"
 gem "bcrypt", "~> 3.1"
 
 # API
-gem "graphql", "~> 2.5"
+gem "graphql", "~> 2.6"
 gem "pundit", "~> 2.5"
 gem "rack-cors"
 
