@@ -4,12 +4,14 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { TraitCard } from '@/components/trait-card'
 import { OriginsDocument, type OriginsQuery } from '@/graphql/generated/graphql'
 import { useGraphqlInfiniteQuery } from '@/lib/queries'
+import { useLanguage } from '@/lib/i18n-context'
 
 import type { CharacterFormValues } from './character-form'
 
 const originArtwork = (slug: string) => `/origins/${slug}.webp`
 
 export function OriginStep() {
+  const { t } = useLanguage()
   const form = useFormContext<CharacterFormValues>()
   const selectedId = useWatch({ control: form.control, name: 'origin' })
   const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
@@ -43,28 +45,30 @@ export function OriginStep() {
   return (
     <div className="grid gap-6">
       <div className="grid max-w-xl gap-2">
-        <h2 className="text-foreground text-xl font-medium">Choose an origin</h2>
+        <h2 className="text-foreground text-xl font-medium">{t('Choose an origin')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          Select the culture and background that shaped your character.
+          {t('Select the culture and background that shaped your character.')}
         </p>
       </div>
 
       {!isLoadingAll && !isError ? (
         <p className="text-muted-foreground text-sm" aria-live="polite">
-          {origins.length} {origins.length === 1 ? 'origin' : 'origins'}
+          {origins.length} {origins.length === 1 ? t('origin') : t('origins')}
         </p>
       ) : null}
 
-      {isLoadingAll ? <p className="text-muted-foreground text-sm">Loading origins…</p> : null}
+      {isLoadingAll ? (
+        <p className="text-muted-foreground text-sm">{t('Loading origins…')}</p>
+      ) : null}
 
       {isError ? (
         <p className="text-danger text-sm" role="alert">
-          Could not load origins. Try again.
+          {t('Could not load origins. Try again.')}
         </p>
       ) : null}
 
       {!isLoadingAll && !isError && origins.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No origins are available.</p>
+        <p className="text-muted-foreground text-sm">{t('No origins are available.')}</p>
       ) : null}
 
       {!isLoadingAll && !isError && origins.length > 0 ? (
@@ -72,8 +76,8 @@ export function OriginStep() {
           {origins.map((origin) => (
             <TraitCard
               key={origin.id}
-              title={origin.name}
-              description={origin.description}
+              title={t(origin.name)}
+              description={t(origin.description)}
               backgroundImage={originArtwork(origin.slug)}
               selected={origin.id === selectedId}
               size="md"

@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
 
 import { graphqlRequest } from '@/lib/api-client'
+import { LanguageProvider } from '@/lib/i18n'
 
 import { OriginStep } from './OriginStep'
 import { characterFormDefaults, type CharacterFormValues } from './character-form'
@@ -25,7 +26,8 @@ const origins = [
     id: '1',
     name: 'Dunestriders',
     slug: 'dunestriders',
-    description: 'Keepers of the Old Faith.',
+    description:
+      'Keepers of the Old Faith who guide pilgrims across the burning central desert to the Spire. Masters of arid survival.',
     created_at: '',
     updated_at: '',
   },
@@ -33,7 +35,8 @@ const origins = [
     id: '2',
     name: 'Greenbloods',
     slug: 'greenbloods',
-    description: 'People of the venomous jungle.',
+    description:
+      'People of the venomous jungle whose bodies neutralize all known toxins. Chemists, medics, and poisoners.',
     created_at: '',
     updated_at: '',
   },
@@ -63,7 +66,9 @@ function renderStep() {
 
   render(
     <QueryClientProvider client={queryClient}>
-      <Harness formRef={formRef} />
+      <LanguageProvider>
+        <Harness formRef={formRef} />
+      </LanguageProvider>
     </QueryClientProvider>,
   )
 
@@ -72,6 +77,7 @@ function renderStep() {
 
 describe('OriginStep', () => {
   beforeEach(() => {
+    window.localStorage.clear()
     graphqlRequestMock.mockReset()
     graphqlRequestMock.mockResolvedValue({
       origins: {
@@ -86,12 +92,29 @@ describe('OriginStep', () => {
 
     expect(await screen.findByRole('button', { name: 'Dunestriders' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Greenbloods' })).toBeInTheDocument()
-    expect(screen.getByText('Keepers of the Old Faith.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Keepers of the Old Faith who guide pilgrims across the burning central desert to the Spire. Masters of arid survival.',
+      ),
+    ).toBeInTheDocument()
     expect(document.querySelector('img[src="/origins/dunestriders.webp"]')).toBeInTheDocument()
     expect(
       document.querySelector('.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3'),
     ).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /reveal origins traits/i })).not.toBeInTheDocument()
+  })
+
+  it('translates backend-provided origin names and descriptions into Polish', async () => {
+    window.localStorage.setItem('savage-worlds-language', 'pl')
+
+    renderStep()
+
+    expect(await screen.findByRole('button', { name: 'Wędrowcy Wydm' })).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Strażnicy Starej Wiary, którzy prowadzą pielgrzymów przez rozpaloną pustynię do Iglicy. Mistrzowie przetrwania w suchym klimacie.',
+      ),
+    ).toBeInTheDocument()
   })
 
   it('selects one origin and replaces it when another is chosen', async () => {
@@ -128,7 +151,9 @@ describe('OriginStep', () => {
 
     render(
       <QueryClientProvider client={queryClient}>
-        <Harness formRef={{ current: null }} />
+        <LanguageProvider>
+          <Harness formRef={{ current: null }} />
+        </LanguageProvider>
       </QueryClientProvider>,
     )
 

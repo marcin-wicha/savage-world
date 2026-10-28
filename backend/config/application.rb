@@ -14,6 +14,7 @@ module SavageWorlds
     # API-only application: no server-rendered views or asset pipeline.
     config.api_only = true
     config.active_storage.variant_processor = :disabled
+    config.i18n.load_path += Dir[Rails.root.join("config/locales/private/*.yml")]
 
     # API-only apps omit cookie and session middleware by default. Session
     # cookies are required for browser authentication.

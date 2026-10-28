@@ -1,3 +1,5 @@
+import { useLanguage } from '@/lib/i18n-context'
+
 const defaultSkillPoints = 12
 
 type SkillPointsBalanceProps = {
@@ -5,6 +7,7 @@ type SkillPointsBalanceProps = {
 }
 
 export function SkillPointsBalance({ spentPoints }: SkillPointsBalanceProps) {
+  const { t } = useLanguage()
   const defaultPointsSpent = Math.min(spentPoints, defaultSkillPoints)
   const availablePoints = Math.max(defaultSkillPoints - defaultPointsSpent, 0)
   const pointsProgress = (availablePoints / defaultSkillPoints) * 100
@@ -18,9 +21,9 @@ export function SkillPointsBalance({ spentPoints }: SkillPointsBalanceProps) {
     >
       <div className="flex items-start justify-between gap-4">
         <div className="grid gap-1">
-          <p className="text-foreground text-sm font-medium">Skill points</p>
+          <p className="text-foreground text-sm font-medium">{t('Skill points')}</p>
           <p className="text-muted-foreground text-xs leading-5">
-            Spend these twelve points before using Hindrance points for additional skills.
+            {t('Spend these twelve points before using Hindrance points for additional skills.')}
           </p>
         </div>
         <p data-slot="skill-points" className="text-foreground shrink-0 text-lg font-semibold">
@@ -29,11 +32,11 @@ export function SkillPointsBalance({ spentPoints }: SkillPointsBalanceProps) {
       </div>
       <div
         role="progressbar"
-        aria-label="Skill points available"
+        aria-label={t('Skill points available')}
         aria-valuemin={0}
         aria-valuemax={defaultSkillPoints}
         aria-valuenow={availablePoints}
-        aria-valuetext={`${availablePoints} of ${defaultSkillPoints} skill points available`}
+        aria-valuetext={`${availablePoints} ${t('of')} ${defaultSkillPoints} ${t('skill points available')}`}
         className="bg-muted h-2 overflow-hidden rounded-full"
       >
         <div

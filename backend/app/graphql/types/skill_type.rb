@@ -12,5 +12,13 @@ module Types
     def attribute
       object.linked_attribute
     end
+
+    def name
+      translated(:name)
+    end
+
+    def description
+      translated(:description)
+    end
   end
 end

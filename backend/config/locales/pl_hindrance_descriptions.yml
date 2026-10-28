@@ -1,0 +1,425 @@
+pl:
+  reference_data:
+    hindrance:
+      all-thumbs:
+        description: >-
+          Z powodu wychowania, braku doświadczenia lub zwykłego pecha niektórzy nie
+          radzą sobie z urządzeniami mechanicznymi i technologicznymi. Ułomność ta
+          nakłada karę −2 podczas obsługi urządzeń mechanicznych lub elektrycznych.
+          Jeśli postać wyrzuci Krytyczną Porażkę podczas używania takiego urządzenia
+          (o ile nie ma ono już wbudowanego efektu), urządzenie się psuje. Jeśli
+          Mistrz Gry uzna to za stosowne, można je naprawić testem Naprawy i poświęcając
+          1k6 godzin.
+      anemic:
+        description: >-
+          Postacie anemiczne są szczególnie podatne na choroby, wpływ środowiska i
+          zmęczenie. Otrzymują karę −2 do testów Wigoru wykonywanych, by oprzeć się
+          Zmęczeniu (zob. Zagrożenia, od strony 125).
+      arrogant:
+        description: >-
+          Twoja postać nie uważa, że jest najlepsza — ona to wie. Niezależnie od tego,
+          czy chodzi o szermierkę, kung-fu czy malarstwo, niewielu może się z nią równać,
+          a ona chętnie się tym chełpi. Samo zwycięstwo jej nie wystarcza: chce
+          zdominować przeciwnika i udowodnić, że nikt jej nie dorównuje. To wojownik,
+          który rozbraja przeciwnika w pojedynku tylko po to, by podnieść jego miecz
+          i oddać mu go z szyderczym uśmiechem. Aroganccy szukają w walce największego
+          zagrożenia, przebijając się przez słabszych wrogów tylko dlatego, że stoją
+          im na drodze.
+      bad-eyes:
+        description: >-
+          Wzrok twojej postaci nie jest już taki jak dawniej. Otrzymuje karę −1 do
+          każdego testu Cechy zależnego od wzroku (na przykład ataków dystansowych i
+          testów Spostrzegawczości) albo −2, jeśli jest to Poważna Ułomność. W realiach,
+          w których dostępne są okulary, noszenie ich znosi tę karę. Jeśli okulary
+          zostaną zgubione lub uszkodzone podczas walki (zwykle jest na to 50% szans,
+          gdy postać zostanie Ranna, upadnie lub dozna innego urazu), postać jest
+          Rozproszona (a przy Poważnej Ułomności także Narażona) do końca swojej
+          następnej tury.
+      bad-luck:
+        description: >-
+          Twoja postać ma nieco mniej szczęścia niż inni. Otrzymuje o jeden żeton
+          szczęścia mniej na sesję gry. Postać nie może jednocześnie mieć tej Ułomności
+          i Przewagi Szczęście.
+      big-mouth:
+        description: >-
+          Jak mówi przysłowie, cicha woda brzegi rwie. Ta postać mogłaby zatopić całą
+          armadę samym gadaniem. Nie potrafi dochować tajemnicy. Zdradza plany i
+          wygaduje rzeczy, które powinny pozostać między przyjaciółmi — zwykle w
+          najmniej odpowiednim momencie.
+      blind:
+        description: >-
+          Postać całkowicie nie widzi. Otrzymuje karę −6 do wszystkich zadań fizycznych
+          wymagających wzroku (decyduje Mistrz Gry). W zamian niewidoma postać
+          otrzymuje wybraną przez siebie darmową Przewagę, która rekompensuje tę
+          szczególnie trudną Ułomność.
+      bloodthirsty:
+        description: >-
+          Twoja postać nigdy nie bierze jeńców, chyba że bezpośrednio nadzoruje ją
+          przełożony. Jej bezwzględność sprawia, że wrogowie odpłacają jej tym samym,
+          często pozbawia ją cennych informacji, przysparza stałych nieprzyjaciół i —
+          zależnie od realiów — może wpędzić ją w kłopoty z przełożonymi lub władzami.
+      cant-swim:
+        description: >-
+          Dzięki basenom, łatwym podróżom nad jeziora i morze oraz powszechnej edukacji
+          większość ludzi w XXI wieku umie pływać. Dawniej nie było to oczywiste — osoby
+          wychowane z dala od łagodnych akwenów często nie potrafiły tego robić.
+          Postać z tą Ułomnością otrzymuje karę −2 do Atletyki podczas pływania, a
+          każdy cal ruchu w wodzie kosztuje 3 cale Tempa. Szczegóły opisano w części
+          Ruch (strona 92) i Tonący (strona 126).
+      cautious:
+        description: >-
+          Ta osoba zawsze zachowuje ostrożność i powściągliwość. Nigdy nie podejmuje
+          pochopnych decyzji i lubi szczegółowo planować działania na długo przed
+          ich rozpoczęciem.
+      clueless:
+        description: >-
+          Twoja postać nie zwraca uwagi na otaczający ją świat i potrafi nie znaleźć
+          stogu siana w małej stercie igieł. Otrzymuje karę −1 do testów Wiedzy ogólnej
+          i Spostrzegawczości.
+      clumsy:
+        description: >-
+          Twoja postać jest niezgrabna, potyka się o powietrze i zawsze jako ostatnia
+          jest wybierana do drużyny sportowej. Otrzymuje karę −2 do testów Atletyki i
+          Skradania.
+      code-of-honor:
+        description: >-
+          Honor jest dla twojej postaci bardzo ważny. Dotrzymuje słowa, nie krzywdzi
+          ani nie zabija jeńców i stara się postępować zgodnie z obowiązującymi w jej
+          świecie zasadami przyzwoitego zachowania.
+      curious:
+        description: >-
+          Ciekawość zabiła kota — i może zgubić także twojego bohatera. Ciekawskie
+          postacie muszą wszystko sprawdzić i zawsze chcą wiedzieć, co kryje się za
+          zagadką lub tajemnicą.
+      death-wish:
+        description: >-
+          Pragnienie śmierci nie oznacza, że bohater chce popełnić samobójstwo — może
+          po prostu uważać, że jego życie jest mniej warte niż szlachetny, choć
+          śmiertelnie niebezpieczny cel. Nie ryzykuje życia bez powodu, ale gdy pojawia
+          się szansa osiągnięcia celu, zrobi wszystko i podejmie każde ryzyko.
+      delusional:
+        description: >-
+          Twoja postać wierzy w coś, co wszyscy inni uważają za dziwne. Drobne urojenia
+          są nieszkodliwe albo postać zachowuje je dla siebie (rząd dodaje środki
+          uspokajające do napojów, psy potrafią mówić, wszyscy jesteśmy bohaterami
+          jakiejś gry i tak dalej). Przy Poważnej Ułomności często głosi swoje poglądy,
+          co czasem prowadzi do niebezpieczeństwa (rządzą nami kosmici, szpitale są
+          śmiertelnie niebezpieczne, mam alergię na zbroje, zombie są moimi
+          przyjaciółmi).
+      doubting-thomas:
+        description: >-
+          Niektórzy nie wierzą w zjawiska nadprzyrodzone, dopóki nie znajdą się w
+          paszczy potwora. Niewierzący Tomasze są sceptykami i próbują racjonalizować
+          to, co nadnaturalne. Wchodzą w niebezpieczeństwo, w które nie wierzą, i
+          szukają innych wyjaśnień każdego niezwykłego wydarzenia. Nawet po zetknięciu
+          się z niepodważalną prawdą z czasem zaczynają wątpić we własne wspomnienia,
+          racjonalizują je lub uznają za jednorazowy wyjątek — by przy następnej
+          tajemnicy znów wątpić.
+      driven:
+        description: >-
+          Ślubowanie jest zobowiązaniem wobec innych; osoby z tą Ułomnością mają cel,
+          który służy im samym. Mogą chcieć chronić krainę, zdobyć odznaczenie,
+          udowodnić, że są najlepszym gladiatorem w Rzymie albo pilotem we flocie
+          galaktycznej. Wersja Drobna kształtuje postać i wpływa na jej decyzje, ale
+          zdarza się rzadko lub jest dość nieszkodliwa. Wersja Poważna oznacza
+          nadrzędne pragnienie, które często powraca albo naraża bohaterkę i jej
+          otoczenie na niebezpieczeństwo.
+      elderly:
+        description: >-
+          Twoja postać jest już w podeszłym wieku, ale nie jest jeszcze gotowa na dom
+          opieki. Jej Tempo spada o 1, a testy biegu otrzymują karę −1 (minimum 1).
+          Otrzymuje też karę −1 do testów Zręczności, Siły i Wigoru, ale nie do testów
+          powiązanych z nimi umiejętności. W zamian mądrość wieku daje jej 5
+          dodatkowych punktów umiejętności, które można przeznaczyć na dowolne
+          umiejętności powiązane ze Sprytem.
+      enemy:
+        description: >-
+          Ktoś nienawidzi postaci i chce ją zniszczyć, uwięzić lub zabić. Wartość
+          Ułomności zależy od potęgi wroga i tego, jak często może się pojawić. Drobny
+          wróg może być samotnym rewolwerowcem szukającym zemsty albo zdradzonym
+          bractwem, które jest groźne, ale rzadko się zjawia. Poważnym wrogiem mogą
+          być wpływowe władze, banda przestępców lub jeden wyjątkowo potężny i
+          nieustępliwy rywal. Jeśli wróg zostanie pokonany, Mistrz Gry powinien z
+          czasem wprowadzić następcę albo postać może wykupić tę Ułomność, poświęcając
+          Rozwój.
+      greedy:
+        description: >-
+          Skąpiec mierzy wartość posiadanymi dobrami i majątkiem. Przy Drobnej
+          Ułomności zaciekle domaga się większej części łupu lub nagrody, na które
+          natrafi drużyna. Przy Poważnej kłóci się o wszystko, co uważa za
+          niesprawiedliwy podział, i może nawet zabić, jeśli poczuje się urażony lub
+          zapragnie czegoś, czego nie może mieć.
+      habit:
+        description: >-
+          Twoja postać ma irytujący lub niebezpieczny nawyk. Drobny nawyk przeszkadza
+          otoczeniu, ale nie jest groźny. Postać może dłubać w nosie, bezustannie
+          bawić się telefonem, wtrącać „wiesz” do każdego zdania albo głośno żuć gumę.
+          Sojusznicy unikają jej, jeśli mogą. Poważny nawyk to wyniszczające lub
+          niebezpieczne uzależnienie fizyczne bądź psychiczne, na przykład od
+          narkotyków, alkoholu czy wirtualnej rzeczywistości. Uzależniona postać,
+          która nie dostanie swojej dawki, musi co 24 godziny wykonać test Wigoru;
+          w razie porażki otrzymuje poziom Zmęczenia. Raz na 24 godziny test Leczenia
+          z użyciem odpowiedniego środka usuwa poziom Zmęczenia na cztery godziny.
+          Potem Zmęczenie wraca i można je usunąć tylko przez zażycie uzależniającej
+          substancji.
+      hard-of-hearing:
+        description: >-
+          Ta Ułomność dotyczy postaci, które częściowo lub całkowicie utraciły słuch.
+          Przy wersji Drobnej otrzymują karę −4 do wszystkich testów Spostrzegawczości
+          opartych na słuchu, także przy budzeniu przez głośne dźwięki. Wersja Poważna
+          oznacza głuchotę: postać nie słyszy i automatycznie oblewa testy
+          Spostrzegawczości zależne od słuchu. Aparat słuchowy zmniejsza karę o 2,
+          ale wymaga baterii i ma 50% szans wypaść, gdy postać zostanie Ranna, upadnie
+          lub dozna innego urazu.
+      heroic:
+        description: >-
+          Ta szlachetna osoba nigdy nie odmawia komuś w potrzebie. Może nie robić tego
+          z radością, ale zawsze rusza na ratunek tym, którzy nie potrafią pomóc sobie
+          sami. Jako pierwsza wbiegłaby do płonącego budynku, zwykle zgadza się
+          polować na potwory za niewielką zapłatę lub zupełnie za darmo i łatwo ją
+          przekonać wzruszającą opowieścią.
+      hesitant:
+        description: >-
+          W stresujących sytuacjach twoja postać się waha. Podczas walki dobiera dwie
+          karty akcji i działa zgodnie z niższą. Jeśli dobierze Jokera, używa go
+          normalnie i ignoruje tę Ułomność w tej rundzie (dlatego jako Drobna
+          Ułomność zwiększa szansę dobrania Jokera!). Postać nie może wybrać Przewagi
+          Szybki ani Zimna krew.
+      illiterate:
+        description: >-
+          Twoja postać nie potrafi czytać. Umie podpisać się i wie, co oznacza znak
+          STOP, ale niewiele więcej. Słabo radzi sobie też z matematyką: prawdopodobnie
+          obliczy 2 + 2 = 4, ale mnożenie i podobne działania są poza jej zasięgiem.
+          Postać nie potrafi czytać ani pisać w żadnym języku, niezależnie od tego,
+          iloma językami mówi.
+      impulsive:
+        description: >-
+          Ryzykant niemal zawsze najpierw działa, a dopiero potem myśli. Rzadko
+          zastanawia się nad konsekwencjami przed podjęciem działania.
+      jealous:
+        description: >-
+          Niepewność siebie prowadzi do zazdrości o osiągnięcia innych lub
+          zaborczości wobec tego, co postać uważa za swoje. Często narzeka, dąsa się,
+          pożąda cudzych rzeczy lub uznania, przypisuje sobie czyjeś zasługi,
+          nie wykonuje poleceń i ogólnie sprawia problemy. Przy Drobnej Ułomności
+          zazdrość dotyczy jednej rzeczy, na przykład „niezrównanych” umiejętności
+          pilotażu lub obiektu uczuć. Przy Poważnej postać zazdrości każdemu, kto jej
+          dorównuje lub ją przewyższa. Oczernia rywali, próbuje ich przyćmić albo
+          aktywnie knuje, by podważyć ich pozycję.
+      loyal:
+        description: >-
+          Ten wierny obrońca bez wahania ryzykuje życie dla przyjaciół. Nie każda
+          postać z tą Ułomnością musi tak postępować, ale gdy przyjaciele są
+          zagrożeni, zawsze jako pierwsza rusza im na pomoc.
+      mean:
+        description: >-
+          Ta zrzęda jest zgryźliwa i nieprzyjemna. Niechętnie robi cokolwiek dla
+          innych, za przysługi żąda zapłaty i nie przyjmuje nagród ani uprzejmości z
+          wdzięcznością. Oprócz oczywistych problemów odgrywania postaci otrzymuje
+          karę −1 do testów Perswazji.
+      mild-mannered:
+        description: >-
+          Ta łagodna osoba nie wydaje się groźna. Może być trochę pulchna, mieć
+          przyjazną twarz lub cichy głos. Niezależnie od przyczyny trudno jej
+          wyglądać na twardziela. Otrzymuje karę −2 do testów Zastraszania.
+      mute:
+        description: >-
+          W wyniku urazu lub od urodzenia postać nie potrafi mówić. W razie potrzeby
+          może pisać wiadomości, używać języka migowego lub innych form komunikacji
+          wizualnej. Odczytanie takiej komunikacji może wymagać testu
+          Spostrzegawczości; obowiązują kary wynikające między innymi ze słabego
+          oświetlenia.
+      obese:
+        description: >-
+          Osoby, które dobrze znoszą swoją wagę, mają Przewagę Krzepki. Pozostałe są
+          Otyłe. Postać nie może jednocześnie mieć Przewagi Krzepki i tej Ułomności,
+          a jej Rozmiar nie może wzrosnąć powyżej +3. Rozmiar (a tym samym Krzepa)
+          otyłego bohatera wzrasta o 1. Tempo spada o 1, a kość biegu o jeden typ
+          (minimum k4). Siłę na potrzeby zbroi i noszonego ekwipunku (ale nie broni)
+          traktuje się jako niższą o jeden typ kości (minimum k4). Postać może mieć
+          też trudności ze znalezieniem pasującej zbroi lub odzieży albo z przejściem
+          przez ciasne przestrzenie.
+      obligation:
+        description: >-
+          Twoja postać ma obowiązek, którym musi zajmować się codziennie lub regularnie.
+          Może to być praca, wolontariat, opieka nad rodziną lub przyjaciółmi i tym
+          podobne. Zwykle zajmuje około 20 godzin w większości tygodni, a w wersji
+          Poważnej co najmniej 40. Gracz powinien omówić z Mistrzem Gry, na czym
+          dokładnie polega ten obowiązek.
+      one-arm:
+        description: >-
+          Twoja postać straciła rękę przy urodzeniu lub w walce. Na szczęście druga
+          ręka jest (teraz) tą sprawniejszą. Zadania wymagające obu rąk, takie jak
+          niektóre testy Atletyki (decyduje Mistrz Gry) lub użycie broni
+          dwuręcznej, otrzymują modyfikator −4.
+      one-eye:
+        description: >-
+          Ten weteran stracił oko i ma problemy z oceną odległości. Otrzymuje karę −2
+          do każdego testu Cechy zależnego od wzroku, gdy cel znajduje się dalej niż
+          5 cali (10 jardów).
+      outsider:
+        description: >-
+          W społeczeństwie złożonym z niewielu grup twoja postać do żadnej z nich nie
+          należy. Może to być rdzenny mieszkaniec Ameryki w miasteczku na Dzikim
+          Zachodzie, kosmita wśród ludzkich żołnierzy albo półork w drużynie elfów,
+          krasnoludów i ludzi. Miejscowi mogą zawyżać ceny, ignorować prośby o pomoc
+          i traktować ją jak kogoś z niższej klasy. Postać otrzymuje karę −2 do testów
+          Perswazji na osoby spoza własnej grupy. Wersja Poważna oznacza także
+          niewielkie lub żadne prawa w głównym obszarze kampanii. Może być innym
+          gatunkiem wśród ksenofobów, przybyszem w okrutnej i zacofanej cywilizacji
+          albo sztuczną inteligencją, której prawa nie uznają za osobę.
+      overconfident:
+        description: >-
+          Nie ma rzeczy, której twoja postać nie mogłaby pokonać. Przynajmniej tak
+          uważa. Jest przekonana, że potrafi niemal wszystko, i nigdy nie chce wycofać
+          się przed wyzwaniem. Nie jest samobójcą, ale regularnie podejmuje się zadań
+          przekraczających granice rozsądku.
+      pacifist:
+        description: >-
+          Twoja postać bezwzględnie nie znosi przemocy. Przy Drobnej Ułomności walczy
+          tylko wtedy, gdy nie ma innego wyjścia, i nigdy nie pozwala zabijać jeńców
+          ani bezbronnych ofiar. Postać z Poważną Ułomnością nigdy nie walczy z żywymi
+          istotami. Może się bronić, ale nie skrzywdzi trwale rozumnych, żywych
+          stworzeń. Może stosować metody nieśmiercionośne (zob. strona 104), ale tylko
+          w obronie własnej lub innych. Zdecydowanie złe istoty, nieumarli, demony i
+          podobne stworzenia są dozwolonym celem nawet dla postaci z Poważną
+          Ułomnością.
+      phobia:
+        description: >-
+          Fobie to przytłaczające i irracjonalne lęki dręczące psychikę bohatera.
+          Gdy postać znajdzie się w obecności obiektu swojej fobii (decyduje Mistrz
+          Gry; zwykle wystarczy go zobaczyć), otrzymuje karę −1 do wszystkich testów
+          Cechy przy Drobnej Ułomności albo −2 przy Poważnej. Fobia nie powinna być
+          zbyt oczywista: każdy może bać się wampirów, więc nie jest to fobia, lecz
+          zdrowy rozsądek. Zwykle dotyczy przypadkowego elementu kojarzącego się z
+          wydarzeniem. Pamiętaj: fobie są irracjonalne.
+      poverty:
+        description: >-
+          Mówi się, że głupiec szybko rozstaje się z pieniędzmi. Twój bohater jest
+          jednym z nich. Zaczyna z połową zwykłych funduszy w danym świecie i nie
+          potrafi zatrzymać pieniędzy zdobytych podczas przygód. Ogólnie rzecz biorąc,
+          co tydzień gry jego majątek zmniejsza się o połowę.
+      quirk:
+        description: >-
+          Ta osoba ma drobne dziwactwo, zwykle zabawne, choć czasem wpędzające ją w
+          kłopoty. Szermierz może zawsze próbować wyryć inicjały na przeciwnikach,
+          krasnolud może bez przerwy chwalić swoją kulturę, a snobistyczna debiutantka
+          może odmawiać jedzenia, picia lub rozmowy z niższymi klasami.
+      ruthless:
+        description: >-
+          Fanatyk zrobi niemal wszystko, by osiągnąć swoje cele. Przy Poważnej
+          Ułomności krzywdzi każdego, kto stanie mu na drodze. Przy Drobnej powstrzymuje
+          się przed wyrządzeniem prawdziwej krzywdy wszystkim poza tymi, którzy
+          bezpośrednio mu się sprzeciwiają.
+      secret:
+        description: >-
+          Twoja postać skrywa tajemnicę, by chronić siebie lub innych. Przy Drobnej
+          Ułomności jej ujawnienie byłoby kłopotliwe, ale nie zagrażałoby życiu.
+          Poważna tajemnica spowodowałaby dotkliwe problemy. Jeśli wyjdzie na jaw,
+          postać powinna zamienić tę Ułomność na Wroga, Zhańbienie, Poszukiwanego lub
+          inną odpowiednią Ułomność zatwierdzoną przez Mistrza Gry.
+      shamed:
+        description: >-
+          Coś prześladuje twojego bohatera. Może złamał przysięgę, może po honorowej
+          walce kazał zabić przeciwnika z powodu wyższej sprawy, a może nie jest
+          tchórzem, ale kiedyś uciekł z bitwy, zostawiając innych na śmierć. Przy
+          Drobnej Ułomności nikt zwykle nie zna haniebnych okoliczności — dręczą one
+          tylko bohatera. Może za wszelką cenę unikać podobnego błędu albo znów
+          postąpić tak samo i mieć do siebie żal. Przy Poważnej Ułomności jego czyn
+          jest powszechnie znany lub znany osobom, na których mu zależy. Pozostałe
+          postacie graczy powinny poznać tę historię jak najwcześniej, najlepiej
+          podczas tworzenia postaci. Jeśli tak się nie stanie, mogą ją ujawnić
+          bohaterowie niezależni i od czasu do czasu wykorzystać przeciwko niemu.
+      slow:
+        description: >-
+          Niepełnosprawność lub dawny uraz ogranicza poruszanie się bohatera. Przy
+          Drobnej Ułomności Tempo spada o 1, a kość biegu o jeden typ (jeśli wynosi
+          k4, spada do k4 − 1). Przy Poważnej kość biegu spada o jeden typ, Tempo o 2,
+          a testy Atletyki i testy przeciwko Atletyce (na przykład podczas Prób lub
+          chwytania) otrzymują karę −2. Postać z tą Ułomnością nie może wybrać
+          Przewagi Szybkonogi. Proteza: postać z wersją Drobną może używać protezy;
+          jeśli ją straci, obowiązują ją efekty wersji Poważnej. Wózki: mniej więcej
+          od epoki wiktoriańskiej postać może bezpłatnie zacząć z ręcznym wózkiem.
+          W realiach współczesnych może wybrać też lekki lub elektryczny wózek.
+          Każdy wózek wymaga w miarę równego podłoża (decyduje Mistrz Gry). RĘCZNY:
+          Tempo wynosi połowę kości Atletyki (maksymalnie 3); postać nie może biegać.
+          LEKKI: Tempo wynosi połowę kości Atletyki; postać może biegać z k4 (Drobna)
+          albo k4 − 1 (Poważna). ELEKTRYCZNY: Tempo 6 na równym podłożu, 3 na
+          nierównym; postać nie może biegać. Większość wózków elektrycznych może
+          przejechać około 10 mil przed ponownym ładowaniem.
+      small:
+        description: >-
+          Ten bohater jest bardzo chudy, bardzo niski lub jedno i drugie. Jego Rozmiar
+          (zob. strona 106) spada o 1, co obniża również Krzepę. Rozmiar nie może
+          spaść poniżej −1, ale kara do Krzepy pozostaje. Na przykład niski niziołek
+          zachowuje Rozmiar −1 i traci punkt Krzepy.
+      stubborn:
+        description: >-
+          Uparci zawsze chcą postawić na swoim i nigdy nie przyznają się do błędu.
+          Nawet gdy pomyłka jest oczywista, próbują ją usprawiedliwić półprawdami i
+          wymówkami.
+      suspicious:
+        description: >-
+          Twoja postać nie ufa nikomu. Przy Drobnej Ułomności jej paranoja często
+          utrudnia zaufanie innym. Może żądać zapłaty z góry, domagać się umów na
+          piśmie albo wierzyć, że nawet przyjaciele chcą ją oszukać. Przy Poważnej
+          Ułomności testy Wsparcia pomagające tej postaci otrzymują karę −2.
+      thin-skinned:
+        description: >-
+          Osobiste przytyki łatwo dotykają tę osobę. Przy Drobnej Ułomności otrzymuje
+          karę −2, gdy odpiera ataki Drwiną. Przy Poważnej kara wynosi −4.
+      timid:
+        description: >-
+          Nie każdy ma nerwy ze stali. Twoja postać źle znosi widok krwi i przemocy
+          oraz boi się zranienia. Otrzymuje karę −2 do testów Strachu i podczas
+          opierania się Zastraszaniu.
+      tongue-tied:
+        description: >-
+          Twoja postać nie potrafi powiedzieć niczego efektownego (albo wpada na to
+          dopiero później), zbacza z tematu, próbując kogoś przekonać, i ogólnie
+          kiepsko się komunikuje. Otrzymuje karę −1 do testów Zastraszania, Występów,
+          Perswazji i Drwin, jeśli opierają się na mowie.
+      ugly:
+        description: >-
+          Atrakcyjni ludzie mają łatwiej. Ta nieszczęsna osoba do nich nie należy.
+          Otrzymuje karę −1 do testów Perswazji albo −2, jeśli wybierze Poważną
+          Ułomność.
+      vengeful:
+        description: >-
+          Zemsta oznacza kłopoty dla kogoś, a ten bohater zamierza ją wymierzyć. Przy
+          Drobnej Ułomności zwykle szuka zemsty zgodnie z prawem; sposób zależy od
+          sytuacji. Niektórzy planują miesiącami, inni żądają natychmiastowego
+          zadośćuczynienia. Postać z Poważną Ułomnością nie pozwoli niczemu stanąć na
+          drodze do rozrachunku. Nie oznacza to, że od razu użyje przemocy, ale jej
+          działania będą eskalować, aż osiągnie pełną satysfakcję.
+      vow:
+        description: >-
+          Postać złożyła przysięgę osobie lub sprawie, w którą wierzy. Poziom
+          Ułomności zależy od niebezpieczeństwa związanego z jej wypełnieniem i od
+          tego, jak często może się pojawić. Drobna przysięga może dotyczyć służby
+          zakonowi o szerokich celach, które rzadko kolidują z planami drużyny.
+          Poważna przysięga często i długotrwale wymaga czasu oraz naraża życie
+          postaci.
+      wanted:
+        description: >-
+          Twoja postać popełniła przestępstwo i zostanie aresztowana, jeśli władze ją
+          rozpoznają. Zakłada to, że w danym świecie istnieją prawa i policja, która
+          ich pilnuje. Poziom Ułomności zależy od powagi przestępstwa i aktywności
+          łowców. Drobna Ułomność może oznaczać liczne niezapłacone mandaty za
+          parkowanie (w kampanii, w której czasem trzeba prowadzić) albo poważniejsze
+          przestępstwo popełnione daleko od głównego obszaru kampanii. Oskarżenie o
+          morderstwo to niemal zawsze Poważna Ułomność, jeśli ktoś może szukać
+          sprawiedliwości lub zemsty.
+      young:
+        description: >-
+          Bohater ma 12–15 lat (w ludzkich latach; należy dostosować to do innych ras).
+          Ma tylko 4 punkty na rozwój atrybutów zamiast 5 i 10 punktów umiejętności
+          zamiast 12. W zależności od realiów mogą go też ograniczać przepisy — nie
+          może prowadzić, posiadać broni palnej i tak dalej. W zamian młodzi mają
+          sporo szczęścia: na początku każdej sesji dobierają dodatkowy żeton
+          szczęścia (łączy się to z innymi Przewagami, takimi jak Szczęście czy
+          Wielkie szczęście). Większość młodych postaci powinna też wybrać Ułomność
+          Drobna postać, ale nie jest to obowiązkowe. Przy Poważnej Ułomności postać
+          ma 8–11 lat, otrzymuje tylko 3 punkty na atrybuty i 10 na umiejętności oraz
+          musi wybrać Ułomność Drobna postać. Bardzo młodzi bohaterowie dobierają
+          dwa dodatkowe żetony szczęścia na początku każdej sesji.

@@ -8,6 +8,7 @@ import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-f
 import { Card, CardContent } from '@/components/ui/card'
 import { ApiError } from '@/lib/api-client'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
+import { useLanguage } from '@/lib/i18n-context'
 
 import { AttributesStep } from './AttributesStep'
 import { DerivedStatistics } from './DerivedStatistics'
@@ -149,6 +150,7 @@ const stepDefinitions: StepDefinition[] = [
 ]
 
 export function NewCharacterRoute() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
@@ -205,13 +207,13 @@ export function NewCharacterRoute() {
   )
 
   if (isEditing && characterQuery.isPending) {
-    return <p className="text-muted-foreground text-sm">Loading character…</p>
+    return <p className="text-muted-foreground text-sm">{t('Loading character…')}</p>
   }
 
   if (isEditing && characterQuery.isError) {
     return (
       <p className="text-danger text-sm" role="alert">
-        Could not load character. Try again.
+        {t('Could not load character. Try again.')}
       </p>
     )
   }
@@ -238,7 +240,7 @@ export function NewCharacterRoute() {
 
     return {
       id: step.id,
-      title: step.title,
+      title: t(step.title),
       content:
         index >= 1 ? (
           <div className="grid gap-6">
@@ -281,10 +283,10 @@ export function NewCharacterRoute() {
   return (
     <section className="mx-auto max-w-7xl">
       <p className="text-muted-foreground text-[0.65rem] font-medium tracking-[0.22em] uppercase">
-        {isEditing ? 'Character editing' : 'Character creation'}
+        {t(isEditing ? 'Character editing' : 'Character creation')}
       </p>
       <h1 className="text-foreground mt-2 text-4xl">
-        {isEditing ? 'Edit character' : 'Create a character'}
+        {t(isEditing ? 'Edit character' : 'Create a character')}
       </h1>
 
       <Card className="mt-6">
@@ -293,7 +295,11 @@ export function NewCharacterRoute() {
             <MultiStepFlow
               steps={steps}
               completeLabel={
-                saveMutation.isPending ? 'Saving…' : isEditing ? 'Save changes' : 'Save character'
+                saveMutation.isPending
+                  ? t('Saving…')
+                  : isEditing
+                    ? t('Save changes')
+                    : t('Save character')
               }
               onBack={() => navigate('/characters')}
               onBeforeNext={(_step, index) => validateStep(index)}
@@ -306,7 +312,7 @@ export function NewCharacterRoute() {
             />
             {saveMutation.error ? (
               <p className="text-danger mt-4 text-sm" role="alert">
-                Could not save character: {saveErrorMessage(saveMutation.error)}
+                {t('Could not save character:')} {t(saveErrorMessage(saveMutation.error) ?? '')}
               </p>
             ) : null}
           </FormProvider>

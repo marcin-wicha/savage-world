@@ -1,10 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "GraphQL edges", type: :request do
-  def execute(query, variables: nil)
+  def execute(query, variables: nil, locale: nil)
+    headers = json_headers
+    headers["X-Language"] = locale if locale
     post "/graphql",
       params: { query: query, variables: variables }.to_json,
-      headers: json_headers
+      headers: headers
   end
 
   it "returns edges with snake_case fields and structured requirements" do
@@ -82,6 +84,37 @@ RSpec.describe "GraphQL edges", type: :request do
         { "kind" => "skill", "skill" => "athletics", "die" => 8 },
         { "kind" => "skill", "skill" => "shooting", "die" => 8 }
       ]
+    )
+  end
+
+  it "returns Polish reference names and localized requirement text when requested" do
+    create(
+      :edge,
+      name: "Ace",
+      slug: "ace",
+      category: "professional",
+      minimum_rank: "novice",
+      description: "Ace description in English.",
+      requirements: [
+        { "kind" => "attribute", "attribute" => "agility", "die" => 8 },
+        { "kind" => "wild_card" }
+      ]
+    )
+
+    query = "{ edges { nodes { name requirements_text description } } }"
+    execute(query, locale: "pl")
+
+    expect(json.dig("data", "edges", "nodes", 0)).to eq(
+      "name" => "As",
+      "requirements_text" => "Nowicjusz, Zręczność d8+, Dzika karta",
+      "description" => I18n.t("reference_data.edge.ace.description", locale: :pl)
+    )
+
+    execute(query)
+    expect(json.dig("data", "edges", "nodes", 0)).to eq(
+      "name" => "Ace",
+      "requirements_text" => "Novice, Agility d8+, Wild Card",
+      "description" => "Ace description in English."
     )
   end
 

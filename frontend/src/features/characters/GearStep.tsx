@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/card'
 import { GearDocument, type GearCategory, type GearQuery } from '@/graphql/generated/graphql'
 import { useGraphqlInfiniteQuery } from '@/lib/queries'
+import { useLanguage } from '@/lib/i18n-context'
 import { cn } from '@/lib/utils'
 
 import type { CharacterFormValues } from './character-form'
@@ -127,15 +128,16 @@ function formatMoney(amount: number) {
   }).format(amount)
 }
 
-function formatCost(item: GearItem) {
-  if (item.cost === null || item.cost_text === '—') return 'No listed price'
+function formatCost(item: GearItem, t: (text: string) => string) {
+  if (item.cost === null || item.cost_text === '—') return t('No listed price')
   if (/^[\d,.]+(?:\+|\/.*)?$/.test(item.cost_text)) return `$${item.cost_text}`
   if (/^\d+(?:\.\d+)?$/.test(item.cost_text)) return formatMoney(item.cost)
 
-  return item.cost_text
+  return t(item.cost_text)
 }
 
 function GearMoneyBalance({ spent }: { spent: number }) {
+  const { t } = useLanguage()
   const remaining = startingMoney - spent
   const progress = Math.min((spent / startingMoney) * 100, 100)
 
@@ -155,15 +157,15 @@ function GearMoneyBalance({ spent }: { spent: number }) {
             <Coins className="size-4" aria-hidden="true" />
           </span>
           <div className="grid gap-1">
-            <p className="text-foreground text-sm font-medium">Starting funds</p>
+            <p className="text-foreground text-sm font-medium">{t('Starting funds')}</p>
             <p className="text-muted-foreground text-xs leading-5">
-              Buy what your character can carry into the adventure.
+              {t('Buy what your character can carry into the adventure.')}
             </p>
           </div>
         </div>
         <div className="text-right">
           <p className="text-muted-foreground text-[0.65rem] font-medium tracking-[0.16em] uppercase">
-            left
+            {t('left')}
           </p>
           <p
             data-slot="gear-money-remaining"
@@ -175,11 +177,11 @@ function GearMoneyBalance({ spent }: { spent: number }) {
       </div>
       <div
         role="progressbar"
-        aria-label="Starting money spent"
+        aria-label={t('Starting money spent')}
         aria-valuemin={0}
         aria-valuemax={startingMoney}
         aria-valuenow={Math.min(spent, startingMoney)}
-        aria-valuetext={`${formatMoney(spent)} of ${formatMoney(startingMoney)} spent`}
+        aria-valuetext={`${formatMoney(spent)} ${t('of')} ${formatMoney(startingMoney)} ${t('spent')}`}
         className="bg-muted h-2 overflow-hidden rounded-full"
       >
         <div
@@ -191,8 +193,12 @@ function GearMoneyBalance({ spent }: { spent: number }) {
         />
       </div>
       <div className="text-muted-foreground flex justify-between text-xs">
-        <span>{formatMoney(spent)} spent</span>
-        <span>{formatMoney(startingMoney)} starting</span>
+        <span>
+          {formatMoney(spent)} {t('spent')}
+        </span>
+        <span>
+          {formatMoney(startingMoney)} {t('starting')}
+        </span>
       </div>
     </div>
   )
@@ -217,6 +223,7 @@ function GearArtwork({ item }: { item: GearItem }) {
 }
 
 function GearEffects({ item, limit }: { item: GearItem; limit?: number }) {
+  const { t } = useLanguage()
   const entries = effectEntries(item)
   const visibleEntries = limit ? entries.slice(0, limit) : entries
 
@@ -226,12 +233,14 @@ function GearEffects({ item, limit }: { item: GearItem; limit?: number }) {
     <div className="flex flex-wrap gap-1.5">
       {visibleEntries.map(([key, value]) => (
         <Badge key={key} variant="outline" className="max-w-full font-normal">
-          <span className="text-muted-foreground">{displayLabel(key)}:</span>{' '}
-          <span className="truncate">{displayValue(value)}</span>
+          <span className="text-muted-foreground">{t(displayLabel(key))}:</span>{' '}
+          <span className="truncate">{t(displayValue(value))}</span>
         </Badge>
       ))}
       {limit && entries.length > visibleEntries.length ? (
-        <Badge variant="ghost">+{entries.length - visibleEntries.length} more</Badge>
+        <Badge variant="ghost">
+          +{entries.length - visibleEntries.length} {t('more')}
+        </Badge>
       ) : null}
     </div>
   )
@@ -246,6 +255,7 @@ function GearDetails({
   onAdd: () => void
   canAdd: boolean
 }) {
+  const { t } = useLanguage()
   const requirements = requirementLabels(item)
 
   return (
@@ -255,30 +265,30 @@ function GearDetails({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <Badge variant="outline" className="mb-2">
-              {categoryLabels[item.category]}
+              {t(categoryLabels[item.category])}
             </Badge>
-            <CardTitle className="font-display text-xl">{item.name}</CardTitle>
+            <CardTitle className="font-display text-xl">{t(item.name)}</CardTitle>
           </div>
-          <p className="text-foreground shrink-0 text-lg font-semibold">{formatCost(item)}</p>
+          <p className="text-foreground shrink-0 text-lg font-semibold">{formatCost(item, t)}</p>
         </div>
         <CardDescription>
-          {item.source_book} · page {item.source_page}
+          {t(item.source_book)} · {t('page')} {item.source_page}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5">
         {item.description ? (
-          <p className="text-muted-foreground text-sm leading-6">{item.description}</p>
+          <p className="text-muted-foreground text-sm leading-6">{t(item.description)}</p>
         ) : null}
         {requirements.length > 0 ? (
           <div className="grid gap-2">
             <h4 className="text-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-              Requirements
+              {t('Requirements')}
             </h4>
             <ul className="text-muted-foreground grid gap-1 text-sm">
               {requirements.map((requirement) => (
                 <li key={requirement} className="flex gap-2">
                   <span aria-hidden="true">·</span>
-                  <span>{requirement}</span>
+                  <span>{t(requirement)}</span>
                 </li>
               ))}
             </ul>
@@ -287,7 +297,7 @@ function GearDetails({
         {effectEntries(item).length > 0 ? (
           <div className="grid gap-2">
             <h4 className="text-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-              Rules
+              {t('Rules')}
             </h4>
             <GearEffects item={item} />
           </div>
@@ -296,7 +306,11 @@ function GearDetails({
       <CardFooter>
         <Button type="button" className="w-full" onClick={onAdd} disabled={!canAdd}>
           <Plus aria-hidden="true" />
-          {item.cost === null ? 'Price unavailable' : canAdd ? 'Add to pack' : 'Not enough money'}
+          {item.cost === null
+            ? t('Price unavailable')
+            : canAdd
+              ? t('Add to pack')
+              : t('Not enough money')}
         </Button>
       </CardFooter>
     </Card>
@@ -304,6 +318,7 @@ function GearDetails({
 }
 
 export function GearStep() {
+  const { t } = useLanguage()
   const form = useFormContext<CharacterFormValues>()
   const quantities = useWatch({ control: form.control, name: 'gear' }) ?? {}
   const gearNames = useWatch({ control: form.control, name: 'gear_names' }) ?? {}
@@ -338,13 +353,13 @@ export function GearStep() {
     const matchesCategory = category === allCategories || item.category === category
     const matchesSearch =
       !normalizedSearch ||
-      item.name.toLowerCase().includes(normalizedSearch) ||
-      item.description?.toLowerCase().includes(normalizedSearch) ||
-      categoryLabels[item.category].toLowerCase().includes(normalizedSearch)
+      t(item.name).toLowerCase().includes(normalizedSearch) ||
+      (item.description && t(item.description).toLowerCase().includes(normalizedSearch)) ||
+      t(categoryLabels[item.category]).toLowerCase().includes(normalizedSearch)
 
     return matchesCategory && matchesSearch
   })
-  const searchOptions = gear.map((item) => ({ value: item.id, label: item.name }))
+  const searchOptions = gear.map((item) => ({ value: item.id, label: t(item.name) }))
   const activeItem = gearById.get(activeGearId ?? '') ?? filteredGear[0]
   const selectedItems = Object.entries(quantities).flatMap(([id, quantity]) => {
     const item = gearById.get(id)
@@ -383,8 +398,8 @@ export function GearStep() {
   }
 
   const categoryOptions: { value: GearCategoryFilter; label: string }[] = [
-    { value: allCategories, label: 'All gear' },
-    ...categoryOrder.map((value) => ({ value, label: categoryLabels[value] })),
+    { value: allCategories, label: t('All gear') },
+    ...categoryOrder.map((value) => ({ value, label: t(categoryLabels[value]) })),
   ]
 
   return (
@@ -392,11 +407,12 @@ export function GearStep() {
       <div className="grid max-w-2xl gap-2">
         <div className="flex items-center gap-2">
           <ShoppingBag className="text-muted-foreground size-5" aria-hidden="true" />
-          <h2 className="text-foreground text-xl font-medium">Visit the gear shop</h2>
+          <h2 className="text-foreground text-xl font-medium">{t('Visit the gear shop')}</h2>
         </div>
         <p className="text-muted-foreground text-sm leading-6">
-          Browse the catalog, inspect the rules, and assemble a useful pack without spending more
-          than your starting funds.
+          {t(
+            'Browse the catalog, inspect the rules, and assemble a useful pack without spending more than your starting funds.',
+          )}
         </p>
       </div>
 
@@ -407,23 +423,23 @@ export function GearStep() {
           <div className="flex min-w-0 flex-1 items-center gap-2">
             <Search className="text-muted-foreground size-4 shrink-0" aria-hidden="true" />
             <AutocompleteInput
-              aria-label="Search gear"
+              aria-label={t('Search gear')}
               options={searchOptions}
               value={search}
               onValueChange={setSearch}
-              placeholder="Search gear, weapons, armor…"
+              placeholder={t('Search gear, weapons, armor…')}
               className="w-full max-w-xl"
             />
           </div>
           {!isLoadingAll && !isError ? (
             <p className="text-muted-foreground text-sm" aria-live="polite">
-              {filteredGear.length} {filteredGear.length === 1 ? 'item' : 'items'}
+              {filteredGear.length} {filteredGear.length === 1 ? t('item') : t('items')}
             </p>
           ) : null}
         </div>
         <div
           role="tablist"
-          aria-label="Gear categories"
+          aria-label={t('Gear categories')}
           className="border-border flex flex-wrap gap-1 border-b pb-2"
         >
           {categoryOptions.map((option) => (
@@ -445,17 +461,19 @@ export function GearStep() {
       </div>
 
       {isLoadingAll ? (
-        <p className="text-muted-foreground text-sm">Loading the shop catalog…</p>
+        <p className="text-muted-foreground text-sm">{t('Loading the shop catalog…')}</p>
       ) : null}
 
       {isError ? (
         <p className="text-danger text-sm" role="alert">
-          Could not load gear. Try again.
+          {t('Could not load gear. Try again.')}
         </p>
       ) : null}
 
       {!isLoadingAll && !isError && filteredGear.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No gear matches this search or category.</p>
+        <p className="text-muted-foreground text-sm">
+          {t('No gear matches this search or category.')}
+        </p>
       ) : null}
 
       {!isLoadingAll && !isError && filteredGear.length > 0 ? (
@@ -477,7 +495,7 @@ export function GearStep() {
                 >
                   <button
                     type="button"
-                    aria-label={`View details for ${item.name}`}
+                    aria-label={`${t('View details for')} ${t(item.name)}`}
                     aria-pressed={activeItem?.id === item.id}
                     onClick={() => setActiveGearId(item.id)}
                     className="focus-visible:ring-ring/50 block w-full text-left outline-none focus-visible:ring-3"
@@ -486,30 +504,36 @@ export function GearStep() {
                     <CardHeader className="gap-2">
                       <div className="flex items-start justify-between gap-2">
                         <CardTitle className="font-display text-lg leading-tight">
-                          {item.name}
+                          {t(item.name)}
                         </CardTitle>
-                        {quantity > 0 ? <Badge>{quantity} in pack</Badge> : null}
+                        {quantity > 0 ? (
+                          <Badge>
+                            {quantity} {t('in pack')}
+                          </Badge>
+                        ) : null}
                       </div>
-                      <CardDescription>{categoryLabels[item.category]}</CardDescription>
+                      <CardDescription>{t(categoryLabels[item.category])}</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-3 pt-0">
                       <p className="text-muted-foreground line-clamp-3 min-h-15 text-sm leading-5">
-                        {item.description ?? 'Select this item to inspect its available rules.'}
+                        {item.description
+                          ? t(item.description)
+                          : t('Select this item to inspect its available rules.')}
                       </p>
                       <GearEffects item={item} limit={3} />
                     </CardContent>
                   </button>
                   <CardFooter className="flex items-center justify-between gap-3">
-                    <p className="text-foreground text-sm font-semibold">{formatCost(item)}</p>
+                    <p className="text-foreground text-sm font-semibold">{formatCost(item, t)}</p>
                     <Button
                       type="button"
                       size="sm"
                       onClick={() => addItem(item)}
                       disabled={!canAdd}
-                      aria-label={`Add ${item.name} to pack`}
+                      aria-label={`${t('Add')} ${t(item.name)} ${t('to pack')}`}
                     >
                       <Plus aria-hidden="true" />
-                      Add
+                      {t('Add')}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -530,11 +554,11 @@ export function GearStep() {
               <CardHeader>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <CardTitle className="font-display text-xl">Your pack</CardTitle>
+                    <CardTitle className="font-display text-xl">{t('Your pack')}</CardTitle>
                     <CardDescription>
                       {selectedItems.length === 0
-                        ? 'Nothing selected yet.'
-                        : `${selectedItems.length} ${selectedItems.length === 1 ? 'item' : 'items'} selected`}
+                        ? t('Nothing selected yet.')
+                        : `${selectedItems.length} ${selectedItems.length === 1 ? t('item') : t('items')} ${t('selected')}`}
                     </CardDescription>
                   </div>
                   <PackageOpen className="text-muted-foreground size-5" aria-hidden="true" />
@@ -548,7 +572,9 @@ export function GearStep() {
                       className="border-border flex items-center gap-2 border-b pb-2 last:border-0 last:pb-0"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-foreground truncate text-sm font-medium">{item.name}</p>
+                        <p className="text-foreground truncate text-sm font-medium">
+                          {t(item.name)}
+                        </p>
                         <p className="text-muted-foreground text-xs">
                           {formatMoney((item.cost ?? 0) * quantity)}
                         </p>
@@ -557,7 +583,7 @@ export function GearStep() {
                         type="button"
                         variant="outline"
                         size="icon-xs"
-                        aria-label={`Remove one ${item.name}`}
+                        aria-label={`${t('Remove one')} ${t(item.name)}`}
                         onClick={() => setQuantity(item, quantity - 1)}
                       >
                         <Minus aria-hidden="true" />
@@ -567,7 +593,7 @@ export function GearStep() {
                         type="button"
                         variant="outline"
                         size="icon-xs"
-                        aria-label={`Add one ${item.name}`}
+                        aria-label={`${t('Add one')} ${t(item.name)}`}
                         disabled={item.cost === null || spent + item.cost > startingMoney}
                         onClick={() => addItem(item)}
                       >
@@ -577,7 +603,7 @@ export function GearStep() {
                         type="button"
                         variant="ghost"
                         size="icon-xs"
-                        aria-label={`Remove ${item.name}`}
+                        aria-label={`${t('Remove')} ${t(item.name)}`}
                         onClick={() => setQuantity(item, 0)}
                       >
                         <Trash2 aria-hidden="true" />
@@ -587,7 +613,7 @@ export function GearStep() {
                 </CardContent>
               ) : null}
               <CardFooter className="justify-between">
-                <span className="text-muted-foreground text-sm">Pack total</span>
+                <span className="text-muted-foreground text-sm">{t('Pack total')}</span>
                 <span className="text-foreground font-semibold">{formatMoney(spent)}</span>
               </CardFooter>
             </Card>

@@ -1,0 +1,509 @@
+---
+pl:
+  reference_data:
+    origin:
+      dunestriders:
+        name: Wędrowcy Wydm
+        description: Strażnicy Starej Wiary, którzy prowadzą pielgrzymów przez rozpaloną
+          pustynię do Iglicy. Mistrzowie przetrwania w suchym klimacie.
+      greenbloods:
+        name: Zielonokrwiści
+        description: Ludzie z jadowitej dżungli, których organizmy neutralizują wszystkie
+          znane toksyny. Chemicy, medycy i truciciele.
+      stepperiders:
+        name: Jeźdźcy Stepów
+        description: Koczowniczy jeźdźcy i łucznicy otwartych równin, związani ze
+          swoimi stadami i końmi.
+      the-darkfolk:
+        name: Lud Ciemności
+        description: Ludzie Miasta ukrytego w Ciemności — pozostałości cienia Aznara.
+          Widzą w mroku, są przystosowani do dźwięków i ślepi na światło. Pochodzą
+          od zbiegów.
+      the-emberborn:
+        name: Zrodzeni z Żaru
+        description: Lud ognia z Żaropadu — zamknięta społeczność obrabiająca obsydian
+          i czekająca na uwolnienie swojego boga. Rządzą nimi Ucho i Dłoń, a żywa
+          skała uczy ich prawdomówności.
+      the-leagueborn:
+        name: Zrodzeni z Ligi
+        description: Obywatele Ligi — federacji wolnych miast połączonych kanałami,
+          drogami i umowami. Każdy musi wędrować po świecie i doskonalić rzemiosło,
+          zanim przedstawi miastu swoje arcydzieło.
+      the-mirrorfolk:
+        name: Lud Zwierciadeł
+        description: Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych,
+          którzy uciekli i schronili się za lustrzanym lasem. Mistrzowie kamuflażu
+          i obróbki lustrzanego drewna.
+      the-shieldborn:
+        name: Zrodzeni z Tarczy
+        description: Wojownicza arystokracja Żelaznego Dominium, rządzona przez króla,
+          który przed wiekami zjednoczył klany górali. Siedmioletnie dzieci trafiają
+          na Pola Tarczy, gdzie kształtuje się z nich żołnierzy. Król jest bogiem
+          ukrywającym się wśród śmiertelników.
+      wind-wall-barbarians:
+        name: Barbarzyńcy Wichrowej Ściany
+        description: Lud Burzy z krańca świata, gdzie wichrowa ściana nigdy nie ustaje.
+          Zahartowani przez chłód i niesiony wiatrem pył, głośni i nieustraszeni wobec
+          śmierci.
+    edge:
+      ace:
+        name: As
+      acrobat:
+        name: Akrobata
+      alertness:
+        name: Czujność
+      ambidextrous:
+        name: Oburęczność
+      arcane-background:
+        name: Tło magiczne
+      aristocrat:
+        name: Arystokrata
+      artificer:
+        name: Wynalazca
+      assassin:
+        name: Zabójca
+      attractive:
+        name: Atrakcyjny
+      beast-bond:
+        name: Więź ze zwierzęciem
+      beast-master:
+        name: Władca zwierząt
+      berserk:
+        name: Szał
+      block:
+        name: Blok
+      bolster:
+        name: Wzmocnienie
+      brave:
+        name: Odważny
+      brawler:
+        name: Zabijaka
+      brawny:
+        name: Krzepki
+      bruiser:
+        name: Zapaśnik
+      brute:
+        name: Siłacz
+      calculating:
+        name: Wyrachowany
+      champion:
+        name: Czempion
+      channeling:
+        name: Przewodzenie
+      charismatic:
+        name: Charyzmatyczny
+      chi:
+        name: Chi
+      combat-acrobat:
+        name: Akrobata bojowy
+      combat-reflexes:
+        name: Odruchy bojowe
+      command:
+        name: Dowodzenie
+      command-presence:
+        name: Autorytet dowódcy
+      common-bond:
+        name: Wspólnota więzi
+      concentration:
+        name: Koncentracja
+      connections:
+        name: Kontakty
+      counterattack:
+        name: Kontratak
+      danger-sense:
+        name: Zmysł zagrożenia
+      dead-shot:
+        name: Celny strzał
+      dodge:
+        name: Unik
+      double-tap:
+        name: Podwójny strzał
+      elan:
+        name: Zapał
+      expert:
+        name: Ekspert
+      extra-effort:
+        name: Dodatkowy wysiłek
+      extraction:
+        name: Wycofanie
+      fame:
+        name: Sława
+      famous:
+        name: Sławny
+      fast-healer:
+        name: Szybkie leczenie
+      feint:
+        name: Zwód
+      fervor:
+        name: Żar
+      filthy-rich:
+        name: Obrzydliwie bogaty
+      first-strike:
+        name: Pierwsze uderzenie
+      fleet-footed:
+        name: Szybkonogi
+      followers:
+        name: Zwolennicy
+      free-runner:
+        name: Biegacz
+      frenzy:
+        name: Furia
+      gadgeteer:
+        name: Majsterkowicz
+      giant-killer:
+        name: Pogromca olbrzymów
+      great-luck:
+        name: Wielkie szczęście
+      hard-to-kill:
+        name: Trudny do zabicia
+      harder-to-kill:
+        name: Jeszcze trudniejszy do zabicia
+      healer:
+        name: Uzdrowiciel
+      hold-the-line:
+        name: Utrzymać pozycję!
+      holy-unholy-warrior:
+        name: Święty/nieświęty wojownik
+      humiliate:
+        name: Upokorzenie
+      improved-block:
+        name: Ulepszony blok
+      improved-counterattack:
+        name: Ulepszony kontratak
+      improved-dodge:
+        name: Ulepszony unik
+      improved-extraction:
+        name: Ulepszone wycofanie
+      improved-first-strike:
+        name: Ulepszone pierwsze uderzenie
+      improved-frenzy:
+        name: Ulepszony szał
+      improved-nerves-of-steel:
+        name: Ulepszone stalowe nerwy
+      improved-rapid-fire:
+        name: Ulepszone szybkie strzelanie
+      improved-rapid-recharge:
+        name: Ulepszone szybkie ładowanie
+      improved-sweep:
+        name: Ulepszone zamaszyste cięcie
+      improved-trademark-weapon:
+        name: Ulepszona broń popisowa
+      improvisational-fighter:
+        name: Improwizujący wojownik
+      inspire:
+        name: Inspiracja
+      investigator:
+        name: Śledczy
+      iron-jaw:
+        name: Żelazna szczęka
+      iron-will:
+        name: Żelazna wola
+      jack-of-all-trades:
+        name: Złota rączka
+      killer-instinct:
+        name: Instynkt zabójcy
+      level-headed:
+        name: Zimna krew
+      linguist:
+        name: Lingwista
+      liquid-courage:
+        name: Płynna odwaga
+      luck:
+        name: Szczęście
+      marksman:
+        name: Strzelec wyborowy
+      martial-artist:
+        name: Mistrz sztuk walki
+      martial-warrior:
+        name: Wojownik
+      master:
+        name: Mistrz
+      master-tactician:
+        name: Mistrz taktyki
+      master-of-arms:
+        name: Mistrz broni
+      mcgyver:
+        name: McGyver
+      menacing:
+        name: Groźny
+      mentalist:
+        name: Mentalista
+      mighty-blow:
+        name: Potężny cios
+      mr-fix-it:
+        name: Pan Złota Rączka
+      natural-leader:
+        name: Urodzony przywódca
+      nerves-of-steel:
+        name: Stalowe nerwy
+      new-powers:
+        name: Nowe moce
+      no-mercy:
+        name: Bez litości
+      power-points:
+        name: Punkty mocy
+      power-surge:
+        name: Przypływ mocy
+      professional:
+        name: Profesjonalista
+      provoke:
+        name: Prowokacja
+      quick:
+        name: Szybki
+      rabble-rouser:
+        name: Podżegacz
+      rapid-fire:
+        name: Szybkie strzelanie
+      rapid-recharge:
+        name: Szybkie ładowanie
+      reliable:
+        name: Niezawodny
+      retort:
+        name: Riposta
+      rich:
+        name: Bogaty
+      rock-and-roll:
+        name: Rock and roll!
+      scavenger:
+        name: Zbieracz
+      scholar:
+        name: Uczony
+      sidekick:
+        name: Pomocnik
+      soldier:
+        name: Żołnierz
+      soul-drain:
+        name: Wysysanie duszy
+      steady-hands:
+        name: Pewna ręka
+      streetwise:
+        name: Znajomość ulicy
+      strong-willed:
+        name: Silna wola
+      sweep:
+        name: Zamaszyste cięcie
+      tactician:
+        name: Taktyk
+      thief:
+        name: Złodziej
+      tough-as-nails:
+        name: Twardy jak skała
+      tougher-than-nails:
+        name: Twardszy niż skała
+      trademark-weapon:
+        name: Broń popisowa
+      two-fisted:
+        name: Oburęczny wojownik
+      two-gun-kid:
+        name: Rewolwerowiec
+      very-attractive:
+        name: Bardzo atrakcyjny
+      weapon-master:
+        name: Mistrz broni
+      wizard:
+        name: Czarownik
+      woodsman:
+        name: Leśnik
+      work-the-crowd:
+        name: Rozgrzać tłum
+      work-the-room:
+        name: Oczarować salę
+    hindrance:
+      all-thumbs:
+        name: Złote ręce na opak
+      anemic:
+        name: Anemiczny
+      arrogant:
+        name: Arogancki
+      bad-eyes:
+        name: Słaby wzrok
+      bad-luck:
+        name: Pech
+      big-mouth:
+        name: Niewyparzona gęba
+      blind:
+        name: Ślepy
+      bloodthirsty:
+        name: Krwiożerczy
+      cant-swim:
+        name: Nie umie pływać
+      cautious:
+        name: Ostrożny
+      clueless:
+        name: Nierozgarnięty
+      clumsy:
+        name: Niezdarny
+      code-of-honor:
+        name: Kodeks honorowy
+      curious:
+        name: Ciekawski
+      death-wish:
+        name: Pragnienie śmierci
+      delusional:
+        name: Urojony
+      doubting-thomas:
+        name: Niedowiarek
+      driven:
+        name: Zdeterminowany
+      elderly:
+        name: Sędziwy
+      enemy:
+        name: Wróg
+      greedy:
+        name: Chciwy
+      habit:
+        name: Nawyk
+      hard-of-hearing:
+        name: Niedosłuch
+      heroic:
+        name: Heroiczny
+      hesitant:
+        name: Niezdecydowany
+      illiterate:
+        name: Niepiśmienny
+      impulsive:
+        name: Impulsywny
+      jealous:
+        name: Zazdrosny
+      loyal:
+        name: Lojalny
+      mean:
+        name: Złośliwy
+      mild-mannered:
+        name: Łagodny
+      mute:
+        name: Niemy
+      obese:
+        name: Otyły
+      obligation:
+        name: Zobowiązanie
+      one-arm:
+        name: Jednoręki
+      one-eye:
+        name: Jednooki
+      outsider:
+        name: Obcy
+      overconfident:
+        name: Zbyt pewny siebie
+      pacifist:
+        name: Pacyfista
+      phobia:
+        name: Fobia
+      poverty:
+        name: Bieda
+      quirk:
+        name: Dziwactwo
+      ruthless:
+        name: Bezwzględny
+      secret:
+        name: Sekret
+      shamed:
+        name: Zhańbiony
+      slow:
+        name: Powolny
+      small:
+        name: Niski
+      stubborn:
+        name: Uparty
+      suspicious:
+        name: Podejrzliwy
+      thin-skinned:
+        name: Przewrażliwiony
+      timid:
+        name: Nieśmiały
+      tongue-tied:
+        name: Język w supeł
+      ugly:
+        name: Brzydki
+      vengeful:
+        name: Mściwy
+      vow:
+        name: Ślub
+      wanted:
+        name: Poszukiwany
+      young:
+        name: Młody
+    skill:
+      academics:
+        name: Wiedza akademicka
+      athletics:
+        name: Atletyka
+      battle:
+        name: Taktyka
+      boating:
+        name: Żeglarstwo
+      common-knowledge:
+        name: Wiedza ogólna
+      driving:
+        name: Prowadzenie
+      electronics:
+        name: Elektronika
+      faith:
+        name: Wiara
+      fighting:
+        name: Walka
+      focus:
+        name: Skupienie
+      gambling:
+        name: Hazard
+      hacking:
+        name: Hakowanie
+      healing:
+        name: Leczenie
+      intimidation:
+        name: Zastraszanie
+      language:
+        name: Język
+      notice:
+        name: Spostrzegawczość
+      occult:
+        name: Okultyzm
+      performance:
+        name: Występy
+      persuasion:
+        name: Perswazja
+      piloting:
+        name: Pilotaż
+      psionics:
+        name: Psionika
+      repair:
+        name: Naprawa
+      research:
+        name: Badania
+      riding:
+        name: Jeździectwo
+      science:
+        name: Nauka
+      shooting:
+        name: Strzelanie
+      spellcasting:
+        name: Rzucanie zaklęć
+      stealth:
+        name: Skradanie
+      survival:
+        name: Przetrwanie
+      taunt:
+        name: Drwina
+      thievery:
+        name: Złodziejstwo
+      weird-science:
+        name: Dziwna nauka
+    attributes:
+      agility: Zręczność
+      smarts: Spryt
+      spirit: Duch
+      strength: Siła
+      vigor: Wigor
+    ranks:
+      novice: Nowicjusz
+      seasoned: Doświadczony
+      veteran: Weteran
+      heroic: Heroiczny
+      legendary: Legendarny
+    requirements:
+      wild_card: Dzika karta
+      arcane_background: Tło nadprzyrodzone
+    arcane_backgrounds:
+      any: Dowolne
+    conjunctions:
+      or: " lub "

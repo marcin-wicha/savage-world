@@ -7,6 +7,7 @@ import { TraitCardStack, type TraitCardStackTrait } from '@/components/trait-car
 import { Button } from '@/components/ui/button'
 import { EdgesDocument, type EdgeCategory, type EdgesQuery } from '@/graphql/generated/graphql'
 import { useGraphqlInfiniteQuery } from '@/lib/queries'
+import { useLanguage } from '@/lib/i18n-context'
 import { cn } from '@/lib/utils'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
@@ -38,6 +39,7 @@ const edgeArtwork = (slug: string) => `/traits/edges/${slug}.png`
 const edgeHindrancePointCost = 2
 
 export function EdgesStep() {
+  const { language, t } = useLanguage()
   const form = useFormContext<CharacterFormValues>()
   const watchedSelectedIds = useWatch({ control: form.control, name: 'edges' })
   const selectedIds = useMemo(
@@ -130,11 +132,13 @@ export function EdgesStep() {
     : rankFilteredEdges
   const normalizedSearch = search.trim().toLowerCase()
   const filteredEdges = normalizedSearch
-    ? requirementsFilteredEdges.filter((edge) => edge.name.toLowerCase().includes(normalizedSearch))
+    ? requirementsFilteredEdges.filter((edge) =>
+        t(edge.name).toLowerCase().includes(normalizedSearch),
+      )
     : requirementsFilteredEdges
   const searchOptions = rankFilteredEdges.map((edge) => ({
     value: edge.id,
-    label: edge.name,
+    label: t(edge.name),
   }))
   const reservedHindrancePoints = attributeHindrancePointsSpent + skillHindrancePointsSpent
   const edgePointsSpent = selectedIds.length * edgeHindrancePointCost
@@ -222,13 +226,18 @@ export function EdgesStep() {
 
   const traits: TraitCardStackTrait[] = filteredEdges.map((edge) => {
     const isSelected = selectedIds.includes(edge.id)
-    const categoryLabel = categoryLabels[edge.category] ?? edge.category
-    const minimumRankLabel = rankOptions.find((rank) => rank.value === edge.minimum_rank)?.label
+    const categoryLabel =
+      edge.category === 'professional' && language === 'pl'
+        ? t('Professional category')
+        : t(categoryLabels[edge.category] ?? edge.category)
+    const minimumRankLabel = t(
+      rankOptions.find((rank) => rank.value === edge.minimum_rank)?.label ?? edge.minimum_rank,
+    )
 
     return {
-      title: edge.name,
+      title: t(edge.name),
       eyebrow: minimumRankLabel ? `${minimumRankLabel} · ${categoryLabel}` : categoryLabel,
-      description: edge.description || edge.requirements_text || undefined,
+      description: t(edge.description || edge.requirements_text || '') || undefined,
       backgroundImage: edgeArtwork(edge.slug),
       selected: isSelected,
       disabled: !isSelected && availableForEdges < edgeHindrancePointCost,
@@ -238,9 +247,9 @@ export function EdgesStep() {
   return (
     <div className="grid gap-6">
       <div className="grid max-w-xl gap-2">
-        <h2 className="text-foreground text-xl font-medium">Choose edges</h2>
+        <h2 className="text-foreground text-xl font-medium">{t('Choose edges')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          Spend hindrance points to buy edges. Each edge costs two hindrance points.
+          {t('Spend hindrance points to buy edges. Each edge costs two hindrance points.')}
         </p>
       </div>
 
@@ -249,8 +258,8 @@ export function EdgesStep() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <FilterButton
-            label="Rank"
-            options={rankOptions}
+            label={t('Rank')}
+            options={rankOptions.map((option) => ({ ...option, label: t(option.label) }))}
             multiple
             value={ranks}
             onValueChange={setRanks}
@@ -262,41 +271,41 @@ export function EdgesStep() {
             onClick={() => setOnlyRequirementsMet((pressed) => !pressed)}
             className={cn(onlyRequirementsMet && 'bg-accent text-accent-foreground')}
           >
-            Requirements met
+            {t('Requirements met')}
           </Button>
           <AutocompleteInput
-            aria-label="Search edges"
+            aria-label={t('Search edges')}
             options={searchOptions}
             value={search}
             onValueChange={setSearch}
-            placeholder="Search edges"
+            placeholder={t('Search edges')}
             className="w-full sm:w-64"
           />
         </div>
         {!isLoadingAll && !isError ? (
           <p className="text-muted-foreground text-sm" aria-live="polite">
-            {filteredEdges.length} {filteredEdges.length === 1 ? 'edge' : 'edges'}
+            {filteredEdges.length} {filteredEdges.length === 1 ? t('edge') : t('edges')}
           </p>
         ) : null}
       </div>
 
-      {isLoadingAll ? <p className="text-muted-foreground text-sm">Loading edges…</p> : null}
+      {isLoadingAll ? <p className="text-muted-foreground text-sm">{t('Loading edges…')}</p> : null}
 
       {isError ? (
         <p className="text-danger text-sm" role="alert">
-          Could not load edges. Try again.
+          {t('Could not load edges. Try again.')}
         </p>
       ) : null}
 
       {!isLoadingAll && !isError && filteredEdges.length === 0 ? (
         <p className="text-muted-foreground text-sm">
-          No edges match the selected filters or search.
+          {t('No edges match the selected filters or search.')}
         </p>
       ) : null}
 
       {!isLoadingAll && !isError && filteredEdges.length > 0 ? (
         <TraitCardStack
-          category="Edges"
+          category={t('Edges')}
           traits={traits}
           size="md"
           columns={3}

@@ -42,8 +42,20 @@ describe('api-client', () => {
     expect(init.credentials).toBe('include')
     expect(init.method).toBe('GET')
     expect(headers.get('Accept')).toBe('application/json')
+    expect(headers.get('X-Language')).toBe('en')
     expect(headers.get('X-CSRF-Token')).toBeNull()
     expect(ensureCsrfTokenMock).not.toHaveBeenCalled()
+  })
+
+  it('sends the persisted Polish language preference', async () => {
+    window.localStorage.setItem('savage-worlds-language', 'pl')
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 1 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await api.get('/api/v1/characters')
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect((init.headers as Headers).get('X-Language')).toBe('pl')
   })
 
   it('sends JSON bodies and the CSRF token for unsafe methods', async () => {

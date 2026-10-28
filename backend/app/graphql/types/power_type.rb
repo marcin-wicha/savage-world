@@ -10,5 +10,21 @@ module Types
     field :summary, String, null: false
     field :source_book, String, null: false
     field :source_page, Integer, null: false
+
+    def name
+      translated(:name)
+    end
+
+    def duration
+      translated(:duration)
+    end
+
+    def range
+      translated(:range)
+    end
+
+    def summary
+      translated(:summary)
+    end
   end
 end

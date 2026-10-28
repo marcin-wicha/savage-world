@@ -1,10 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "GraphQL hindrances", type: :request do
-  def execute(query, variables: nil)
+  def execute(query, variables: nil, locale: nil)
+    headers = json_headers
+    headers["X-Language"] = locale if locale
     post "/graphql",
       params: { query: query, variables: variables }.to_json,
-      headers: json_headers
+      headers: headers
   end
 
   it "returns hindrances with snake_case fields and structured requirements" do
@@ -54,6 +56,23 @@ RSpec.describe "GraphQL hindrances", type: :request do
       "source_page" => 28
     )
     expect(node["requirements"]).to eq([])
+  end
+
+  it "returns Polish names when requested" do
+    create(
+      :hindrance,
+      name: "All Thumbs",
+      slug: "all-thumbs",
+      severity: "minor",
+      description: "Due to upbringing, lack of exposure, or pure bad luck, some individuals are \"all thumbs\" when it comes to mechanical or technological devices. All Thumbs inflicts a −2 penalty when using mechanical or electrical devices. If he rolls a Critical Failure while using such a device (and it doesn’t already have a built-in effect), it’s broken. If the GM feels it’s appropriate, it can be fixed with a Repair roll and 1d6 hours."
+    )
+
+    execute("{ hindrances { nodes { name description } } }", locale: "pl")
+
+    expect(json.dig("data", "hindrances", "nodes", 0)).to include(
+      "name" => "Złote ręce na opak",
+      "description" => "Z powodu wychowania, braku doświadczenia lub zwykłego pecha niektórzy nie radzą sobie z urządzeniami mechanicznymi i technologicznymi. Ułomność ta nakłada karę −2 podczas obsługi urządzeń mechanicznych lub elektrycznych. Jeśli postać wyrzuci Krytyczną Porażkę podczas używania takiego urządzenia (o ile nie ma ono już wbudowanego efektu), urządzenie się psuje. Jeśli Mistrz Gry uzna to za stosowne, można je naprawić testem Naprawy i poświęcając 1k6 godzin."
+    )
   end
 
   it "filters by severity and source book" do

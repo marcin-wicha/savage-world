@@ -13,8 +13,8 @@ class Hindrance < ApplicationRecord
   validates :source_page, numericality: { only_integer: true, greater_than: 0 }
   validate :requirements_are_valid
 
-  def requirements_text
-    Requirements::Text.new(requirements).to_s
+  def requirements_text(locale: :en)
+    Requirements::Text.new(requirements, locale: locale).to_s
   end
 
   private

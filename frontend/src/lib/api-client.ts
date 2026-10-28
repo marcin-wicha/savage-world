@@ -21,6 +21,19 @@ type GraphQLResponse<TData> = {
 }
 
 const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
+const languageStorageKey = 'savage-worlds-language'
+
+function selectedLanguage(): string {
+  try {
+    return typeof window === 'undefined'
+      ? 'en'
+      : window.localStorage.getItem(languageStorageKey) === 'pl'
+        ? 'pl'
+        : 'en'
+  } catch {
+    return 'en'
+  }
+}
 
 export class ApiError extends Error {
   readonly status: number
@@ -80,6 +93,7 @@ export async function request<TData>(
   const requestHeaders = new Headers(headers)
 
   requestHeaders.set('Accept', 'application/json')
+  requestHeaders.set('X-Language', selectedLanguage())
 
   if (body !== undefined && !requestHeaders.has('Content-Type')) {
     requestHeaders.set('Content-Type', 'application/json')

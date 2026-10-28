@@ -4,6 +4,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { SkillDie } from '@/components/skill-die'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useLanguage } from '@/lib/i18n-context'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { applyEdgeEffects, describeEdgeEffect, parseEdgeEffects } from './edge-effects'
@@ -47,8 +48,10 @@ function SummaryList({
   items: string[]
   emptyLabel?: string
 }) {
+  const { t } = useLanguage()
+
   if (items.length === 0) {
-    return <p className="text-muted-foreground text-sm">{emptyLabel}</p>
+    return <p className="text-muted-foreground text-sm">{t(emptyLabel)}</p>
   }
 
   return (
@@ -69,6 +72,8 @@ type SummaryItem = {
 }
 
 function SummaryItemTooltip({ item }: { item: SummaryItem }) {
+  const { t } = useLanguage()
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -76,19 +81,21 @@ function SummaryItemTooltip({ item }: { item: SummaryItem }) {
           type="button"
           className="text-foreground hover:text-primary focus-visible:ring-ring/50 rounded-sm text-left text-sm underline decoration-dotted underline-offset-4 outline-none focus-visible:ring-3"
         >
-          {item.name}
+          {t(item.name)}
         </button>
       </TooltipTrigger>
       <TooltipContent side="top" align="start" className="leading-5">
-        {item.description}
+        {t(item.description)}
       </TooltipContent>
     </Tooltip>
   )
 }
 
 function SummaryItemList({ items }: { items: SummaryItem[] }) {
+  const { t } = useLanguage()
+
   if (items.length === 0) {
-    return <p className="text-muted-foreground text-sm">None selected.</p>
+    return <p className="text-muted-foreground text-sm">{t('None selected.')}</p>
   }
 
   return (
@@ -107,8 +114,10 @@ function SkillSummaryList({
 }: {
   skills: (SummaryItem & { die: CharacterFormValues['skill_dice'][string]; modifier: number })[]
 }) {
+  const { t } = useLanguage()
+
   if (skills.length === 0) {
-    return <p className="text-muted-foreground text-sm">None selected.</p>
+    return <p className="text-muted-foreground text-sm">{t('None selected.')}</p>
   }
 
   return (
@@ -120,7 +129,7 @@ function SkillSummaryList({
             readOnly
             die={skill.die}
             modifier={skill.modifier}
-            label={`${skill.name} die`}
+            label={`${t(skill.name)} ${t('die')}`}
           />
         </li>
       ))}
@@ -129,6 +138,7 @@ function SkillSummaryList({
 }
 
 export function CharacterSummaryStep() {
+  const { t } = useLanguage()
   const { control } = useFormContext<CharacterFormValues>()
   const values = useWatch({ control })
   const earnedPoints = values.hindrance_points_earned ?? 0
@@ -164,30 +174,30 @@ export function CharacterSummaryStep() {
 
   const hindrances = selectedHindrances.map((id) => ({
     id,
-    name: `${hindranceNames[id] ?? humanize(hindranceSlugs[id] ?? id)} (${hindranceSeverities[id] ?? 'minor'})`,
-    description: hindranceDescriptions[id] ?? 'No description available.',
+    name: `${t(hindranceNames[id] ?? humanize(hindranceSlugs[id] ?? id))} (${t(hindranceSeverities[id] ?? 'minor')})`,
+    description: t(hindranceDescriptions[id] ?? 'No description available.'),
   }))
   const skills = selectedSkills.map((id) => ({
     id,
-    name: skillNames[id] ?? humanize(skillSlugs[id] ?? id),
-    description: skillDescriptions[id] ?? 'No description available.',
+    name: t(skillNames[id] ?? humanize(skillSlugs[id] ?? id)),
+    description: t(skillDescriptions[id] ?? 'No description available.'),
     ...applyEdgeEffects(skillDices[id] ?? 'd4', selectedEffects, 'skill', skillSlugs[id] ?? ''),
   }))
   const edges = selectedEdges.map((id) => ({
     id,
-    name: edgeNames[id] ?? humanize(edgeSlugs[id] ?? id),
-    description: edgeDescriptions[id] ?? 'No description available.',
+    name: t(edgeNames[id] ?? humanize(edgeSlugs[id] ?? id)),
+    description: t(edgeDescriptions[id] ?? 'No description available.'),
   }))
   const gear = Object.entries(gearQuantities).map(
-    ([id, quantity]) => `${gearNames[id] ?? humanize(id)} × ${quantity}`,
+    ([id, quantity]) => `${t(gearNames[id] ?? humanize(id))} × ${quantity}`,
   )
 
   return (
     <div className="grid gap-6">
       <div className="grid max-w-2xl gap-2">
-        <h2 className="text-foreground text-xl font-medium">Review your character</h2>
+        <h2 className="text-foreground text-xl font-medium">{t('Review your character')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          Check every choice before saving this character to your roster.
+          {t('Check every choice before saving this character to your roster.')}
         </p>
       </div>
 
@@ -196,44 +206,49 @@ export function CharacterSummaryStep() {
       {!hindrancePointsBalanced ? (
         <p className="text-danger text-sm" role="alert">
           {remainingPoints > 0
-            ? `Spend all ${remainingPoints} remaining hindrance ${remainingPoints === 1 ? 'point' : 'points'} before saving.`
-            : 'Hindrance points are overspent. Return to an earlier step and adjust your choices.'}
+            ? `${t('Spend all')} ${remainingPoints} ${t('remaining hindrance points before saving.')}`
+            : t(
+                'Hindrance points are overspent. Return to an earlier step and adjust your choices.',
+              )}
         </p>
       ) : (
         <p className="text-muted-foreground text-sm" role="status">
-          All hindrance points have been spent.
+          {t('All hindrance points have been spent.')}
         </p>
       )}
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <SummarySection title="Concept">
+        <SummarySection title={t('Concept')}>
           <dl className="grid gap-3 text-sm">
             <div>
-              <dt className="text-muted-foreground">Name</dt>
-              <dd className="text-foreground font-medium">{concept.name || 'Unnamed'}</dd>
+              <dt className="text-muted-foreground">{t('Name')}</dt>
+              <dd className="text-foreground font-medium">{concept.name || t('Unnamed')}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">Description</dt>
+              <dt className="text-muted-foreground">{t('Description')}</dt>
               <dd className="text-foreground whitespace-pre-wrap">
-                {concept.description || 'No concept description.'}
+                {concept.description || t('No concept description.')}
               </dd>
             </div>
           </dl>
         </SummarySection>
 
-        <SummarySection title="Origin">
+        <SummarySection title={t('Origin')}>
           <p className="text-foreground text-sm font-medium">
-            {values.origin_name ||
-              (values.origin ? `Origin ${values.origin}` : 'No origin selected.')}
+            {values.origin_name
+              ? t(values.origin_name)
+              : values.origin
+                ? `${t('Origin')} ${values.origin}`
+                : t('No origin selected.')}
           </p>
         </SummarySection>
 
-        <SummarySection title="Attributes">
+        <SummarySection title={t('Attributes')}>
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {(Object.keys(attributeLabels) as (keyof CharacterFormValues['attributes'])[]).map(
               (attribute) => (
                 <div key={attribute}>
-                  <dt className="text-muted-foreground text-sm">{attributeLabels[attribute]}</dt>
+                  <dt className="text-muted-foreground text-sm">{t(attributeLabels[attribute])}</dt>
                   <dd className="text-foreground font-medium">
                     {(() => {
                       const effective = applyEdgeEffects(
@@ -251,15 +266,18 @@ export function CharacterSummaryStep() {
           </dl>
         </SummarySection>
 
-        <SummarySection title="Hindrances" description={`${hindrances.length} selected`}>
+        <SummarySection
+          title={t('Hindrances')}
+          description={`${hindrances.length} ${t('selected')}`}
+        >
           <SummaryItemList items={hindrances} />
         </SummarySection>
 
-        <SummarySection title="Skills" description={`${skills.length} selected`}>
+        <SummarySection title={t('Skills')} description={`${skills.length} ${t('selected')}`}>
           <SkillSummaryList skills={skills} />
         </SummarySection>
 
-        <SummarySection title="Edges" description={`${edges.length} selected`}>
+        <SummarySection title={t('Edges')} description={`${edges.length} ${t('selected')}`}>
           <div className="grid gap-2">
             <SummaryItemList items={edges} />
             {selectedEffects.length > 0 ? (
@@ -267,7 +285,7 @@ export function CharacterSummaryStep() {
                 {selectedEdges.flatMap((id) =>
                   parseEdgeEffects(edgeEffects[id]).map((effect, index) => (
                     <li key={`${id}-${index}`}>
-                      {edgeNames[id] ?? 'Edge'}: {describeEdgeEffect(effect)}
+                      {t(edgeNames[id] ?? 'Edge')}: {t(describeEdgeEffect(effect))}
                     </li>
                   )),
                 )}
@@ -276,7 +294,7 @@ export function CharacterSummaryStep() {
           </div>
         </SummarySection>
 
-        <SummarySection title="Gear" description={`${gear.length} selected`}>
+        <SummarySection title={t('Gear')} description={`${gear.length} ${t('selected')}`}>
           <SummaryList items={gear} />
         </SummarySection>
       </div>

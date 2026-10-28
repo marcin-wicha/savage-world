@@ -6,5 +6,13 @@ module Types
     field :description, String, null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+
+    def name
+      translated(:name)
+    end
+
+    def description
+      translated(:description)
+    end
   end
 end

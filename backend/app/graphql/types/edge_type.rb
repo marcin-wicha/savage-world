@@ -12,5 +12,26 @@ module Types
     field :source_book, String, null: false
     field :source_page, Integer, null: false
     field :repeatable, Boolean, null: false
+
+    def name
+      translated(:name)
+    end
+
+    def requirements_text
+      locale = context[:locale] || :en
+      default_text = Edges::RequirementsText.new(object, locale: locale).to_s
+
+      ReferenceData::Translations.translate(
+        :edge,
+        object.slug,
+        :requirements_text,
+        default_text,
+        locale: locale
+      )
+    end
+
+    def description
+      translated(:description)
+    end
   end
 end

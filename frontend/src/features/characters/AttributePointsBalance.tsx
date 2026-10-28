@@ -1,3 +1,5 @@
+import { useLanguage } from '@/lib/i18n-context'
+
 const defaultAttributePoints = 5
 
 type AttributePointsBalanceProps = {
@@ -5,6 +7,7 @@ type AttributePointsBalanceProps = {
 }
 
 export function AttributePointsBalance({ spentPoints }: AttributePointsBalanceProps) {
+  const { t } = useLanguage()
   const defaultPointsSpent = Math.min(spentPoints, defaultAttributePoints)
   const availablePoints = Math.max(defaultAttributePoints - defaultPointsSpent, 0)
   const pointsProgress = (availablePoints / defaultAttributePoints) * 100
@@ -18,9 +21,9 @@ export function AttributePointsBalance({ spentPoints }: AttributePointsBalancePr
     >
       <div className="flex items-start justify-between gap-4">
         <div className="grid gap-1">
-          <p className="text-foreground text-sm font-medium">Attribute points</p>
+          <p className="text-foreground text-sm font-medium">{t('Attribute points')}</p>
           <p className="text-muted-foreground text-xs leading-5">
-            Spend these five points before using Hindrance points for increases.
+            {t('Spend these five points before using Hindrance points for increases.')}
           </p>
         </div>
         <p data-slot="attribute-points" className="text-foreground shrink-0 text-lg font-semibold">
@@ -29,11 +32,11 @@ export function AttributePointsBalance({ spentPoints }: AttributePointsBalancePr
       </div>
       <div
         role="progressbar"
-        aria-label="Attribute points available"
+        aria-label={t('Attribute points available')}
         aria-valuemin={0}
         aria-valuemax={defaultAttributePoints}
         aria-valuenow={availablePoints}
-        aria-valuetext={`${availablePoints} of ${defaultAttributePoints} attribute points available`}
+        aria-valuetext={`${availablePoints} ${t('of')} ${defaultAttributePoints} ${t('attribute points available')}`}
         className="bg-muted h-2 overflow-hidden rounded-full"
       >
         <div

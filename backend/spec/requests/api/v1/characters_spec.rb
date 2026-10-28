@@ -55,6 +55,16 @@ RSpec.describe "Characters", type: :request do
       )
     end
 
+    it "returns a localized origin name when requested" do
+      localized_origin = create(:origin, name: "Dunestriders", slug: "dunestriders")
+      create(:character, user: user, origin: localized_origin)
+
+      get "/api/v1/characters", headers: json_headers.merge("X-Language" => "pl")
+
+      expect(response).to have_http_status(:ok)
+      expect(json.dig("characters", 0, "origin_name")).to eq("Wędrowcy Wydm")
+    end
+
     it "requires authentication" do
       delete "/api/v1/session", headers: json_headers
 

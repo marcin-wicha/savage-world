@@ -1,0 +1,269 @@
+# Polish summaries of SWADE core Edge rules, based on the licensed local
+# reference descriptions. Core mechanical source data is Apache-2.0; see
+# backend/db/data/edges/LICENSE and backend/db/data/edges/NOTICE.md.
+---
+pl:
+  reference_data:
+    edge:
+      ace:
+        description: Asy prowadzący pojazdy ignorują 2 punkty kar do rzutów na Żeglarstwo, Prowadzenie lub Pilotaż. Mogą też wydawać Żetony, by absorbować obrażenia pojazdu, którym kierują, używając odpowiedniej umiejętności zamiast Wigoru; każdy sukces i przebicie neguje jedną Ranę.
+      acrobat:
+        description: Raz można przerzucić wynik Atletyki związany z równowagą, akrobacją lub chwytaniem. Nie dotyczy to przerywania akcji, wspinaczki, pływania ani rzucania.
+      alertness:
+        description: Premia +2 do Spostrzegawczości przy słyszeniu, widzeniu i innym zmysłowym wykrywaniu otoczenia.
+      ambidextrous:
+        description: Postać ignoruje karę za używanie niewiodącej ręki. Trzymając broń w każdej dłoni, może kumulować premie do Parowania obu broni.
+      arcane-background:
+        description: Postać zyskuje nadnaturalne zdolności dzięki magii, niezwykłym energiom lub mocom duchowym; wybiera odpowiednie Tło nadprzyrodzone i uzyskuje dostęp do mocy.
+      aristocrat:
+        description: W kontaktach towarzyskich z elitą, możnymi i arystokracją postać otrzymuje +2 do Perswazji podczas nawiązywania kontaktów oraz +2 do Wiedzy ogólnej dotyczącej etykiety, rodów, heraldyki i plotek wyższych sfer.
+      artificer:
+        description: Postać potrafi tworzyć urządzenia nadprzyrodzone i przekazywać je sojusznikom.
+      assassin:
+        description: Obrażenia postaci rosną o +2, gdy przeciwnik jest Bezbronny albo postać ma nad nim Przewagę.
+      attractive:
+        description: Premia +1 do Występów i Perswazji wobec osób, które pociąga typ postaci.
+      beast-bond:
+        description: Postać może wydawać własne Żetony w imieniu podległych jej zwierząt, w tym wierzchowców, pupili i chowańców.
+      beast-master:
+        description: Zwykłe zwierzęta nie zaatakują postaci, chyba że sama je zaatakuje lub zostaną rozwścieczone. Towarzyszy jej lojalne zwierzę o Rozmiarze 0 lub mniejszym; jest Pomocnikiem i nie awansuje. Utracony pupil zostaje zastąpiony po 1k4 dniach. Kolejne wykupienia pozwalają zdobyć dodatkowego pupila, podnieść jedną jego Cechę o jeden typ kości, zwiększyć maksymalny Rozmiar pupila o 1 (do 3) albo uczynić go Dziką Kartą (wymaga rangi Heroicznej).
+      berserk:
+        description: Po otrzymaniu Rany lub stanu Wstrząśnięty od obrażeń fizycznych postać wykonuje test Sprytu; porażka (lub dobrowolna decyzja) wprawia ją w szał. Siła rośnie o typ kości, ataki wręcz muszą być Dzikim Atakiem, a postać nie może używać umiejętności wymagających skupienia. Otrzymuje +2 do Wytrzymałości i ignoruje 1 poziom kar za Rany. Krytyczna porażka testu Walki trafia losowy cel w zasięgu. Po 5 rundach otrzymuje poziom Wyczerpania, po 10 kolejny i szał się kończy. Można go wcześniej zakończyć testem Sprytu −2 jako darmową akcją.
+      block:
+        description: Parowanie postaci wzrasta o +1, a premia za przewagę liczebną przeciwników przeciw niej zmniejsza się o 1.
+      bolster:
+        description: Po udanym Teście przeciw wrogowi postać może usunąć stan Rozproszony albo Bezbronny jednego sojusznika.
+      brave:
+        description: Premia +2 do testów Strachu, a wyniki Tabeli Strachu zmniejszają się o 2.
+      brawler:
+        description: Wytrzymałość wzrasta o 1, a ciosy pięścią, stopą lub pazurami zadają Siła+k4. Jeśli postać ma już kość obrażeń od Pazurów, Mistrza sztuk walki itp., zwiększa ją o jeden typ. Nie nadaje pięściom cechy Broni naturalnej.
+      brawny:
+        description: Rozmiar wzrasta o 1 (zwiększając też Wytrzymałość o 1). Siłę traktuje się jako wyższą o jeden typ kości przy określaniu obciążenia oraz minimalnej Siły wymaganej do używania wyposażenia bez kar. Rozmiar nie może przekroczyć +3.
+      bruiser:
+        description: Wytrzymałość wzrasta dodatkowo o 1, a obrażenia pięści lub pazurów o jeden typ kości.
+      brute:
+        description: Atletyka jest powiązana z Siłą zamiast ze Zręcznością przy awansie; postać może też bronić się Siłą przed Testami Atletyki. Zasięg krótki rzucanych przedmiotów rośnie o 1, średni i daleki odpowiednio podwajają się (np. 3/6/12 staje się 4/8/16).
+      calculating:
+        description: Gdy karta akcji postaci ma wartość 5 lub mniej, może zignorować do 2 punktów kar do jednego działania w tej turze, w tym za wiele akcji, osłonę, zasięg lub Rany.
+      champion:
+        description: Postać zadaje +2 obrażenia nadnaturalnie złym stworzeniom (lub dobrym, jeśli sama jest zła). Premia obejmuje obrażenia obszarowe, ataki dystansowe i moce; o kwalifikacji przeciwnika decyduje MG.
+      channeling:
+        description: Przebicie w teście umiejętności mistycznej lub aktywacji urządzenia mistycznego obniża koszt mocy o 1 Punkt Mocy, nawet do 0.
+      charismatic:
+        description: Postać otrzymuje jeden darmowy przerzut testu Perswazji.
+      chi:
+        description: Na początku każdej walki postać otrzymuje punkt Chi, który może wydać na przerzut nieudanego ataku (nawet krytycznej porażki), zmuszenie przeciwnika do przerzucenia ataku przeciw niej albo +k6 obrażeń udanego ataku Walką gołymi rękami, stopami, pazurami lub inną Bronią naturalną (kość może eksplodować). Niewykorzystany punkt przepada po walce.
+      combat-acrobat:
+        description: Ataki przeciw postaci otrzymują karę −1, jeśli jest świadoma ataku, może się poruszać i nie podlega karom za obciążenie ani minimalną Siłę.
+      combat-reflexes:
+        description: Premia +2 do testów odzyskania przytomności po stanie Wstrząśnięty lub Ogłuszony.
+      command:
+        description: Pomocnicy w zasięgu dowodzenia otrzymują +1 do testów Ducha przy próbie wyjścia ze stanu Wstrząśnięty.
+      command-presence:
+        description: Zasięg dowodzenia postaci wynosi 10 cali (20 jardów).
+      common-bond:
+        description: Postać może swobodnie przekazywać swoje Żetony innym postaciom, z którymi może się porozumieć.
+      concentration:
+        description: Bazowy czas trwania każdej mocy, która nie jest natychmiastowa, zostaje podwojony; dotyczy to także podtrzymywania mocy.
+      connections:
+        description: Raz na sesję postać może poprosić o przysługę wybraną frakcję lub kontakt, o ile może się z nim skontaktować. Zakres pomocy zależy od kontaktu i decyzji MG. Atut można wybierać wielokrotnie, za każdym razem wskazując nowe kontakty.
+      counterattack:
+        description: Raz na turę, jeśli postać nie jest Wstrząśnięta ani Ogłuszona, może wykonać darmowy atak przeciw niej po nieudanym ataku Walką przeciwnika. Kontratak następuje natychmiast.
+      danger-sense:
+        description: Przy teście zaskoczenia postać otrzymuje +2 do Spostrzegawczości; przebicie pozwala rozpocząć spotkanie w gotowości. Przy innych nagłych zagrożeniach wykonuje test Spostrzegawczości −2 (lub +2, jeśli zwykle przysługuje test). Udany test przeciw atakowi odbiera napastnikowi Przewagę.
+      dead-shot:
+        description: Gdy postać otrzyma Jokera, podwaja łączne obrażenia pierwszego udanego testu Atletyki (rzucanie) lub Strzelania w tej rundzie.
+      dodge:
+        description: O ile postać nie została zaskoczona i całkowicie nieświadoma ataku, ataki dystansowe przeciw niej otrzymują −2. Premia nie kumuluje się z osłoną.
+      double-tap:
+        description: Przy broni o Szybkostrzelności 1, która może wystrzelić dwa razy bez ręcznego przeładowania, postać wydaje dodatkowy nabój, by uzyskać +1 do trafienia i obrażeń na akcję. Nie łączy się z Szybkim strzelaniem. Broń z trybem serii trzech strzałów zamiast tego otrzymuje +2 do Strzelania i obrażeń, zużywając 6 nabojów.
+      elan:
+        description: Wydanie Żetonu na przerzut Cechy daje dodatkowe +2 do wyniku. Premia nie dotyczy obrażeń ani testu Wigor przy absorbowaniu Ran, chyba że wydano osobny Żeton na jego przerzut.
+      expert:
+        description: Jak atut Profesjonalista, lecz zwiększa wybraną Cecha i jej limit o jeden dodatkowy stopień.
+      extra-effort:
+        description: Po rzucie na Skupienie postać może wydać 1 Punkt Mocy, by dodać +1 do wyniku, albo 3 Punkty Mocy, by dodać +2. Nie można poprawić krytycznej porażki.
+      extraction:
+        description: Gdy postać wycofuje się z walki wręcz, jeden wybrany przez gracza sąsiadujący przeciwnik nie otrzymuje darmowego ataku.
+      fame:
+        description: Postać zarabia podwójną zwykłą stawkę za płatne występy i otrzymuje +1 do Perswazji wobec przyjaznych osób, które ją rozpoznają. Sława może też przynosić rozpoznawalność, natrętnych wielbicieli i dodatkowe zobowiązania.
+      famous:
+        description: Postać zarabia pięciokrotność zwykłej stawki za występy i otrzymuje +2 do Perswazji wobec przyjaznych osób, które ją znają. Powszechna sława wiąże się z większą liczbą zobowiązań, rywali, skandali i trudnością działania w tłumie.
+      fast-healer:
+        description: Premia +2 do testów Wigoru związanych z naturalnym leczeniem; test wykonuje się co 3 dni zamiast co 5.
+      feint:
+        description: Wykonując Test umiejętnością Walki, postać może zmusić przeciwnika do obrony Sprytem zamiast Zręcznością.
+      fervor:
+        description: Pomocnicy w zasięgu dowodzenia otrzymują +1 do obrażeń Walką, gdy dowódca zagrzewa ich do walki.
+      filthy-rich:
+        description: Postać rozpoczyna grę z pięciokrotnością początkowych funduszy i, jeśli pasuje to do realiów, otrzymuje około 500 000 dolarów rocznego dochodu po odliczeniu zobowiązań. Większe bogactwo ustala się z MG i wiąże z dodatkowymi aktywami oraz obowiązkami.
+      first-strike:
+        description: Raz na rundę, jeśli postać nie jest Wstrząśnięta ani Ogłuszona, może wykonać darmowy atak Walką na przeciwniku, który właśnie wszedł w jej zasięg.
+      fleet-footed:
+        description: Tempo postaci wzrasta o 2, a kość biegu o jeden typ (np. z k6 do k8).
+      followers:
+        description: Każde wykupienie zapewnia pięciu oddanych zwolenników używających profilu Żołnierza. Utraceni mogą z czasem zostać zastąpieni. Trzeba zapewnić im utrzymanie i udział w nagrodach; rozwijają się jak postacie graczy.
+      free-runner:
+        description: Na trudnym terenie postać porusza się z pełnym Tempem, jeśli może odbijać się lub huśtać na przeszkodach. Otrzymuje też +2 do Atletyki przy wspinaczce i w pieszych pościgach.
+      frenzy:
+        description: Postać wykonuje w turze jeden dodatkowy atak; dodatkową kość może skierować przeciw temu samemu lub innemu celowi, rozpatrując ataki oddzielnie.
+      gadgeteer:
+        description: Postać może poświęcić całą turę i wykonać test Dziwnej nauki −2, by z części zmajstrować urządzenie pozwalające użyć dostępnej w świecie mocy o randze nie wyższej niż jej ranga i koszcie najwyżej 3 Punkty Mocy. Wydaje na nie do 3 Punktów Mocy; koszt wraz z modyfikatorami nie może przekroczyć wydanych punktów. Nie może w tej turze wykonywać innych działań ani utrzymywać mocy; po jej zakończeniu urządzenie rozpada się.
+      giant-killer:
+        description: Postać zadaje dodatkowe k6 obrażeń stworzeniom co najmniej o 3 Rozmiary większym od siebie.
+      great-luck:
+        description: Na początku każdej sesji gracz otrzymuje dwa dodatkowe Żetony zamiast jednego.
+      hard-to-kill:
+        description: Postać ignoruje kary za Rany podczas testów Wigoru, które mają zapobiec Wykrwawieniu.
+      harder-to-kill:
+        description: Gdy postać zostaje zabita, rzuć kością. Wynik nieparzysty oznacza śmierć, a parzysty — nieprzytomność i niewiarygodne ocalenie. Może zostać pojmana, ograbiona lub uznana za martwą, ale przeżywa.
+      healer:
+        description: Premia +2 do wszystkich testów Leczenia, naturalnego i magicznego.
+      hold-the-line:
+        description: Pomocnicy pod dowództwem postaci otrzymują +1 do Wytrzymałości.
+      holy-unholy-warrior:
+        description: Bóstwo lub siła wyższa wspiera wiernego wojownika cudami i nadnaturalną ochroną, pomagając mu przetrwać niebezpieczeństwa służby.
+      humiliate:
+        description: Postać otrzymuje darmowy przerzut Testu Drwiną.
+      improved-block:
+        description: Jak Blok, ale premia do Parowania wzrasta łącznie o +2, a premia za przewagę liczebną przeciwników przeciw postaci zmniejsza się o 2.
+      improved-counterattack:
+        description: Jak Kontratak, ale postać może wykonać darmowy atak przeciw maksymalnie trzem nieudanym atakom na turę.
+      improved-dodge:
+        description: Premia +2 przy unikaniu ataków obszarowych.
+      improved-extraction:
+        description: Gdy postać wycofuje się z walki wręcz, maksymalnie trzech wybranych przeciwników nie otrzymuje darmowego ataku.
+      improved-first-strike:
+        description: Jak Pierwsze uderzenie, ale postać może zaatakować w ten sposób maksymalnie trzech przeciwników na rundę.
+      improved-frenzy:
+        description: Postać może dodać dodatkową kość Walki do maksymalnie dwóch ataków Walką w tej samej turze.
+      improved-nerves-of-steel:
+        description: Postać ignoruje 2 punkty kar za Rany.
+      improved-rapid-fire:
+        description: W tej samej turze postać może dwukrotnie zwiększyć Szybkostrzelność broni o 1, stosując to do dwóch ataków w ramach wielu akcji.
+      improved-rapid-recharge:
+        description: Podczas odpoczynku postać odzyskuje 20 Punktów Mocy na godzinę.
+      improved-sweep:
+        description: Zamaszyste cięcie nie podlega karze −2.
+      improved-trademark-weapon:
+        description: Premie związane z wybraną bronią popisową wzrastają do +2.
+      improvisational-fighter:
+        description: Postać ignoruje zwykłą karę −2 za używanie improwizowanej broni.
+      inspire:
+        description: Raz na turę postać może wykonać test Taktyki, by wesprzeć jeden rodzaj testu Cechy wszystkich sojuszniczych Pomocników w zasięgu dowodzenia. Wymaga akcji i możliwości porozumienia się z nimi.
+      investigator:
+        description: Premia +2 do Badań oraz do testów Spostrzegawczości podczas przeszukiwania dokumentów, stert przedmiotów lub wypatrywania ukrytych rzeczy.
+      iron-jaw:
+        description: Premia +2 do testów absorbowania Ran oraz testów Wigoru przeciw nokautującym ciosom.
+      iron-will:
+        description: Postać wykorzystuje premię Silnej woli do opierania się mocom i negowania ich skutków. Nie kumuluje się z Odwagą i nie obejmuje późniejszych testów wynikających z mocy.
+      jack-of-all-trades:
+        description: Po obserwacji lub zbadaniu dziedziny postać może poświęcić akcję na test Sprytu. Sukces daje k4 odpowiedniej umiejętności, przebicie k6. Po porażce lub w celu uzyskania przebicia można spróbować ponownie po godzinie nauki. Efekt trwa do rozpoczęcia nauki innej dziedziny.
+      killer-instinct:
+        description: Postać otrzymuje darmowy przerzut każdego rozpoczętego przez siebie przeciwstawnego Testu.
+      level-headed:
+        description: W walce postać dobiera dodatkową kartę akcji i wybiera, której użyje. Ulepszona wersja pozwala dobrać dwie dodatkowe karty i wybrać jedną.
+      linguist:
+        description: Na początku gry postać zna wybraną liczbę języków równą połowie typu kości Sprytu, zaokrągloną zgodnie z zasadami, każdy na poziomie k6.
+      liquid-courage:
+        description: Rundę po wypiciu mocnego alkoholu Wigor wzrasta o jeden typ kości, zwiększając także Wytrzymałość; postać ignoruje 1 poziom kar za Rany. Spryt, Zręczność i powiązane umiejętności otrzymują −1. Efekt trwa godzinę, po czym postać zyskuje poziom Wyczerpania na 4 godziny.
+      luck:
+        description: Na początku każdej sesji postać otrzymuje jeden dodatkowy Żeton.
+      marksman:
+        description: Jeśli postać nie porusza się i w pierwszej akcji strzela lub rzuca z Szybkostrzelnością najwyżej 1, otrzymuje +1 do Atletyki (rzucanie) lub Strzelania albo ignoruje do 2 punktów kar za celowanie w konkretną część ciała, osłonę, zasięg, skalę lub prędkość. Nie kumuluje się z manewrem Celowanie ani nie działa przy kolejnych atakach.
+      martial-artist:
+        description: Pięści i stopy postaci są Bronią naturalną, więc jest uzbrojona; otrzymuje +1 do ciosów nimi i zadaje Siła+k4 obrażeń. Jeśli ma już kość obrażeń Siły od Pazurów lub Zabijaki, zwiększa ją o typ. Nie wzmacnia innych naturalnych broni, np. kłów czy rogów.
+      martial-warrior:
+        description: Premia Walki wzrasta do +2, a kość obrażeń postaci rośnie o kolejny typ.
+      master:
+        description: Przy wybranej Cechie z Atutu Ekspert kość Dzikiej Karty wzrasta do k10.
+      master-tactician:
+        description: Taktyk otrzymuje łącznie dwie dodatkowe karty akcji do rozdysponowania w każdej rundzie.
+      master-of-arms:
+        description: Jak Mistrz broni, ale Parowanie wzrasta dodatkowo o 1, a kość premii do obrażeń Walką wynosi k10.
+      mcgyver:
+        description: Poświęcając całą turę i wykonując test Naprawy, postać może z łatwo dostępnych materiałów stworzyć improwizowaną broń, ładunek wybuchowy lub narzędzie działające do użycia albo końca spotkania. Sukces tworzy prosty sprzęt (np. 2k4 w małym wzorniku wybuchu albo broń 5/10/20, 2k6), przebicie lepszy (np. 2k6 w średnim lub 2k4 w dużym wzorniku, albo broń pięciostrzałową 10/20/40, 2k8). Porażka nie kończy urządzenia, a krytyczna porażka oznacza brak materiałów. MG określa możliwe konstrukcje.
+      menacing:
+        description: Jeśli postać ma Krwiożerczość, Złośliwość, Bezwzględność lub jest Brzydka, może wykorzystać tę cechę i otrzymuje +2 do Zastraszania.
+      mentalist:
+        description: Postać z Tłem nadprzyrodzonym Psionika i umiejętnością Psionika potrafi wykorzystywać zdolności mentalne do oddziaływania na umysły.
+      mighty-blow:
+        description: Gdy postać otrzyma Jokera, podwaja obrażenia pierwszego udanego ataku Walką w tej rundzie.
+      mr-fix-it:
+        description: Mechanik otrzymuje +2 do Naprawy. Przy przebiciu naprawa zajmuje połowę zwykłego czasu, a ten atut skraca go dodatkowo do jednej czwartej.
+      natural-leader:
+        description: Atuty dowódcze, które normalnie obejmują tylko Pomocników, działają również na Dzikie Karty.
+      nerves-of-steel:
+        description: Postać ignoruje 1 punkt kar za Rany.
+      new-powers:
+        description: Postać wybiera nową moc dostępną dla jej Tła nadprzyrodzonego o randze nie wyższej niż jej własna. Może wybrać ten atut wielokrotnie albo zamiast mocy dodać nową manifestację do znanej mocy.
+      no-mercy:
+        description: Gdy postać wydaje Żeton na przerzut obrażeń, dodaje +2 do końcowego wyniku.
+      power-points:
+        description: Postać otrzymuje dodatkowe Punkty Mocy. Atut można wybrać raz na rangę, a na randze Legendarnej dowolną liczbę razy; każde kolejne wykupienie na tej randze daje tylko 2 punkty.
+      power-surge:
+        description: Gdy postać otrzyma Jokera, odzyskuje 10 Punktów Mocy, nie przekraczając zwykłego maksimum.
+      professional:
+        description: Dla wybranej umiejętności lub atrybutu zwiększa Cecha o jeden typ kości i podnosi jej limit o jeden stopień (np. k12+1 staje się k12+2). Można wybrać raz dla każdej Cechy.
+      provoke:
+        description: Raz na turę, po przebiciu w Teście Drwiną, postać prowokuje cel. Oprócz zwykłych skutków Testu wróg otrzymuje −2 do działań przeciw innym celom. Efekt kumuluje się ze stanem Rozproszony, ale nie z kolejnymi Prowokacjami; kończy się po Jokerze, kolejnej prowokacji innej osoby lub końcu spotkania.
+      quick:
+        description: Gdy postać otrzyma kartę akcji o wartości 5 lub niższej, może ją odrzucić i dobierać kolejne, aż uzyska kartę wyższą niż 5. Przy Zimnej krwi najpierw dobiera dodatkową kartę i wybiera, a następnie może użyć tego atutu.
+      rabble-rouser:
+        description: Raz na turę postać może wykonać Test Zastraszaniem lub Drwiną przeciw wszystkim wrogom w średnim wzorniku wybuchu, którzy ją widzą i słyszą. Każdy broni się i rozpatruje Test osobno.
+      rapid-fire:
+        description: Przy szybkostrzelnej broni dystansowej, jeśli postać ma dość amunicji, może zwiększyć Szybkostrzelność o 1 podczas jednego ataku Strzelaniem w tej turze.
+      rapid-recharge:
+        description: Podczas odpoczynku postać odzyskuje 10 Punktów Mocy na godzinę zamiast 5.
+      reliable:
+        description: Postać otrzymuje darmowy przerzut każdego testu Wsparcia.
+      retort:
+        description: Jeśli postać uzyska przebicie, broniąc się przed Testem Zastraszania lub Drwiną, napastnik staje się Rozproszony.
+      rich:
+        description: Postać rozpoczyna grę z trzykrotnością zwykłych funduszy początkowych. Jeśli w danym świecie występuje stały dochód, otrzymuje równowartość około 150 000 dolarów rocznie.
+      rock-and-roll:
+        description: Jeśli postać nie porusza się w turze, ignoruje karę za odrzut przy strzelaniu z broni o Szybkostrzelności co najmniej 2.
+      scavenger:
+        description: Raz na spotkanie postać może znaleźć, przypomnieć sobie lub wydobyć potrzebny sprzęt, trochę amunicji albo inny użyteczny przedmiot. O tym, co można zdobyć i kiedy kończy się spotkanie, decyduje MG.
+      scholar:
+        description: Wybierz jedną umiejętność spośród Wiedzy akademickiej, Taktyki, Okultyzmu, Nauki lub dozwolonej w danym świecie umiejętności wiedzy opartej na Sprycie. Postać otrzymuje +2 do jej wyników. Atut można wybrać ponownie dla innej umiejętności.
+      sidekick:
+        description: Postać zyskuje pomocnika Nowicjusza będącego Dziką Kartą; zaczyna każdą sesję z 2 Żetonami i może awansować. Gracz kontroluje go jak sojusznika, a jego zdolności uzupełniają zdolności mentora. Może wpaść w kłopoty; jeśli zginie, nie zostaje zastąpiony, chyba że atut zostanie wykupiony ponownie. Postać może wydawać za niego Żetony tak, jakby miał Wspólnotę więzi.
+      soldier:
+        description: Po kilku dniach przyzwyczajenia się do ekwipunku postać traktuje Siłę jako wyższą o jeden typ kości przy określaniu obciążenia i minimalnej Siły do używania sprzętu bez kar (kumuluje się z Krzepkim). Otrzymuje darmowy przerzut testów Wigoru przeciw zagrożeniom środowiskowym.
+      soul-drain:
+        description: Postać mistyczna może przyjąć poziom Wyczerpania, by odzyskać do 5 Punktów Mocy, a następnie kolejny poziom (do Wyczerpania), by odzyskać kolejne 5. Nie może w ten sposób stać się Nieprzytomna. Wyczerpanie znika wyłącznie naturalnie; Ukojenie i podobne efekty go nie usuwają.
+      steady-hands:
+        description: Postać ignoruje karę za niestabilną platformę. Podczas biegu jej zwykła kara −2 zmniejsza się do −1.
+      streetwise:
+        description: Postać zna lokalny czarny rynek, paserów i przestępcze środowisko. Otrzymuje +2 do Zastraszania lub Perswazji przy nawiązywaniu kontaktów z półświatkiem oraz +2 do Wiedzy ogólnej dotyczącej nielegalnych działań.
+      strong-willed:
+        description: Postać otrzymuje premię +2 do testów Sprytu i Ducha broniących przed Testami przeciwników.
+      sweep:
+        description: Postać może zaatakować wszystkich sąsiadujących przeciwników Walką z karą −2; rzut obrażeń wykonuje się osobno dla każdego trafienia.
+      tactician:
+        description: W każdej rundzie walki lub pościgu dowódca otrzymuje dodatkową kartę akcji, trzymaną oddzielnie. Na początku rundy może ją odrzucić albo przekazać Pomocnikowi w zasięgu dowodzenia; odbiorca decyduje, czy zastąpi nią swoją kartę, czy ją odrzuci.
+      thief:
+        description: Złodziej otrzymuje +1 do Atletyki przy wspinaczce w mieście, +1 do Skradania w miejskim otoczeniu oraz +1 do Złodziejstwa w każdych warunkach.
+      tough-as-nails:
+        description: Postać może otrzymać łącznie 4 Rany, zanim stanie się Nieprzytomna. Maksymalna kara za Rany nadal wynosi −3.
+      tougher-than-nails:
+        description: Postać może otrzymać łącznie 5 Ran, zanim stanie się Nieprzytomna. Maksymalna kara za Rany nadal wynosi −3.
+      trademark-weapon:
+        description: Wybierz unikatową broń. Używając jej, postać otrzymuje +1 do Atletyki (rzucanie), Walki lub Strzelania oraz +1 do Parowania, gdy broń jest dobyta. Atut można wybrać wielokrotnie dla innych broni. Po utracie broń można zastąpić, ale MG określa, kiedy premie znów zaczną działać.
+      two-fisted:
+        description: Jeśli postać wykonuje atak Walką jedną ręką, a późniejszą akcją atak drugą, drugi atak nie otrzymuje kary za wiele akcji. Nadal obowiązuje kara za niewiodącą rękę, chyba że postać ma Oburęczność. Z atutem Rewolwerowiec druga akcja może być atakiem dystansowym.
+      two-gun-kid:
+        description: Jak Oburęczny wojownik, ale dotyczy broni dystansowej. Postać może strzelić lub rzucić bronią z każdej ręki w osobnych akcjach, bez kary za wiele akcji. Z atutem Oburęczny wojownik druga akcja może być atakiem wręcz.
+      very-attractive:
+        description: Premia Atrakcyjnego wzrasta do +2 do Występów i Perswazji wobec osób, które pociąga typ postaci.
+      weapon-master:
+        description: Parowanie postaci wzrasta o +1, a dodatkowa kość obrażeń w testach Walki wynosi k8 zamiast k6. Premie działają, gdy postać jest uzbrojona, w tym gdy używa atutu Mistrz sztuk walki, pazurów lub innej zdolności liczącej się jako broń.
+      wizard:
+        description: Podczas rzucania mocy czarodziej może wydać dodatkowy Punkt Mocy, by zmienić jej manifestację, np. zamienić ognistą eksplozję w błyskawicę.
+      woodsman:
+        description: Leśnik otrzymuje +2 do Przetrwania oraz do Skradania w dziczy (nie w miastach, ruinach ani pod ziemią).
+      work-the-crowd:
+        description: Jak Oczarować salę, ale podczas Wsparcia postać może wesprzeć do dwóch sojuszników dodatkowymi kośćmi z akcji Wsparcia.
+      work-the-room:
+        description: Raz na turę, wspierając sojusznika Perswazją lub Występami, postać rzuca dodatkową kością umiejętności Wsparcia. Ta kość wspiera także innego sojusznika, który ją widzi lub słyszy, przy jego najbliższej akcji.

@@ -1,0 +1,252 @@
+# Polish translations of SWADE core skill descriptions.
+# The English source data is derived from the Apache-2.0 SWADE Foundry system;
+# see backend/db/data/skills/NOTICE.md and backend/db/data/skills/LICENSE.
+---
+pl:
+  reference_data:
+    skill:
+      academics:
+        description: >-
+          Wiedza akademicka obejmuje znajomość nauk humanistycznych i społecznych,
+          literatury, historii, archeologii oraz pokrewnych dziedzin. Pozwala
+          przypomnieć sobie na przykład koniec kalendarza Majów albo zacytować
+          fragment Makbeta.
+      athletics:
+        description: >-
+          Atletyka łączy koordynację ruchową z wyuczonymi umiejętnościami, takimi jak
+          wspinaczka, skakanie, utrzymywanie równowagi, jazda na rowerze, zapasy,
+          narciarstwo, pływanie, rzucanie i chwytanie. Postać polegająca bardziej na
+          sile fizycznej niż koordynacji może wybrać Przewagę Siłacz (strona 38),
+          aby powiązać tę Umiejętność z Siłą zamiast ze Zręcznością.
+      battle:
+        description: >-
+          Taktyka odzwierciedla znajomość strategii i taktyki. Służy do ogólnej
+          wiedzy wojskowej i jest kluczowa podczas dowodzenia oddziałami w bitwach
+          masowych (zob. strona 131).
+      boating:
+        description: >-
+          Żeglarstwo pozwala prowadzić większość łodzi i statków typowych dla danego
+          świata. Obejmuje też typowe czynności związane z jednostką, takie jak
+          wiązanie węzłów, obsługa ożaglowania czy korzystanie z prądów.
+      common-knowledge:
+        description: >-
+          Wiedza ogólna pozwala rozpoznać ludzi, miejsca i rzeczy ze świata postaci,
+          w tym etykietę, geografię, kulturę, powszechną technologię, kontakty
+          i zwyczaje.
+      driving:
+        description: >-
+          Prowadzenie pozwala kierować dowolnym napędzanym pojazdem lądowym typowym
+          dla danego świata, w tym samochodem, motocyklem czy czołgiem. Rowery
+          i inne pojazdy napędzane siłą mięśni wymagają Atletyki, a pojazdy
+          zaprzęgowe — Jeździectwa. W nowoczesnych realiach, gdzie pojazdy są
+          powszechne, zwykła podróż nie wymaga testu Prowadzenia; testy są potrzebne
+          głównie w niebezpiecznych lub stresujących sytuacjach, takich jak pościgi
+          (strona 113).
+      electronics:
+        description: >-
+          Elektronika pozwala obsługiwać złożone lub specjalistyczne urządzenia,
+          takie jak panele sterowania maszyn przemysłowych czy systemy czujników
+          statków kosmicznych. Urządzenia konsumenckie typowe dla danego świata
+          zwykle nie wymagają tej Umiejętności — jeśli test jest w ogóle potrzebny,
+          wystarczy Wiedza ogólna. Dotyczy to we współczesnym świecie m.in.
+          magnetowidów i telefonów komórkowych. Naprawa uszkodzonego urządzenia
+          elektronicznego wymaga Naprawy (strona 34).
+      faith:
+        description: >-
+          Wiara to Umiejętność nadprzyrodzona wymagana przez Tło nadprzyrodzone
+          (Cuda); opisano je na stronie 148.
+      fighting:
+        description: >-
+          Walka obejmuje wszystkie ataki wręcz — pięściami, toporem, mieczem
+          świetlnym czy w ramach sztuk walki. Zasady walki i manewry wojowników
+          opisano w rozdziale trzecim.
+      focus:
+        description: >-
+          Skupienie to Umiejętność nadprzyrodzona dla Tła nadprzyrodzonego
+          (Obdarzony); zob. strona 148.
+      gambling:
+        description: >-
+          Hazard przydaje się w saloonach Dzikiego Zachodu, kryjówkach przestępców,
+          koszarach czy na pokładach statków kosmicznych. Aby rozstrzygnąć godzinę
+          gry bez testowania każdego rozdania, wszyscy ustalają stawkę i wykonują
+          test Hazardu. Postać z najniższym wynikiem płaci postaci z najwyższym
+          różnicę wyników pomnożoną przez stawkę; pozostałe osoby rozliczają się
+          analogicznie w parach, a osoba pozostająca pośrodku nie wygrywa ani nie
+          traci. Przykład: przy wynikach 10 i 4 oraz stawce 10 dolarów przegrywający
+          płaci 60 dolarów. Osoba oszukująca otrzymuje premię +2 do testu (Mistrz Gry
+          może zmienić modyfikator zależnie od metody); Krytyczna Porażka oznacza
+          przyłapanie, zwykle z nieprzyjemnymi konsekwencjami.
+      hacking:
+        description: >-
+          Hakowanie służy do tworzenia programów i włamywania się do zabezpieczonych
+          systemów; zawsze wymaga komputera lub podobnego interfejsu. Większość zadań
+          rozstrzyga pojedynczy test, a czas — od jednej akcji po miesiące — ustala
+          Mistrz Gry zależnie od złożoności. Sukces oznacza powodzenie, a przebicie
+          skraca czas o połowę. Porażka zwykle wymaga ponownej próby, zaś Krytyczna
+          Porażka może zablokować dostęp, uruchomić alarm lub inną kontrę.
+      healing:
+        description: >-
+          Leczenie służy m.in. do opatrywania Ran, diagnozowania chorób i analizy
+          niektórych śladów kryminalistycznych. Zasady leczenia Ran znajdują się na
+          stronie 96, a chorób i trucizn na stronie 128. Analiza obrażeń pozwala
+          ustalić m.in. przyczynę i czas śmierci oraz kierunek ataku: sukces daje
+          podstawowe informacje, a przebicie ujawnia więcej szczegółów.
+      intimidation:
+        description: >-
+          Zastraszanie to sztuka przerazić przeciwnika, by ustąpił, ujawnił informacje
+          lub uciekł. Jest to test przeciwstawny Duchowi przeciwnika; w walce stanowi
+          Próbę (strona 108). Poza walką sukces sprawia, że przeciwnik w dużej mierze
+          ustępuje, coś wyjawia albo odchodzi przy pierwszej okazji, a przebicie może
+          skłonić go do ustąpienia do końca sceny, wyjawienia wszystkiego lub ucieczki.
+          Krytyczna Porażka uodparnia cel na Zastraszanie tej postaci do końca
+          spotkania. Umiejętność może też symulować kilka godzin zdobywania przysług
+          lub informacji na ulicy (zob. Networking, strona 133).
+      language:
+        description: >-
+          W przygodowych lub fantastycznych realiach Mistrz Gry może odgrywać bariery
+          językowe, pominąć tę Umiejętność albo zastosować Zasadę wielu języków
+          (strona 140). W bardziej realistycznych światach postacie mogą wydawać
+          punkty Umiejętności na dodatkowe języki, np. rosyjski lub polski w grze
+          o III wojnie światowej. Jeśli jest używana, Umiejętność powinna wskazywać
+          język, np. Język (hiszpański) lub Język (amerykański język migowy), a jej
+          kość określa biegłość: k4 pozwala czytać, pisać i mówić typowe zwroty;
+          k6 umożliwia dłuższą, choć czasem niepłynną rozmowę; k8 oznacza płynność;
+          k10 pozwala naśladować dialekty; k12 — mistrzowsko recytować ważne dzieła
+          literackie lub ustne. Postacie zaczynają z k8 we własnym języku.
+      notice:
+        description: >-
+          Spostrzegawczość odzwierciedla ogólną świadomość otoczenia i czujność.
+          Służy do wychwytywania widoków, dźwięków, smaków i zapachów, znajdowania
+          wskazówek, wykrywania zasadzek i ukrytej broni oraz oceny, czy rywal kłamie,
+          boi się lub cieszy. Sukces daje podstawową informację, np. odgłos ruchu
+          w lesie, zapach dymu lub wrażenie, że ktoś nie mówi całej prawdy; przebicie
+          ujawnia więcej, np. kierunek dźwięku lub temat, którego ktoś unika.
+      occult:
+        description: >-
+          Okultyzm oznacza wiedzę i doświadczenie w sprawach paranormalnych,
+          w których istnienie większość ludzi nie wierzy. Pozwala rozszyfrowywać
+          tajemnicze piktogramy, przypominać sobie informacje o istotach
+          nadprzyrodzonych, sposoby leczenia potwornych chorób, takich jak likantropia
+          i wampiryzm, oraz odprawiać rytuały. Do wyszukiwania informacji w bibliotece,
+          archiwum gazet, starych księgach czy internecie służą Badania, choć
+          śledczy z wyższym Okultyzmem może użyć tej Umiejętności (zob. Badania,
+          strona 34).
+      performance:
+        description: >-
+          Dobry artysta może podnieść ludzi na duchu, poderwać tłum do działania
+          lub zarobić na występie. Występy obejmują śpiew, aktorstwo, grę na
+          instrumencie i podobne zajęcia dla publiczności. Zebrane środki zależą od
+          sytuacji; zwykle sukces przynosi 20%, a przebicie 30% początkowych funduszy
+          danego świata. Mistrz Gry może pomnożyć tę kwotę przez rangę artysty.
+          Większe występy mogą przynieść więcej, ale wymagają czasu, energii
+          i przygotowań. Za zgodą Mistrza Gry Występy mogą zastąpić Perswazję przy
+          oszustwie, blefie lub kamuflażu.
+      persuasion:
+        description: >-
+          Perswazja pozwala przekonywać innych argumentami, pochlebstwem, oszustwem,
+          nagrodami lub innymi przyjaznymi metodami; nie jest kontrolą umysłu i może
+          zmienić czyjeś nastawienie, ale nie cele. Przy Wsparciu sojuszników
+          (strona 106) test jest nieprzeciwstawny. Wobec opornego celu testuje się
+          przeciw jego Duchowi. Mistrz Gry modyfikuje test stosownie do odgrywania
+          rozmowy, właściwych Przewag i Ułomności oraz okoliczności. Sukces poprawia
+          nastawienie celu o jeden poziom, a przebicie o dwa; dalsza zmiana zwykle
+          wymaga czasu. Porażka nie zmienia jego zdania w tej scenie, a Krytyczna
+          Porażka pogarsza nastawienie o dwa poziomy. Zwykle wykonuje się jeden test
+          na rozmowę, chyba że pojawią się nowe informacje lub istotna nagroda.
+          Perswazja może też symulować kilka godzin nawiązywania kontaktów w celu
+          zdobycia przysług lub informacji (zob. Networking, strona 133).
+      piloting:
+        description: >-
+          Pilotaż pozwala manewrować samolotami, helikopterami, plecakami odrzutowymi
+          i statkami kosmicznymi. Zasady pościgów i walki pojazdów znajdują się
+          w rozdziale czwartym. Istota, która potrafi latać z natury, np. dzięki
+          skrzydłom, używa Atletyki.
+      psionics:
+        description: >-
+          Psionika to Umiejętność używana przez psioników do aktywowania i kontrolowania
+          zdolności psionicznych. Zob. Przewagę Tło nadprzyrodzone (Psionika) na
+          stronie 148.
+      repair:
+        description: >-
+          Naprawa pozwala rozkładać i naprawiać mechaniczne urządzenia, pojazdy,
+          broń oraz proste urządzenia elektryczne; obejmuje też materiały wybuchowe
+          i ich użycie. Czas testu zależy od Mistrza Gry i złożoności zadania.
+          Sukces oznacza, że przedmiot działa, a przebicie skraca wymagany czas
+          o połowę. Bez podstawowych narzędzi postać otrzymuje niewielką karę
+          (−1 do −2), a bez specjalistycznego sprzętu — poważną (−3 do −4).
+          Naprawa urządzeń elektronicznych jest ograniczona poziomem Elektroniki;
+          używa się tej z tych dwóch Umiejętności, której kość jest niższa.
+      research:
+        description: >-
+          Badania pozwalają skutecznie korzystać z bibliotek, archiwów gazet,
+          internetu i innych pisemnych źródeł informacji.
+      riding:
+        description: >-
+          Jeździectwo pozwala dosiadać, kontrolować i prowadzić dowolne zwierzę
+          wierzchowe lub pojazd zaprzęgowy typowy dla danego świata, w tym konie,
+          wielbłądy, smoki, wozy i rydwany. Zasady walki konnej opisano na
+          stronie 103.
+      science:
+        description: >-
+          Nauka obejmuje wiedzę z nauk ścisłych, takich jak biologia, ksenobiologia,
+          chemia, geologia i inżynieria. Sukces w teście ujawnia podstawowe
+          informacje o zagadnieniu, a przebicie — więcej szczegółów.
+      shooting:
+        description: >-
+          Strzelanie obejmuje wszystkie próby trafienia celu bronią dystansową,
+          taką jak łuk, pistolet czy wyrzutnia rakiet. Broni miotanej używa się
+          z Atletyką (strona 29). Szczegóły walki dystansowej opisano w rozdziale
+          trzecim.
+      spellcasting:
+        description: >-
+          Magowie, czarodzieje, czarnoksiężnicy i wiedźmy używają Rzucania zaklęć,
+          by rzucać czary. Zob. Przewagę Tło nadprzyrodzone (Magia) na stronie 148.
+      stealth:
+        description: >-
+          Skradanie pozwala ukrywać się i poruszać bezgłośnie. Sukces oznacza uniknięcie
+          wykrycia, jeśli wrogowie nie są szczególnie czujni; porażka sprawia, że
+          zauważają coś podejrzanego i zaczynają aktywne poszukiwania. Gdy są już
+          zaalarmowani, Skradanie jest testem przeciwstawnym Spostrzegawczości
+          (grupowym, jeśli przeciwników jest wielu; zob. strona 89). Mistrz Gry
+          uwzględnia okoliczności, takie jak ciemność, osłona, hałas, rozproszenia
+          i różnica Skali. Suche liście mogą dać karę −2 do Skradania, a dostrzeżenie
+          kogoś w ciemności podlega karze za oświetlenie (−4); tego samego
+          modyfikatora nie stosuje się ponownie do przeciwnego testu. Podejście na
+          tyle blisko, by zaatakować wręcz, zawsze wymaga testu przeciwstawnego
+          Skradania i Spostrzegawczości: sukces czyni ofiarę Narażoną do końca tury
+          atakującego, a przebicie daje mu Zaskoczenie (strona 100). W walce testuje
+          się Skradanie co turę jako darmową akcję po ruchu lub czynności mogącej
+          zwrócić uwagę; poza walką częstotliwość i dystans ustala Mistrz Gry
+          stosownie do sytuacji.
+      survival:
+        description: >-
+          Przetrwanie pozwala znaleźć pożywienie, wodę i schronienie w nieprzyjaznym
+          środowisku oraz orientować się w dziczy i rozpoznawać jadalne rośliny.
+          Sukces zapewnia żywność i wodę dla jednej osoby na dzień, a przebicie —
+          dla pięciu osób. Zasady Głodu i Pragnienia opisano w części Zagrożenia
+          na stronie 125. Umiejętność służy też do wykrywania i śledzenia tropów;
+          każdy test obejmuje zwykle milę, choć Mistrz Gry może to zmienić.
+          Modyfikator zależy od celu, środowiska i upływu czasu: tropienie dużej
+          grupy na świeżym śniegu może dać premię +4, a śledzenie jednej osoby po
+          skałach i strumieniach po ponad dniu — karę −4.
+      taunt:
+        description: >-
+          Drwina atakuje dumę przeciwnika przez szyderstwo, okrutne żarty lub
+          przechwalanie się. Jest to test przeciwstawny Sprytowi przeciwnika;
+          w walce stanowi Próbę (strona 108). Poza walką sukces sprawia, że cel
+          ustępuje, odchodzi lub rozpoczyna bójkę. Przebicie może go zastraszyć do
+          końca sceny, skłonić do odejścia w gniewie lub łzach albo do lekkomyślnego
+          ataku, np. z Dzikim atakiem w pierwszej rundzie. Krytyczna Porażka uodparnia
+          cel na Drwiny tej postaci do końca spotkania.
+      thievery:
+        description: >-
+          Złodziejstwo obejmuje otwieranie zamków i sejfów, kieszonkostwo, sztuczki
+          zręcznościowe, zastawianie i rozbrajanie pułapek oraz podobne działania
+          polegające na zmyleniu, sabotażu, skrytości i manipulacji.
+      weird-science:
+        description: >-
+          „Szaleni” naukowcy, wynalazcy w światach magii lub technologii znacznie
+          wykraczającej poza naszą, alchemicy i rzemieślnicy nadprzyrodzeni używają
+          Dziwnej nauki jako Umiejętności nadprzyrodzonej, choć ich metody mogą się
+          różnić. Więcej informacji zawiera Przewaga Tło nadprzyrodzone (Dziwna
+          nauka) na stronie 148.

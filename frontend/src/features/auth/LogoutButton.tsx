@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { ApiError } from '@/lib/api-client'
 import { useRestMutation } from '@/lib/queries'
+import { useLanguage } from '@/lib/i18n-context'
 
 import { clearAuthHint } from './auth-hint'
 import { type SessionResponse, sessionQueryKey } from './use-session'
 
 export function LogoutButton() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -42,7 +44,7 @@ export function LogoutButton() {
       disabled={logoutMutation.isPending}
       onClick={() => logoutMutation.mutate()}
     >
-      {logoutMutation.isPending ? 'Logging out...' : 'Log out'}
+      {logoutMutation.isPending ? t('Logging out...') : t('Log out')}
     </Button>
   )
 }

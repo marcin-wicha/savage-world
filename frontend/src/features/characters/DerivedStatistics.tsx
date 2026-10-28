@@ -6,6 +6,7 @@ import SwordIcon from '@icons/sword.svg?react'
 
 import { type SkillDieType } from '@/components/dice-types'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useLanguage } from '@/lib/i18n-context'
 import { cn } from '@/lib/utils'
 
 type DerivedStatisticId = 'pace' | 'parry' | 'toughness'
@@ -76,6 +77,8 @@ function formatValue(value: number) {
 }
 
 function StatisticTooltip({ statistic }: { statistic: DerivedStatistic }) {
+  const { t } = useLanguage()
+
   return (
     <TooltipContent
       side="bottom"
@@ -84,21 +87,21 @@ function StatisticTooltip({ statistic }: { statistic: DerivedStatistic }) {
       data-testid={`${statistic.id}-tooltip`}
     >
       <div className="grid gap-1">
-        <p className="font-medium">{statistic.label}</p>
-        <p className="text-background/75 leading-5">{statistic.description}</p>
+        <p className="font-medium">{t(statistic.label)}</p>
+        <p className="text-background/75 leading-5">{t(statistic.description)}</p>
       </div>
       <div className="grid gap-1.5">
         <ul className="grid gap-1 text-xs">
           {statistic.contributions.map((contribution) => (
             <li key={contribution.label} className="flex items-center justify-between gap-4">
-              <span>{contribution.label}</span>
+              <span>{t(contribution.label)}</span>
               <span className="font-medium tabular-nums">{formatValue(contribution.value)}</span>
             </li>
           ))}
         </ul>
         {statistic.armor !== undefined ? (
           <p className="text-background/75 text-xs leading-4">
-            Armor is included in the total and shown in parentheses.
+            {t('Armor is included in the total and shown in parentheses.')}
           </p>
         ) : null}
       </div>
@@ -107,11 +110,12 @@ function StatisticTooltip({ statistic }: { statistic: DerivedStatistic }) {
 }
 
 export function DerivedStatistics({ statistics, vigor = 'd4', className }: DerivedStatisticsProps) {
+  const { t } = useLanguage()
   const statisticsToDisplay = statistics ?? statisticsFor(vigor)
 
   return (
     <section
-      aria-label="Derived statistics"
+      aria-label={t('Derived statistics')}
       data-slot="derived-statistics"
       className={cn('border-border border-y', className)}
     >
@@ -128,7 +132,7 @@ export function DerivedStatistics({ statistics, vigor = 'd4', className }: Deriv
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  aria-label={`${statistic.label}: ${value}`}
+                  aria-label={`${t(statistic.label)}: ${value}`}
                   className="group focus-visible:ring-ring/50 flex min-w-0 flex-1 items-center justify-center gap-2 px-4 py-3 text-left outline-none first:pl-0 last:pr-0 focus-visible:ring-3 sm:flex-none sm:justify-start sm:pr-8"
                   data-statistic={statistic.id}
                 >

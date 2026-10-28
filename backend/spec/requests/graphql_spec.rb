@@ -1,10 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "GraphQL", type: :request do
-  def execute(query, variables: nil)
+  def execute(query, variables: nil, locale: nil)
+    headers = json_headers
+    headers["X-Language"] = locale if locale
     post "/graphql",
       params: { query: query, variables: variables }.to_json,
-      headers: json_headers
+      headers: headers
   end
 
   it "returns origins with their selectable fields" do
@@ -20,6 +22,22 @@ RSpec.describe "GraphQL", type: :request do
       "description" => "Hidden herders.",
       "created_at" => origin.created_at.iso8601,
       "updated_at" => origin.updated_at.iso8601
+    )
+  end
+
+  it "returns localized origin names and descriptions when requested" do
+    create(
+      :origin,
+      name: "The Mirrorfolk",
+      slug: "the-mirrorfolk",
+      description: "Hidden herders of the high plateau, descendants of escaped prisoners of war who broke out and hid behind the mirrorwood. Masters of camouflage and mirrorwood craft."
+    )
+
+    execute("{ origins { nodes { name description } } }", locale: "pl")
+
+    expect(json.dig("data", "origins", "nodes", 0)).to eq(
+      "name" => "Lud Zwierciadeł",
+      "description" => "Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych, którzy uciekli i schronili się za lustrzanym lasem. Mistrzowie kamuflażu i obróbki lustrzanego drewna."
     )
   end
 

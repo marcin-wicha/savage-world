@@ -12,5 +12,17 @@ module Types
     field :artwork_url, String, null: true
     field :source_book, String, null: false
     field :source_page, Integer, null: false
+
+    def name
+      translated(:name)
+    end
+
+    def cost_text
+      translated(:cost_text)
+    end
+
+    def description
+      translated(:description)
+    end
   end
 end

@@ -3,6 +3,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { SkillDie } from '@/components/skill-die'
 import { skillDieTypes, type SkillDieType } from '@/components/dice-types'
 import { Card, CardContent } from '@/components/ui/card'
+import { useLanguage } from '@/lib/i18n-context'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { AttributePointsBalance } from './AttributePointsBalance'
@@ -46,6 +47,7 @@ const attributeDefinitions = [
 ] as const
 
 export function AttributesStep() {
+  const { t } = useLanguage()
   const form = useFormContext<CharacterFormValues>()
   const attributes = useWatch({ control: form.control, name: 'attributes' })
   const earnedHindrancePoints =
@@ -110,10 +112,11 @@ export function AttributesStep() {
   return (
     <div className="grid gap-6">
       <div className="grid max-w-xl gap-2">
-        <h2 className="text-foreground text-xl font-medium">Assign attributes</h2>
+        <h2 className="text-foreground text-xl font-medium">{t('Assign attributes')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          Start each attribute at d4. The total pool is five default points plus available Hindrance
-          points. Once the total pool is spent, only downgrades are allowed.
+          {t(
+            'Start each attribute at d4. The total pool is five default points plus available Hindrance points. Once the total pool is spent, only downgrades are allowed.',
+          )}
         </p>
       </div>
 
@@ -131,12 +134,12 @@ export function AttributesStep() {
           <Card key={id}>
             <CardContent className="grid gap-4">
               <div className="grid gap-1">
-                <h3 className="text-foreground font-medium">{label}</h3>
-                <p className="text-muted-foreground text-sm leading-5">{description}</p>
+                <h3 className="text-foreground font-medium">{t(label)}</h3>
+                <p className="text-muted-foreground text-sm leading-5">{t(description)}</p>
               </div>
               <SkillDie
                 die={attributes[id]}
-                label={`${label} die`}
+                label={`${t(label)} ${t('die')}`}
                 showModifier={false}
                 maxDie={maxDieFor(id)}
                 onDieChange={handleDieChange(id)}

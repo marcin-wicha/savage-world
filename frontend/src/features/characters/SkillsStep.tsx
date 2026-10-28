@@ -7,6 +7,7 @@ import { skillDieTypes, type SkillDieType } from '@/components/dice-types'
 import { TraitCardStack, type TraitCardStackTrait } from '@/components/trait-card-stack'
 import { SkillsDocument, type SkillsQuery } from '@/graphql/generated/graphql'
 import { useGraphqlInfiniteQuery } from '@/lib/queries'
+import { useLanguage } from '@/lib/i18n-context'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { SkillPointsBalance } from './SkillPointsBalance'
@@ -48,6 +49,7 @@ function skillPointCost(skill: { core: boolean }, die: SkillDieType) {
 }
 
 export function SkillsStep() {
+  const { t } = useLanguage()
   const form = useFormContext<CharacterFormValues>()
   const selectedIds = useWatch({ control: form.control, name: 'skills' }) ?? []
   const skillDices = useWatch({ control: form.control, name: 'skill_dice' }) ?? {}
@@ -82,11 +84,11 @@ export function SkillsStep() {
   const skillById = new Map(skills.map((skill) => [skill.id, skill]))
   const normalizedSearch = search.trim().toLowerCase()
   const filteredSkills = normalizedSearch
-    ? skills.filter((skill) => skill.name.toLowerCase().includes(normalizedSearch))
+    ? skills.filter((skill) => t(skill.name).toLowerCase().includes(normalizedSearch))
     : skills
   const searchOptions = skills.map((skill) => ({
     value: skill.id,
-    label: skill.name,
+    label: t(skill.name),
   }))
   const skillPointsSpent = selectedIds.reduce((total, skillId) => {
     const skill = skillById.get(skillId)
@@ -211,13 +213,13 @@ export function SkillsStep() {
     const currentDie = skillDices[skill.id] ?? defaultDieFor(skill)
 
     return {
-      title: skill.name,
-      eyebrow: attributeLabel(skill.attribute),
-      description: skill.description || undefined,
+      title: t(skill.name),
+      eyebrow: t(attributeLabel(skill.attribute)),
+      description: skill.description ? t(skill.description) : undefined,
       headerContent: (
         <SkillDie
           die={isSelected ? currentDie : null}
-          label={`${skill.name} die`}
+          label={`${t(skill.name)} ${t('die')}`}
           showModifier={false}
           maxDie={maxDieFor(skill)}
           disabledDice={skill.core ? ['d4'] : []}
@@ -263,10 +265,11 @@ export function SkillsStep() {
   return (
     <div className="grid gap-6">
       <div className="grid max-w-xl gap-2">
-        <h2 className="text-foreground text-xl font-medium">Choose skills</h2>
+        <h2 className="text-foreground text-xl font-medium">{t('Choose skills')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          Choose skills to spend your skill points. Hindrance points can buy additional skills after
-          the default pool is spent.
+          {t(
+            'Choose skills to spend your skill points. Hindrance points can buy additional skills after the default pool is spent.',
+          )}
         </p>
       </div>
 
@@ -281,35 +284,37 @@ export function SkillsStep() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <AutocompleteInput
-          aria-label="Search skills"
+          aria-label={t('Search skills')}
           options={searchOptions}
           value={search}
           onValueChange={setSearch}
-          placeholder="Search skills"
+          placeholder={t('Search skills')}
           className="w-full sm:w-64"
         />
         {!isLoadingAll && !isError ? (
           <p className="text-muted-foreground text-sm" aria-live="polite">
-            {filteredSkills.length} {filteredSkills.length === 1 ? 'skill' : 'skills'}
+            {filteredSkills.length} {filteredSkills.length === 1 ? t('skill') : t('skills')}
           </p>
         ) : null}
       </div>
 
-      {isLoadingAll ? <p className="text-muted-foreground text-sm">Loading skills…</p> : null}
+      {isLoadingAll ? (
+        <p className="text-muted-foreground text-sm">{t('Loading skills…')}</p>
+      ) : null}
 
       {isError ? (
         <p className="text-danger text-sm" role="alert">
-          Could not load skills. Try again.
+          {t('Could not load skills. Try again.')}
         </p>
       ) : null}
 
       {!isLoadingAll && !isError && filteredSkills.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No skills match the search.</p>
+        <p className="text-muted-foreground text-sm">{t('No skills match the search.')}</p>
       ) : null}
 
       {!isLoadingAll && !isError && filteredSkills.length > 0 ? (
         <TraitCardStack
-          category="Skills"
+          category={t('Skills')}
           traits={traits}
           size="md"
           columns={3}

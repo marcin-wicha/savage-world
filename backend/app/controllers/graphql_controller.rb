@@ -7,7 +7,11 @@ class GraphqlController < ApplicationController
     result = SavageWorldsSchema.execute(
       params[:query],
       variables: prepare_variables(params[:variables]),
-      context: { current_user: Current.user, current_session: Current.session },
+      context: {
+              current_user: Current.user,
+              current_session: Current.session,
+              locale: requested_locale
+            },
       operation_name: params[:operationName].presence || params[:operation_name].presence
     )
 

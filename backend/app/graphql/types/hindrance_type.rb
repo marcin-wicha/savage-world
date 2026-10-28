@@ -9,5 +9,17 @@ module Types
     field :description, String, null: true
     field :source_book, String, null: false
     field :source_page, Integer, null: false
+
+    def name
+      translated(:name)
+    end
+
+    def requirements_text
+      Requirements::Text.new(object.requirements, locale: context[:locale] || :en).to_s
+    end
+
+    def description
+      translated(:description)
+    end
   end
 end

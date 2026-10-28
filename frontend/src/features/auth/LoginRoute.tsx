@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ApiError } from '@/lib/api-client'
 import { useRestMutation } from '@/lib/queries'
+import { useLanguage } from '@/lib/i18n-context'
 
 import { refreshAuthHint } from './auth-hint'
 import { type SessionResponse, sessionQueryKey } from './use-session'
@@ -39,6 +40,7 @@ type LoginLocationState = {
 }
 
 export function LoginRoute() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const queryClient = useQueryClient()
@@ -98,33 +100,33 @@ export function LoginRoute() {
       <Card>
         <CardHeader>
           <p className="text-muted-foreground text-[0.65rem] font-medium tracking-[0.22em] uppercase">
-            Player access
+            {t('Player access')}
           </p>
-          <CardTitle className="text-2xl">Sign in</CardTitle>
-          <CardDescription>Sign in to manage your Savage Worlds characters.</CardDescription>
+          <CardTitle className="text-2xl">{t('Sign in')}</CardTitle>
+          <CardDescription>{t('Sign in to manage your Savage Worlds characters.')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={onSubmit} noValidate>
             <div className="space-y-2">
-              <Label htmlFor="login">Login</Label>
+              <Label htmlFor="login">{t('Login')}</Label>
               <Input
                 id="login"
                 type="text"
                 autoComplete="username"
-                placeholder="admin"
+                placeholder={t('admin')}
                 aria-invalid={errors.login ? true : undefined}
                 aria-describedby={errors.login ? 'login-error' : undefined}
                 {...register('login')}
               />
               {errors.login ? (
                 <p id="login-error" className="text-danger text-sm">
-                  {errors.login.message}
+                  {t(errors.login.message ?? '')}
                 </p>
               ) : null}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('Password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -135,19 +137,19 @@ export function LoginRoute() {
               />
               {errors.password ? (
                 <p id="password-error" className="text-danger text-sm">
-                  {errors.password.message}
+                  {t(errors.password.message ?? '')}
                 </p>
               ) : null}
             </div>
 
             {errors.root?.message ? (
               <p role="alert" className="text-danger text-sm">
-                {errors.root.message}
+                {t(errors.root.message)}
               </p>
             ) : null}
 
             <Button type="submit" size="lg" className="w-full" disabled={loginMutation.isPending}>
-              {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
+              {loginMutation.isPending ? t('Signing in...') : t('Sign in')}
             </Button>
           </form>
         </CardContent>

@@ -5,7 +5,7 @@ module Api
         characters = Current.user.characters.order(updated_at: :desc, id: :desc)
         render json: {
           characters: characters.map do |character|
-            character_payload(character).merge(origin_name: character.origin&.name)
+            character_payload(character)
           end
         }
       end
@@ -19,7 +19,7 @@ module Api
       def show
         character = Character.find(character_id)
         authorize character, :show?
-        render json: { character: character_payload(character).merge(origin_name: character.origin&.name) }
+        render json: { character: character_payload(character) }
       end
 
       def destroy
@@ -84,6 +84,11 @@ module Api
         {
           id: character.id,
           name: character.name,
+          origin_name: character.origin && ReferenceData::Translations.for(
+            character.origin,
+            :name,
+            locale: requested_locale
+          ),
           rank: character.rank,
           origin_id: character.origin_id,
           edge_ids: character.edge_ids,

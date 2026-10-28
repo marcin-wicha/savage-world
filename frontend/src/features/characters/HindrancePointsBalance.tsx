@@ -1,5 +1,7 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useLanguage } from '@/lib/i18n-context'
+
 import type { CharacterFormValues } from './character-form'
 
 const maxHindrancePoints = 4
@@ -11,6 +13,7 @@ type HindrancePointsBalanceProps = {
 export function HindrancePointsBalance({
   earnedPoints: earnedPointsOverride,
 }: HindrancePointsBalanceProps = {}) {
+  const { t } = useLanguage()
   const form = useFormContext<CharacterFormValues>()
   const earnedPointsFromForm =
     useWatch({ control: form.control, name: 'hindrance_points_earned' }) ?? 0
@@ -29,9 +32,9 @@ export function HindrancePointsBalance({
     >
       <div className="flex items-start justify-between gap-4">
         <div className="grid gap-1">
-          <p className="text-foreground text-sm font-medium">Hindrance points</p>
+          <p className="text-foreground text-sm font-medium">{t('Hindrance points')}</p>
           <p className="text-muted-foreground text-xs leading-5">
-            Remaining from selected Hindrances for later creation steps.
+            {t('Remaining from selected Hindrances for later creation steps.')}
           </p>
         </div>
         <p className="text-foreground shrink-0 text-lg font-semibold" data-slot="hindrance-points">
@@ -40,11 +43,11 @@ export function HindrancePointsBalance({
       </div>
       <div
         role="progressbar"
-        aria-label="Hindrance points available"
+        aria-label={t('Hindrance points available')}
         aria-valuemin={0}
         aria-valuemax={maxHindrancePoints}
         aria-valuenow={availablePoints}
-        aria-valuetext={`${pointsSummary} hindrance points available`}
+        aria-valuetext={`${pointsSummary} ${t('hindrance points available')}`}
         className="bg-muted h-2 overflow-hidden rounded-full"
       >
         <div

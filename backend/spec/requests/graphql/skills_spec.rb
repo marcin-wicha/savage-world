@@ -1,10 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "GraphQL skills", type: :request do
-  def execute(query, variables: nil)
+  def execute(query, variables: nil, locale: nil)
+    headers = json_headers
+    headers["X-Language"] = locale if locale
     post "/graphql",
       params: { query: query, variables: variables }.to_json,
-      headers: json_headers
+      headers: headers
   end
 
   it "returns skills with snake_case fields" do
@@ -48,6 +50,17 @@ RSpec.describe "GraphQL skills", type: :request do
       "description" => "General knowledge.",
       "source_book" => "SWADE",
       "source_page" => 30
+    )
+  end
+
+  it "returns Polish names and descriptions when requested" do
+    create(:skill, name: "Athletics", slug: "athletics", description: "Athletics description in English.")
+
+    execute("{ skills { nodes { name description } } }", locale: "pl")
+
+    expect(json.dig("data", "skills", "nodes", 0)).to eq(
+      "name" => "Atletyka",
+      "description" => I18n.t("reference_data.skill.athletics.description", locale: :pl)
     )
   end
 

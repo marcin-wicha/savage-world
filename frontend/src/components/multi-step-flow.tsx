@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Check } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/lib/i18n-context'
 import { cn } from '@/lib/utils'
 
 type MultiStepFlowStep = {
@@ -51,6 +52,7 @@ function MultiStepFlow({
   className,
   ...props
 }: MultiStepFlowProps) {
+  const { t } = useLanguage()
   const [uncontrolledStep, setUncontrolledStep] = React.useState(defaultStep)
   const [isAdvancing, setIsAdvancing] = React.useState(false)
   const activeStep = clampStep(currentStep ?? uncontrolledStep, steps.length)
@@ -87,7 +89,7 @@ function MultiStepFlow({
   return (
     <div data-slot="multi-step-flow" className={cn('flex flex-col', className)} {...props}>
       <nav
-        aria-label={headerLabel}
+        aria-label={t(headerLabel)}
         data-slot="multi-step-flow-header"
         className={cn(headerClassName)}
       >
@@ -112,7 +114,7 @@ function MultiStepFlow({
                     !isFuture && 'cursor-pointer',
                   )}
                 >
-                  {isComplete ? <span className="sr-only">Completed: </span> : null}
+                  {isComplete ? <span className="sr-only">{t('Completed: ')}</span> : null}
                   <span
                     className={cn(
                       'flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-medium transition-colors',
@@ -143,7 +145,7 @@ function MultiStepFlow({
         </ol>
       </nav>
       <p className="sr-only" aria-live="polite">
-        Step {activeStep + 1} of {steps.length}: {step.title}
+        {t('Step')} {activeStep + 1} {t('of')} {steps.length}: {step.title}
       </p>
       <div data-slot="multi-step-flow-content" className={cn('mt-6', contentClassName)}>
         {step.content}
@@ -166,7 +168,7 @@ function MultiStepFlow({
           }}
           disabled={isFirst && !onBack}
         >
-          {backLabel}
+          {t(backLabel)}
         </Button>
         <Button
           onClick={() => {
@@ -178,7 +180,7 @@ function MultiStepFlow({
           }}
           disabled={!nextAllowed || isAdvancing}
         >
-          {isLast ? completeLabel : nextLabel}
+          {isLast ? t(completeLabel) : t(nextLabel)}
         </Button>
       </div>
     </div>

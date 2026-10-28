@@ -16,8 +16,8 @@ class Edge < ApplicationRecord
   validate :requirements_are_valid
   validate :effects_are_valid
 
-  def requirements_text
-    Edges::RequirementsText.new(self).to_s
+  def requirements_text(locale: :en)
+    Edges::RequirementsText.new(self, locale: locale).to_s
   end
 
   private

@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ApiError } from '@/lib/api-client'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
+import { useLanguage } from '@/lib/i18n-context'
 import { cn } from '@/lib/utils'
 
 export type JsonValue =
@@ -426,6 +427,7 @@ type RecordFieldProps = {
 }
 
 function RecordField({ field, register, message }: RecordFieldProps) {
+  const { t } = useLanguage()
   const fieldId = `admin-${field.key}`
   const commonProps = {
     id: fieldId,
@@ -441,7 +443,7 @@ function RecordField({ field, register, message }: RecordFieldProps) {
         field.kind === 'textarea' || field.kind === 'json' ? 'md:col-span-2' : '',
       )}
     >
-      <Label htmlFor={fieldId}>{field.label}</Label>
+      <Label htmlFor={fieldId}>{t(field.label)}</Label>
       {field.kind === 'textarea' || field.kind === 'json' ? (
         <Textarea
           {...commonProps}
@@ -453,10 +455,10 @@ function RecordField({ field, register, message }: RecordFieldProps) {
           {...commonProps}
           className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3"
         >
-          {!field.required ? <option value="">Not set</option> : null}
+          {!field.required ? <option value="">{t('Not set')}</option> : null}
           {field.options?.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {t(option.label)}
             </option>
           ))}
         </select>
@@ -473,6 +475,7 @@ function RecordField({ field, register, message }: RecordFieldProps) {
 }
 
 export function AdminEditorRoute() {
+  const { t } = useLanguage()
   const queryClient = useQueryClient()
   const [selectedKey, setSelectedKey] = useState('')
   const [editingRecord, setEditingRecord] = useState<AdminRecord | undefined>()
@@ -619,33 +622,36 @@ export function AdminEditorRoute() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground text-[0.65rem] font-medium tracking-[0.22em] uppercase">
-            Administration
+            {t('Administration')}
           </p>
-          <h1 className="text-foreground text-4xl">Reference data</h1>
+          <h1 className="text-foreground text-4xl">{t('Reference data')}</h1>
           <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-            Maintain the rules and catalog entries used by the character builder.
+            {t('Maintain the rules and catalog entries used by the character builder.')}
           </p>
         </div>
         {selectedResource ? (
           <Button type="button" onClick={openCreate} disabled={recordsQuery.isPending}>
-            Add {selectedResource.label.replace(/s$/, '')}
+            {t('Add')} {t(selectedResource.label.replace(/s$/, ''))}
           </Button>
         ) : null}
       </div>
 
       {referenceData.isPending ? (
         <p className="text-muted-foreground" role="status">
-          Loading resources…
+          {t('Loading resources…')}
         </p>
       ) : null}
       {referenceData.isError ? (
         <p className="text-danger" role="alert">
-          Could not load reference data. Try again.
+          {t('Could not load reference data. Try again.')}
         </p>
       ) : null}
 
       {!referenceData.isPending && !referenceData.isError ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6" aria-label="Reference resources">
+        <div
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6"
+          aria-label={t('Reference resources')}
+        >
           {resources.map((resource) => (
             <button
               key={resource.key}
@@ -657,9 +663,9 @@ export function AdminEditorRoute() {
                 resource.key === activeKey ? 'border-foreground ring-foreground ring-1' : '',
               )}
             >
-              <span className="block font-medium">{resource.label}</span>
+              <span className="block font-medium">{t(resource.label)}</span>
               <span className="text-muted-foreground mt-1 block text-sm">
-                {resource.count} records
+                {resource.count} {t('records')}
               </span>
             </button>
           ))}
@@ -669,19 +675,19 @@ export function AdminEditorRoute() {
       {selectedResource ? (
         <Card>
           <CardHeader>
-            <CardTitle>{selectedResource.label}</CardTitle>
+            <CardTitle>{t(selectedResource.label)}</CardTitle>
             <CardDescription>
               {recordsQuery.isPending
-                ? 'Loading records…'
-                : `${visibleRecords.length} of ${records.length} records shown.`}
+                ? t('Loading records…')
+                : `${visibleRecords.length} ${t('of')} ${records.length} ${t('records shown.')}`}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!recordsQuery.isError ? (
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 <Input
-                  aria-label={`Search ${selectedResource.label}`}
-                  placeholder={`Search ${selectedResource.label.toLowerCase()}…`}
+                  aria-label={`${t('Search')} ${t(selectedResource.label)}`}
+                  placeholder={`${t('Search')} ${t(selectedResource.label.toLowerCase())}…`}
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   className="max-w-sm"
@@ -709,18 +715,20 @@ export function AdminEditorRoute() {
             ) : null}
             {recordsQuery.isError ? (
               <p className="text-danger" role="alert">
-                Could not load {selectedResource.label.toLowerCase()}.
+                {t('Could not load')} {t(selectedResource.label.toLowerCase())}.
               </p>
             ) : records.length === 0 && !recordsQuery.isPending ? (
               <div className="space-y-3">
-                <p className="text-muted-foreground text-sm">No records have been added yet.</p>
+                <p className="text-muted-foreground text-sm">
+                  {t('No records have been added yet.')}
+                </p>
                 <Button type="button" variant="outline" onClick={openCreate}>
-                  Add the first record
+                  {t('Add the first record')}
                 </Button>
               </div>
             ) : visibleRecords.length === 0 && !recordsQuery.isPending ? (
               <p className="text-muted-foreground py-6 text-center text-sm">
-                No records match the current search and filters.
+                {t('No records match the current search and filters.')}
               </p>
             ) : (
               <div className="overflow-x-auto">
@@ -729,7 +737,7 @@ export function AdminEditorRoute() {
                     <tr>
                       {tableFields.map((field) => (
                         <th key={field.key} className="px-3 py-3 font-medium">
-                          {field.label}
+                          {t(field.label)}
                         </th>
                       ))}
                     </tr>
@@ -744,11 +752,13 @@ export function AdminEditorRoute() {
                           <td
                             key={field.key}
                             className="max-w-56 px-3 py-3"
-                            title={displayValue(record[field.key])}
+                            title={t(displayValue(record[field.key]))}
                           >
                             {fieldIndex === 0 ? (
                               <div className="flex items-center gap-3">
-                                <span className="truncate">{displayValue(record[field.key])}</span>
+                                <span className="truncate">
+                                  {t(displayValue(record[field.key]))}
+                                </span>
                                 <div className="flex shrink-0 gap-2 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
                                   <Button
                                     type="button"
@@ -756,7 +766,7 @@ export function AdminEditorRoute() {
                                     variant="outline"
                                     onClick={() => openEdit(record)}
                                   >
-                                    Edit
+                                    {t('Edit')}
                                   </Button>
                                   <Button
                                     type="button"
@@ -765,13 +775,13 @@ export function AdminEditorRoute() {
                                     onClick={() => deleteRecord(record)}
                                     disabled={deleteMutation.isPending}
                                   >
-                                    Delete
+                                    {t('Delete')}
                                   </Button>
                                 </div>
                               </div>
                             ) : (
                               <span className="block truncate">
-                                {displayValue(record[field.key])}
+                                {t(displayValue(record[field.key]))}
                               </span>
                             )}
                           </td>
@@ -784,7 +794,7 @@ export function AdminEditorRoute() {
             )}
             {deleteError ? (
               <p className="text-danger mt-4" role="alert">
-                {deleteError}
+                {t(deleteError)}
               </p>
             ) : null}
           </CardContent>
@@ -802,11 +812,11 @@ export function AdminEditorRoute() {
             <CardHeader>
               <CardTitle id="reference-record-form-title">
                 {editingRecord
-                  ? `Edit ${selectedResource?.label.replace(/s$/, '')}`
-                  : `Add ${selectedResource?.label.replace(/s$/, '')}`}
+                  ? `${t('Edit')} ${t(selectedResource?.label.replace(/s$/, '') ?? '')}`
+                  : `${t('Add')} ${t(selectedResource?.label.replace(/s$/, '') ?? '')}`}
               </CardTitle>
               <CardDescription>
-                Enter the complete record. JSON fields must contain a valid array or object.
+                {t('Enter the complete record. JSON fields must contain a valid array or object.')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -828,10 +838,14 @@ export function AdminEditorRoute() {
                 ) : null}
                 <div className="flex flex-wrap justify-end gap-2">
                   <Button type="button" variant="ghost" onClick={closeForm}>
-                    Cancel
+                    {t('Cancel')}
                   </Button>
                   <Button type="submit" disabled={isSaving}>
-                    {isSaving ? 'Saving…' : editingRecord ? 'Save changes' : 'Create record'}
+                    {isSaving
+                      ? t('Saving…')
+                      : editingRecord
+                        ? t('Save changes')
+                        : t('Create record')}
                   </Button>
                 </div>
               </form>

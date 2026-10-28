@@ -10,6 +10,7 @@ import {
   type HindrancesQuery,
 } from '@/graphql/generated/graphql'
 import { useGraphqlInfiniteQuery } from '@/lib/queries'
+import { useLanguage } from '@/lib/i18n-context'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import type { CharacterFormValues } from './character-form'
@@ -35,6 +36,7 @@ const hindrancePointValues: Record<ConcreteHindranceSeverity, number> = {
 }
 
 export function HindrancesStep() {
+  const { t } = useLanguage()
   const form = useFormContext<CharacterFormValues>()
   const watchedSelectedIds = useWatch({ control: form.control, name: 'hindrances' })
   const selectedIds =
@@ -75,12 +77,12 @@ export function HindrancesStep() {
   const normalizedSearch = search.trim().toLowerCase()
   const filteredHindrances = normalizedSearch
     ? severityFilteredHindrances.filter((hindrance) =>
-        hindrance.name.toLowerCase().includes(normalizedSearch),
+        t(hindrance.name).toLowerCase().includes(normalizedSearch),
       )
     : severityFilteredHindrances
   const searchOptions = severityFilteredHindrances.map((hindrance) => ({
     value: hindrance.id,
-    label: hindrance.name,
+    label: t(hindrance.name),
   }))
   const selectedIdSet = new Set(selectedIds)
   const effectiveSeverityFor = (hindrance: {
@@ -151,19 +153,19 @@ export function HindrancesStep() {
         maxHindrancePoints
 
     return {
-      title: hindrance.name,
-      eyebrow: severityLabels[effectiveSeverity],
+      title: t(hindrance.name),
+      eyebrow: t(severityLabels[effectiveSeverity]),
       eyebrowToggle:
         hindrance.severity === 'minor_or_major'
           ? {
-              offLabel: severityLabels.minor,
-              onLabel: severityLabels.major,
+              offLabel: t(severityLabels.minor),
+              onLabel: t(severityLabels.major),
               pressed: effectiveSeverity === 'major',
               disabled: severityToggleDisabled,
               onToggle: () => toggleSeverity(hindrance.id),
             }
           : undefined,
-      description: hindrance.description || hindrance.requirements_text || undefined,
+      description: t(hindrance.description || hindrance.requirements_text || '') || undefined,
       backgroundImage: hindranceArtwork(hindrance.slug),
       selected: isSelected,
       disabled: !isSelected && pointsIfSelected > maxHindrancePoints,
@@ -220,9 +222,9 @@ export function HindrancesStep() {
   return (
     <div className="grid gap-6">
       <div className="grid max-w-xl gap-2">
-        <h2 className="text-foreground text-xl font-medium">Take hindrances</h2>
+        <h2 className="text-foreground text-xl font-medium">{t('Take hindrances')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          Choose hindrances to earn points for edges, attributes, and skills.
+          {t('Choose hindrances to earn points for edges, attributes, and skills.')}
         </p>
       </div>
 
@@ -231,44 +233,48 @@ export function HindrancesStep() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <FilterButton
-            label="Severity"
-            options={severityOptions}
+            label={t('Severity')}
+            options={severityOptions.map((option) => ({ ...option, label: t(option.label) }))}
             multiple
             value={severities}
             onValueChange={setSeverities}
           />
           <AutocompleteInput
-            aria-label="Search hindrances"
+            aria-label={t('Search hindrances')}
             options={searchOptions}
             value={search}
             onValueChange={setSearch}
-            placeholder="Search hindrances"
+            placeholder={t('Search hindrances')}
             className="w-full sm:w-64"
           />
         </div>
         {!isLoadingAll && !isError ? (
           <p className="text-muted-foreground text-sm" aria-live="polite">
             {filteredHindrances.length}{' '}
-            {filteredHindrances.length === 1 ? 'hindrance' : 'hindrances'}
+            {filteredHindrances.length === 1 ? t('hindrance') : t('hindrances')}
           </p>
         ) : null}
       </div>
 
-      {isLoadingAll ? <p className="text-muted-foreground text-sm">Loading hindrances…</p> : null}
+      {isLoadingAll ? (
+        <p className="text-muted-foreground text-sm">{t('Loading hindrances…')}</p>
+      ) : null}
 
       {isError ? (
         <p className="text-danger text-sm" role="alert">
-          Could not load hindrances. Try again.
+          {t('Could not load hindrances. Try again.')}
         </p>
       ) : null}
 
       {!isLoadingAll && !isError && filteredHindrances.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No hindrances match the selected filters.</p>
+        <p className="text-muted-foreground text-sm">
+          {t('No hindrances match the selected filters.')}
+        </p>
       ) : null}
 
       {!isLoadingAll && !isError && filteredHindrances.length > 0 ? (
         <TraitCardStack
-          category="Hindrances"
+          category={t('Hindrances')}
           traits={traits}
           size="md"
           revealedCount={3}

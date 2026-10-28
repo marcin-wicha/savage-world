@@ -47,6 +47,7 @@ backend/db/data/hindrances/private/
 backend/db/data/skills/private/
 backend/db/data/gear/private/
 backend/db/data/powers/private/
+backend/config/locales/private/
 
 # Backend: compiled assets
 backend/public/assets

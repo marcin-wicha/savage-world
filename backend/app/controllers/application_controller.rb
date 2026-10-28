@@ -19,6 +19,10 @@ class ApplicationController < ActionController::API
     Current.user
   end
 
+  def requested_locale
+    ReferenceData::Translations.normalize_locale(request.headers["X-Language"])
+  end
+
   def set_csrf_cookie
     cookies["XSRF-TOKEN"] = {
       value: form_authenticity_token,
