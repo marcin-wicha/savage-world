@@ -233,9 +233,16 @@
   }
 }
 
+.character-sheet {
+  width: 100%;
+  max-width: 210mm;
+  aspect-ratio: 210 / 297;
+  margin-inline: auto;
+}
+
 @media print {
   @page {
-    size: letter portrait;
+    size: A4 portrait;
     margin: 0.35in;
   }
 
