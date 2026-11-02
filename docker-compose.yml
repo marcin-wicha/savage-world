@@ -1,0 +1,94 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: savage_worlds_production
+      POSTGRES_USER: savage_worlds
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U savage_worlds -d savage_worlds_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  object_storage:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:?Set MINIO_ACCESS_KEY in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:?Set MINIO_SECRET_KEY in .env}
+    volumes:
+      - miniodata:/data
+
+  minio_init:
+    image: minio/mc:latest
+    depends_on:
+      - object_storage
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:?Set MINIO_ACCESS_KEY in .env}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:?Set MINIO_SECRET_KEY in .env}
+      AWS_BUCKET: ${AWS_BUCKET:-uploads}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        until mc alias set local http://object_storage:9000
+        "$${MINIO_ACCESS_KEY}" "$${MINIO_SECRET_KEY}"; do sleep 2; done;
+        mc mb --ignore-existing "local/$${AWS_BUCKET}"
+    restart: on-failure
+
+  rails_api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      minio_init:
+        condition: service_completed_successfully
+    environment:
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?Set RAILS_MASTER_KEY in .env}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?Set SECRET_KEY_BASE in .env}
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: savage_worlds_production
+      DATABASE_USERNAME: savage_worlds
+      DATABASE_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGINS:?Set FRONTEND_ORIGINS in .env}
+      AWS_ACCESS_KEY_ID: ${MINIO_ACCESS_KEY:?Set MINIO_ACCESS_KEY in .env}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_SECRET_KEY:?Set MINIO_SECRET_KEY in .env}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_BUCKET: ${AWS_BUCKET:-uploads}
+      AWS_ENDPOINT: http://object_storage:9000
+    expose:
+      - "80"
+    volumes:
+      - rails_storage:/rails/storage
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost/up || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      rails_api:
+        condition: service_healthy
+    ports:
+      - "80:80"
+
+volumes:
+  pgdata:
+  rails_storage:
+  miniodata:

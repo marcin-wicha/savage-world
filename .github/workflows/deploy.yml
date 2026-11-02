@@ -1,0 +1,39 @@
+name: Deploy OCI Stack
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy stack over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          ENV_FILE_CONTENTS: ${{ secrets.ENV_FILE_CONTENTS }}
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: ENV_FILE_CONTENTS
+          script: |
+            set -eu
+            APP_DIR=/var/www/savage-worlds
+
+            if [ ! -d "$APP_DIR/.git" ]; then
+              git clone https://github.com/${{ github.repository }}.git "$APP_DIR"
+            fi
+
+            cd "$APP_DIR"
+            git fetch origin main
+            git reset --hard origin/main
+
+            umask 077
+            printf '%s\n' "$ENV_FILE_CONTENTS" > .env
+
+            docker compose up --detach --build --remove-orphans

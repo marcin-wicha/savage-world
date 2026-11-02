@@ -597,29 +597,33 @@ The CI PostgreSQL service uses the `postgres:17` image with `postgres` /
 `postgres` credentials on localhost and supplies `DATABASE_HOST`,
 `DATABASE_USERNAME`, and `DATABASE_PASSWORD`.
 
-Deployment target:
+Deployment options:
 
-- Backend: Docker + Kamal on EC2.
-- Database: Amazon RDS for PostgreSQL.
-- Frontend: static build on S3 behind CloudFront.
-- DNS/TLS: Route53 + ACM.
-- Secrets: Kamal secrets or AWS SSM; never commit them.
+- OCI Compute: Docker Compose runs the Rails API, PostgreSQL 17, MinIO, and the
+  built frontend/Nginx reverse proxy. GitHub Actions deploys `main` over SSH.
+- TLS must terminate at an OCI load balancer or another HTTPS reverse proxy;
+  the frontend container only listens on HTTP port 80.
+- The Compose PostgreSQL and MinIO volumes are local to the server. Use an
+  appropriate backup plan, or externally managed services for production.
+- Never commit deployment secrets or `.env` files.
 
-Run deployment commands from `backend/` or use the root wrapper:
+For OCI Compose deployment, configure the GitHub repository secrets
+`SERVER_IP`, `SSH_PRIVATE_KEY`, and `ENV_FILE_CONTENTS`. The latter is the
+complete root `.env` file and must define `DB_PASSWORD`, `SECRET_KEY_BASE`,
+`RAILS_MASTER_KEY`, `FRONTEND_ORIGINS` (the public HTTPS origin),
+`MINIO_ACCESS_KEY`, and `MINIO_SECRET_KEY`. The Compose stack creates the
+configured MinIO bucket (default `uploads`) on startup.
+The workflow expects the SSH user `ubuntu` and deploys into
+`/var/www/savage-worlds`. The remote host needs Git and Docker Compose v2; it
+must be able to clone the GitHub repository.
 
-```bash
-bin/kamal deploy
-```
+The existing Kamal deployment configuration remains available. Its secrets
+are `RAILS_MASTER_KEY`, `DATABASE_URL`, and `FRONTEND_ORIGINS`; deploy from
+`backend/` with `bin/kamal deploy` or use the root wrapper.
 
-Kamal secrets required by `backend/config/deploy.yml`:
-
-- `RAILS_MASTER_KEY`
-- `DATABASE_URL`
-- `FRONTEND_ORIGINS`
-
-The production Dockerfile is API-only: it installs libpq, excludes
-`development:test` gems, runs Bootsnap precompilation, and does not precompile
-assets. The entrypoint runs `bin/rails db:prepare` before starting the server.
+The production Rails Dockerfile installs libpq, excludes `development:test`
+gems, runs Bootsnap precompilation, and does not precompile assets. Its
+entrypoint runs `bin/rails db:prepare` before starting the server.
 
 ## Known constraints and operational notes
 
