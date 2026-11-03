@@ -43,7 +43,7 @@ jobs:
           envs: ENV_FILE_CONTENTS
           script: |
             set -eu
-            APP_DIR=/var/www/savage-worlds
+            APP_DIR=/var/www/app
 
             if [ ! -d "$APP_DIR/.git" ]; then
               git clone https://github.com/${{ github.repository }}.git "$APP_DIR"

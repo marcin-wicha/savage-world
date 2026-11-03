@@ -636,7 +636,7 @@ the deployment keeps `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, and the
 `miniodata` volume name to preserve existing credentials and data. Back up the
 volume and test recovery before upgrading an existing MinIO deployment.
 The workflow expects the SSH user `ubuntu` and deploys into
-`/var/www/savage-worlds`. The remote host needs Git and Docker Compose v2; it
+`/var/www/app`. The remote host needs Git and Docker Compose v2; it
 must be able to clone the GitHub repository.
 
 The existing Kamal deployment configuration remains available. Its secrets
