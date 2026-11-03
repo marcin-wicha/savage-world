@@ -12,6 +12,26 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Check deployment SSH key
+        env:
+          DEPLOY_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          set -eu
+          if [ -z "$DEPLOY_KEY" ]; then
+            echo "SSH_PRIVATE_KEY is empty or unavailable to this job"
+            exit 1
+          fi
+
+          key_file=$(mktemp)
+          trap 'rm -f "$key_file"' EXIT
+          chmod 600 "$key_file"
+          printf '%s\n' "$DEPLOY_KEY" > "$key_file"
+          ssh-keygen -y -P '' -f "$key_file" > /dev/null || {
+            echo "SSH_PRIVATE_KEY is not a valid unencrypted private key"
+            exit 1
+          }
+          echo "SSH_PRIVATE_KEY is present and parses successfully"
+
       - name: Deploy stack over SSH
         uses: appleboy/ssh-action@v1.2.2
         env:
