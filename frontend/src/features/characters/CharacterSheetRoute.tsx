@@ -119,14 +119,14 @@ export function CharacterSheetRoute() {
               className="sm:hidden"
             />
             <InfoBox label="Ancestry / Origin" value={character.origin_name ?? ''} />
-            <InfoBox label="Player" value="" />
+            <InfoBox label="Player" editable />
           </div>
         </header>
 
         <div className="mt-4 grid gap-4 md:grid-cols-[0.9fr_1.35fr_1fr]">
           <div className="grid content-start gap-4">
             <SheetSection title="Attributes">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid gap-2">
                 {Object.entries(attributeLabels).map(([key, label]) => (
                   <div key={key} className="sheet-die-box">
                     <span>{label}</span>
@@ -192,7 +192,13 @@ export function CharacterSheetRoute() {
               <BlankLines count={4} />
             </SheetSection>
             <SheetSection title="Notes">
-              <BlankLines count={8} />
+              <div
+                className="sheet-editable-notes"
+                contentEditable
+                role="textbox"
+                aria-label="Notes"
+                aria-multiline="true"
+              />
             </SheetSection>
           </div>
         </div>
@@ -208,16 +214,22 @@ export function CharacterSheetRoute() {
 function InfoBox({
   label,
   value,
+  editable = false,
   className = '',
 }: {
   label: string
-  value: string
+  value?: string
+  editable?: boolean
   className?: string
 }) {
   return (
     <div className={`sheet-info-box ${className}`}>
       <span>{label}</span>
-      <strong>{value || '\u00a0'}</strong>
+      {editable ? (
+        <div className="sheet-editable-player" contentEditable role="textbox" aria-label={label} />
+      ) : (
+        <strong>{value || '\u00a0'}</strong>
+      )}
     </div>
   )
 }

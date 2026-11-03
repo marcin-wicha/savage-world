@@ -159,10 +159,35 @@
     text-transform: uppercase;
   }
 
-  .sheet-info-box strong {
+  .sheet-info-box strong,
+  .sheet-editable-player {
     min-height: 1rem;
     font-size: 0.8rem;
     font-weight: 700;
+  }
+
+  .sheet-editable-player,
+  .sheet-editable-notes {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  .sheet-editable-player:focus-visible,
+  .sheet-editable-notes:focus-visible {
+    outline: 2px solid black;
+    outline-offset: 2px;
+  }
+
+  .sheet-editable-notes {
+    min-height: 11.6rem;
+    background-image: linear-gradient(
+      to bottom,
+      transparent calc(100% - 1px),
+      #777 calc(100% - 1px)
+    );
+    background-size: 100% 1.45rem;
+    font-size: 0.7rem;
+    line-height: 1.45rem;
   }
 
   .sheet-die-box {

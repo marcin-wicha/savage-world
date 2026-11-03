@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 import { api } from '@/lib/api-client'
@@ -53,7 +54,37 @@ describe('CharacterSheetRoute', () => {
     expect(screen.getByText('Alertness')).toBeInTheDocument()
     expect(screen.getByText('Bloodthirsty')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Print sheet' })).toBeInTheDocument()
+    expect(screen.getByText('Agility').parentElement?.parentElement).toHaveClass('grid')
+    expect(screen.getByText('Agility').parentElement?.parentElement).not.toHaveClass('grid-cols-2')
     expect(apiGetMock).toHaveBeenCalledWith('/api/v1/characters/12', expect.any(Object))
+  })
+
+  it('lets the player fill in Player and Notes on the sheet', async () => {
+    const user = userEvent.setup()
+    apiGetMock.mockResolvedValue({
+      character: {
+        id: 12,
+        name: 'Katarina Voss',
+        rank: 'seasoned',
+        origin_name: 'Dunestriders',
+        attributes: { agility: 'd6', smarts: 'd8', spirit: 'd4', strength: 'd6', vigor: 'd8' },
+        skills: [],
+        edges: [],
+        hindrances: [],
+      },
+    })
+
+    renderSheet()
+
+    const player = await screen.findByRole('textbox', { name: 'Player' })
+    const notes = screen.getByRole('textbox', { name: 'Notes' })
+    expect(notes).toHaveAttribute('aria-multiline', 'true')
+
+    await user.type(player, 'Alex')
+    await user.type(notes, 'Owes a favor to the marshal.')
+
+    expect(player).toHaveTextContent('Alex')
+    expect(notes).toHaveTextContent('Owes a favor to the marshal.')
   })
 
   it('shows a useful error when the character cannot be loaded', async () => {
