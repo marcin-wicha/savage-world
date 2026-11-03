@@ -77,6 +77,19 @@ services:
       retries: 5
       start_period: 30s
 
+  publish-assets:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: assets
+    depends_on:
+      silo_init:
+        condition: service_completed_successfully
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:?Set MINIO_ACCESS_KEY in .env}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:?Set MINIO_SECRET_KEY in .env}
+    restart: on-failure
+
   frontend:
     build:
       context: ./frontend
@@ -85,6 +98,8 @@ services:
     depends_on:
       rails_api:
         condition: service_healthy
+      publish-assets:
+        condition: service_completed_successfully
     expose:
       - "80"
 

@@ -611,6 +611,11 @@ Deployment options:
   GitHub `ENV_FILE_CONTENTS` secret. Keep Caddy's `/data` volume persistent so
   certificates and ACME account data survive deployments. Check certificate
   issuance using `docker compose logs --tail=100 caddy`.
+- Compose `publish-assets` copies frontend static media to the `public-assets`
+  Silo bucket before Nginx starts. Only object reads are public; uploads stay in
+  the separate private `AWS_BUCKET`. Nginx proxies media at existing same-origin
+  URLs without credentials. HTML/JS/CSS stay on Nginx, and development stays local.
+  Old hashed assets are retained; bucket cleanup is manual. See README.md.
 - The Compose PostgreSQL and Silo volumes are local to the server. Use an
   appropriate backup plan, or externally managed services for production.
 - Never commit deployment secrets or `.env` files.

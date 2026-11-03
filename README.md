@@ -72,9 +72,32 @@ pnpm --dir frontend storybook
 
 ## Deployment
 
-The backend is containerized and intended for Kamal on EC2. The frontend is
-built as a static SPA and deployed to S3 behind CloudFront. PostgreSQL is
-provided by RDS.
+The production Compose stack runs Rails, PostgreSQL, Silo object storage,
+Nginx, and Caddy on OCI. Caddy terminates HTTPS for `mw-swade.duckdns.org`.
+
+`docker compose up --detach --build --remove-orphans` builds the frontend and
+runs `publish-assets` before starting Nginx. Images, fonts, artwork, and other
+static media from the build are copied to the dedicated `public-assets` Silo
+bucket. JavaScript, CSS, and HTML remain on Nginx. SVG React components remain
+part of the JavaScript bundle. Development and Storybook continue to serve
+assets locally.
+
+Public media keeps its existing same-origin URL (for example
+`/traits/back.png` or `/assets/geist-….woff2`); Nginx proxies read-only media
+requests to Silo without forwarding session cookies or authorization headers.
+The bucket policy permits only object reads, not anonymous listing or writes.
+The separate `AWS_BUCKET` (default `uploads`) remains private. Never put private
+or user-uploaded files into `frontend/public` or the public-assets bucket.
+Future upload endpoints still need their own authorization and storage wiring;
+Rails currently continues to use local Active Storage.
+
+Publishing retains old hashed files so existing clients can finish loading
+across deployments. Unhashed public paths are overwritten on deployment; asset
+removal and old-version cleanup require deliberate bucket maintenance. Back up
+the Silo volume. Only Caddy exposes host ports; the storage API and console stay
+internal.
+
+The existing Kamal configuration is also available.
 
 Deployment commands are run from `backend/`:
 
