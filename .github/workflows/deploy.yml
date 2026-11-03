@@ -56,4 +56,13 @@ jobs:
             umask 077
             printf '%s\n' "$ENV_FILE_CONTENTS" > .env
 
-            docker compose up --detach --build --remove-orphans
+            PRIVATE_DATA_DIR=/var/www/savage-worlds-private-data
+            for catalog in edges hindrances skills gear powers; do
+              if [ ! -d "$PRIVATE_DATA_DIR/$catalog" ] || [ -z "$(find "$PRIVATE_DATA_DIR/$catalog" -maxdepth 1 -name '*.yml' -print -quit)" ]; then
+                echo "Missing private $catalog catalog in $PRIVATE_DATA_DIR" >&2
+                exit 1
+              fi
+            done
+
+            docker compose -f docker-compose.yml -f docker-compose.private.yml up --detach --build --remove-orphans
+            docker compose -f docker-compose.yml -f docker-compose.private.yml run --rm --no-deps rails_api ./bin/rails db:seed

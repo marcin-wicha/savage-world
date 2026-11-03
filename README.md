@@ -75,6 +75,35 @@ pnpm --dir frontend storybook
 The production Compose stack runs Rails, PostgreSQL, Silo object storage,
 Nginx, and Caddy on OCI. Caddy terminates HTTPS for `mw-swade.duckdns.org`.
 
+### Private reference catalogs
+
+The licensed YAML catalogs and SWADE description overlays under
+`backend/db/data/{edges,hindrances,skills,gear,powers}/private/` are gitignored.
+A Git checkout and `db:prepare` alone cannot populate them. Before the first
+OCI deployment, securely provision each catalog's `.yml` files on the server
+under `/var/www/savage-worlds-private-data/<catalog>/` (for example, copy them
+from the licensed workstation with `scp` or `rsync` over SSH). Keep that directory
+outside `/var/www/app` so the deploy's Git reset cannot affect it. Restrict its
+permissions to the deployment user and ensure the container's `rails` user
+(UID 1000) can read the files. Do not put licensed data in GitHub secrets,
+`.env`, the public-assets bucket, or the Docker image. Back up this directory
+separately from the database.
+
+The deploy checks that all five catalog directories contain YAML before updating
+the stack. `docker-compose.private.yml` mounts them read-only into Rails; after
+`docker compose up`, deployment runs `db:seed` to refresh reference data and
+missing descriptions. Re-running seeds does not reset an existing admin password.
+To refresh catalogs manually after changing the server's files, run from
+`/var/www/app`:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.private.yml run --rm --no-deps rails_api ./bin/rails db:seed
+```
+
+The standard local `docker compose` command does not use the private override.
+If the private data has never been provisioned, deployment stops rather than
+silently removing descriptions from existing records.
+
 `docker compose up --detach --build --remove-orphans` builds the frontend and
 runs `publish-assets` before starting Nginx. Images, fonts, artwork, and other
 static media from the build are copied to the dedicated `public-assets` Silo

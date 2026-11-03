@@ -9,7 +9,10 @@ RSpec.describe "db/seeds.rb" do
     admin = User.find_by!(email_address: "admin")
     expect(admin.authenticate("admin")).to eq(admin)
 
+    admin.update!(password: "changed-password", password_confirmation: "changed-password")
     expect { load seeds }.not_to change(User, :count)
+    expect(admin.reload.authenticate("changed-password")).to eq(admin)
+    expect(admin.authenticate("admin")).to be_falsey
   end
 
   it "removes the retired reference data" do

@@ -7,6 +7,13 @@
 # Ignore bundler config.
 /.bundle
 
+# Private licensed catalogs are mounted at runtime, never baked into the image.
+/db/data/edges/private/
+/db/data/hindrances/private/
+/db/data/skills/private/
+/db/data/gear/private/
+/db/data/powers/private/
+
 # Ignore all environment files.
 /.env*
 

@@ -12,9 +12,6 @@ Edge.where(slug: %w[
 ]).destroy_all
 Hindrance.where(slug: %w[arcane-sensitivity material-components corruption]).destroy_all
 
-admin = User.find_or_initialize_by(email_address: "admin")
-admin.password = "admin"
-admin.password_confirmation = "admin"
-admin.role = :admin
-admin.approved = true
-admin.save!
+unless User.exists?(email_address: "admin")
+  User.create!(email_address: "admin", password: "admin", password_confirmation: "admin", role: :admin, approved: true)
+end

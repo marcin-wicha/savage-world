@@ -1,0 +1,33 @@
+services:
+  rails_api:
+    volumes:
+      - type: bind
+        source: /var/www/savage-worlds-private-data/edges
+        target: /rails/db/data/edges/private
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /var/www/savage-worlds-private-data/hindrances
+        target: /rails/db/data/hindrances/private
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /var/www/savage-worlds-private-data/skills
+        target: /rails/db/data/skills/private
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /var/www/savage-worlds-private-data/gear
+        target: /rails/db/data/gear/private
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /var/www/savage-worlds-private-data/powers
+        target: /rails/db/data/powers/private
+        read_only: true
+        bind:
+          create_host_path: false
