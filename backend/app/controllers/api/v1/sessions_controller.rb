@@ -15,7 +15,7 @@ module Api
       def create
         user = User.authenticate_by(params.permit(:email_address, :password))
 
-        if user
+        if user&.approved?
           start_new_session_for(user)
           render json: { user: user_payload(user) }, status: :created
         else

@@ -5,6 +5,8 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :characters, dependent: :destroy
 
+  scope :pending, -> { where(approved: false) }
+
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   validates :email_address, presence: true, uniqueness: { case_sensitive: false }

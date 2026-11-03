@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -152,6 +152,12 @@ export function LoginRoute() {
               {loginMutation.isPending ? t('Signing in...') : t('Sign in')}
             </Button>
           </form>
+          <p className="text-muted-foreground mt-5 text-center text-sm">
+            {t('Need an account?')}{' '}
+            <Link to="/register" className="text-foreground underline underline-offset-4">
+              {t('Register')}
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </section>

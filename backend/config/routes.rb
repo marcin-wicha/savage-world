@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resource :session, only: %i[show create destroy]
+      resources :registrations, only: :create
+      get "admin/users", to: "admin/users#index"
+      patch "admin/users/:id/approve", to: "admin/users#approve"
+
       get "characters", to: "characters#index", as: :characters_index
       post "characters", to: "characters#create", as: :characters
       get "characters/:id", to: "characters#show", as: :character_show

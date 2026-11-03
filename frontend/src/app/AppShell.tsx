@@ -49,9 +49,14 @@ export function AppShell() {
                   {t('Characters')}
                 </NavLink>
                 {isAdmin ? (
-                  <NavLink to="/admin/reference-data" className={navLinkClass}>
-                    {t('Admin')}
-                  </NavLink>
+                  <>
+                    <NavLink to="/admin/reference-data" className={navLinkClass}>
+                      {t('Admin')}
+                    </NavLink>
+                    <NavLink to="/admin/approvals" className={navLinkClass}>
+                      {t('Approvals')}
+                    </NavLink>
+                  </>
                 ) : null}
                 <LogoutButton />
               </>

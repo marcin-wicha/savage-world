@@ -101,7 +101,7 @@ RSpec.describe "Admin reference data", type: :request do
     end
 
     it "does not expose arbitrary resource classes" do
-      get "/api/v1/admin/users", headers: json_headers
+      get "/api/v1/admin/sessions", headers: json_headers
 
       expect(response).to have_http_status(:not_found)
     end

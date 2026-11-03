@@ -63,6 +63,7 @@ describe('AppShell', () => {
 
     expect(screen.getByRole('link', { name: /login/i })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /characters/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /approvals/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /log out/i })).not.toBeInTheDocument()
   })
 
@@ -74,6 +75,7 @@ describe('AppShell', () => {
     expect(screen.getByRole('link', { name: /characters/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /login/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /approvals/i })).not.toBeInTheDocument()
   })
 
   it('shows the admin navigation for an admin session', () => {
@@ -86,6 +88,10 @@ describe('AppShell', () => {
     renderShell()
 
     expect(screen.getByRole('link', { name: /admin/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /approvals/i })).toHaveAttribute(
+      'href',
+      '/admin/approvals',
+    )
   })
 
   it('updates navigation when the auth state changes', () => {

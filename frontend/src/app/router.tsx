@@ -1,9 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom'
 
 import { LoginRoute } from '@/features/auth/LoginRoute'
+import { RegisterRoute } from '@/features/auth/RegisterRoute'
 import { RequireAdmin } from '@/features/auth/RequireAdmin'
 import { RequireAuth } from '@/features/auth/RequireAuth'
 import { AdminEditorRoute } from '@/features/admin/AdminEditorRoute'
+import { AdminApprovalsRoute } from '@/features/admin/AdminApprovalsRoute'
 import { CharactersRoute } from '@/features/characters/CharactersRoute'
 import { CharacterSheetRoute } from '@/features/characters/CharacterSheetRoute'
 import { NewCharacterRoute } from '@/features/characters/NewCharacterRoute'
@@ -19,6 +21,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomeRoute /> },
       { path: 'login', element: <LoginRoute /> },
+      { path: 'register', element: <RegisterRoute /> },
       {
         element: <RequireAuth />,
         children: [
@@ -28,7 +31,10 @@ export const router = createBrowserRouter([
           { path: 'characters/:id/sheet', element: <CharacterSheetRoute /> },
           {
             element: <RequireAdmin />,
-            children: [{ path: 'admin/reference-data', element: <AdminEditorRoute /> }],
+            children: [
+              { path: 'admin/reference-data', element: <AdminEditorRoute /> },
+              { path: 'admin/approvals', element: <AdminApprovalsRoute /> },
+            ],
           },
         ],
       },

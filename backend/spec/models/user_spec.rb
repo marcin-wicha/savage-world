@@ -10,6 +10,15 @@ RSpec.describe User, type: :model do
   it { is_expected.to validate_presence_of(:email_address) }
   it { is_expected.to validate_uniqueness_of(:email_address).case_insensitive }
 
+  it "defaults new users to pending and scopes pending accounts" do
+    approved = create(:user, approved: true)
+    pending = described_class.create!(email_address: "pending@example.com", password: "password123")
+
+    expect(pending).not_to be_approved
+    expect(described_class.pending).to contain_exactly(pending)
+    expect(described_class.pending).not_to include(approved)
+  end
+
   it "normalizes email addresses" do
     user.email_address = "  Player@Example.COM "
 

@@ -58,6 +58,12 @@ pnpm --dir frontend codegen
 - `GET /api/v1/session` — current user and CSRF token
 - `POST /api/v1/session` — sign in
 - `DELETE /api/v1/session` — sign out
+- `POST /api/v1/registrations` — register with `{ "user": { "email_address": "...", "password": "...", "password_confirmation": "..." } }`; new accounts await admin approval and cannot sign in until approved
+- `GET /api/v1/admin/users` — admin-only pending account list; returns `{ "users": [{ "id": 1, "email_address": "...", "role": "user" }] }`
+- `PATCH /api/v1/admin/users/:id/approve` — admin-only approval; returns `{ "user": { "id": 1, "email_address": "...", "role": "user" } }`
+
+
+Registration returns `201` with `{ "message": "Registration pending approval" }` without signing in. Invalid input returns `422` with `error` and `details`; missing CSRF returns `422`. Pending accounts receive `401` on sign-in (same error as invalid credentials), and authenticated routes reject and clear any old session after approval is revoked. Admin endpoints return `401` without a session, `403` for non-admin users, `404` for missing users, and `422` when approving an already approved user.
 - `POST /graphql` — GraphQL endpoint
 
 Deployment uses Kamal from this directory:

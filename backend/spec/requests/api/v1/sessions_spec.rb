@@ -67,6 +67,19 @@ RSpec.describe "Sessions", type: :request do
       expect(hint_cookie.downcase).not_to include("httponly")
     end
 
+    it "rejects pending accounts without creating a session" do
+      user.update!(approved: false)
+
+      expect {
+        post "/api/v1/session",
+          params: { email_address: user.email_address, password: "password123" }.to_json,
+          headers: json_headers
+      }.not_to change(Session, :count)
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(json["error"]).to eq("Invalid email address or password")
+    end
+
     it "rejects invalid credentials" do
       post "/api/v1/session",
         params: { email_address: user.email_address, password: "wrong-password" }.to_json,
@@ -74,6 +87,40 @@ RSpec.describe "Sessions", type: :request do
 
       expect(response).to have_http_status(:unauthorized)
       expect(json["error"]).to eq("Invalid email address or password")
+    end
+  end
+
+  describe "revoked approval" do
+    it "revokes existing sessions for pending users on REST, session, and GraphQL requests" do
+      post "/api/v1/session",
+        params: { email_address: user.email_address, password: "password123" }.to_json,
+        headers: json_headers
+      user.update!(approved: false)
+
+      get "/api/v1/characters", headers: json_headers
+      expect(response).to have_http_status(:unauthorized)
+      expect(user.sessions.count).to eq(0)
+      expect(response.cookies["sw_authenticated"]).to be_nil
+
+      get "/api/v1/session", headers: json_headers
+      expect(json["user"]).to be_nil
+
+      post "/graphql", params: { query: "{ viewer { id } }" }.to_json, headers: json_headers
+      expect(response).to have_http_status(:ok)
+      expect(json.dig("data", "viewer")).to be_nil
+    end
+
+    it "does not expose a pending user through an existing GraphQL session" do
+      post "/api/v1/session",
+        params: { email_address: user.email_address, password: "password123" }.to_json,
+        headers: json_headers
+      user.update!(approved: false)
+
+      post "/graphql", params: { query: "{ viewer { id } }" }.to_json, headers: json_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(json.dig("data", "viewer")).to be_nil
+      expect(user.sessions.count).to eq(0)
     end
   end
 
