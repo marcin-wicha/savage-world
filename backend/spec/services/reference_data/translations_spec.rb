@@ -52,6 +52,12 @@ RSpec.describe ReferenceData::Translations do
     end
   end
 
+  it "loads provisioned private locale files" do
+    Dir[Rails.root.join("config/locales/private/*.yml")].each do |path|
+      expect(I18n.load_path).to include(path), "private locale not loaded: #{path}"
+    end
+  end
+
   it "falls back to the canonical value for unknown and English records" do
     expect(described_class.translate(:edge, "unknown", :name, "Unknown Edge", locale: :pl))
       .to eq("Unknown Edge")

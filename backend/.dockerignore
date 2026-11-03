@@ -13,6 +13,7 @@
 /db/data/skills/private/
 /db/data/gear/private/
 /db/data/powers/private/
+/config/locales/private/
 
 # Ignore all environment files.
 /.env*

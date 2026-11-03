@@ -57,9 +57,9 @@ jobs:
             printf '%s\n' "$ENV_FILE_CONTENTS" > .env
 
             PRIVATE_DATA_DIR=/var/www/savage-worlds-private-data
-            for catalog in edges hindrances skills gear powers; do
+            for catalog in edges hindrances skills gear powers locales; do
               if [ ! -d "$PRIVATE_DATA_DIR/$catalog" ] || [ -z "$(find "$PRIVATE_DATA_DIR/$catalog" -maxdepth 1 -name '*.yml' -print -quit)" ]; then
-                echo "Missing private $catalog catalog in $PRIVATE_DATA_DIR" >&2
+                echo "Missing private $catalog YAML in $PRIVATE_DATA_DIR" >&2
                 exit 1
               fi
             done

@@ -2,6 +2,12 @@ services:
   rails_api:
     volumes:
       - type: bind
+        source: /var/www/savage-worlds-private-data/locales
+        target: /rails/config/locales/private
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
         source: /var/www/savage-worlds-private-data/edges
         target: /rails/db/data/edges/private
         read_only: true

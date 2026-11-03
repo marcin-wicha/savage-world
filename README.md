@@ -78,10 +78,13 @@ Nginx, and Caddy on OCI. Caddy terminates HTTPS for `mw-swade.duckdns.org`.
 ### Private reference catalogs
 
 The licensed YAML catalogs and SWADE description overlays under
-`backend/db/data/{edges,hindrances,skills,gear,powers}/private/` are gitignored.
+`backend/db/data/{edges,hindrances,skills,gear,powers}/private/`, as well as
+Polish Fantasy Companion translations under `backend/config/locales/private/`,
+are gitignored.
 A Git checkout and `db:prepare` alone cannot populate them. Before the first
 OCI deployment, securely provision each catalog's `.yml` files on the server
-under `/var/www/savage-worlds-private-data/<catalog>/` (for example, copy them
+under `/var/www/savage-worlds-private-data/<catalog>/` and the locale `.yml`
+files under `/var/www/savage-worlds-private-data/locales/` (for example, copy them
 from the licensed workstation with `scp` or `rsync` over SSH). Keep that directory
 outside `/var/www/app` so the deploy's Git reset cannot affect it. Restrict its
 permissions to the deployment user and ensure the container's `rails` user
@@ -89,10 +92,13 @@ permissions to the deployment user and ensure the container's `rails` user
 `.env`, the public-assets bucket, or the Docker image. Back up this directory
 separately from the database.
 
-The deploy checks that all five catalog directories contain YAML before updating
-the stack. `docker-compose.private.yml` mounts them read-only into Rails; after
+The deploy checks that all five catalog directories and the locale directory
+contain YAML before updating the stack. `docker-compose.private.yml` mounts them
+read-only into Rails; after
 `docker compose up`, deployment runs `db:seed` to refresh reference data and
-missing descriptions. Re-running seeds does not reset an existing admin password.
+missing descriptions. Rails loads the mounted translations at boot; restart the
+Rails container after changing locale files. Re-running seeds does not reset an
+existing admin password.
 To refresh catalogs manually after changing the server's files, run from
 `/var/www/app`:
 
