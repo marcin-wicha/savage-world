@@ -3,6 +3,7 @@ module Types
     field :id, ID, null: false
     field :name, String, null: false
     field :slug, String, null: false
+    field :artwork_url, String, null: true
     field :severity, Types::HindranceSeverityEnum, null: false
     field :requirements, [ Types::RequirementType ], null: false
     field :requirements_text, String, null: false

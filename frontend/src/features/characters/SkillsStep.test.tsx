@@ -25,6 +25,7 @@ const skills = [
     id: '1',
     name: 'Athletics',
     slug: 'athletics',
+    artwork_url: 'https://cdn.example.com/custom/SkillsStep.jpg',
     attribute: 'agility',
     core: true,
     source_book: 'SWADE',
@@ -35,6 +36,7 @@ const skills = [
     id: '2',
     name: 'Academics',
     slug: 'academics',
+    artwork_url: null,
     attribute: 'smarts',
     core: false,
     source_book: 'SWADE',
@@ -44,6 +46,7 @@ const skills = [
     id: '3',
     name: 'Faith',
     slug: 'faith',
+    artwork_url: null,
     attribute: 'spirit',
     core: true,
     source_book: 'SWADE',
@@ -58,6 +61,7 @@ const manySkills = [
     id: String(index + 4),
     name: `Skill ${index + 4}`,
     slug: `skill-${index + 4}`,
+    artwork_url: null,
   })),
 ]
 
@@ -132,7 +136,10 @@ describe('SkillsStep', () => {
     expect(screen.getByText('0 / 4')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Athletics' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Academics' })).toBeInTheDocument()
-    expect(document.querySelector('img[src="/traits/skills/athletics.png"]')).toBeInTheDocument()
+    expect(
+      document.querySelector('img[src="https://cdn.example.com/custom/SkillsStep.jpg"]'),
+    ).toBeInTheDocument()
+    expect(document.querySelectorAll('[data-slot="trait-card-artwork"]')).toHaveLength(1)
     expect(
       screen.getByRole('button', { name: 'Athletics' }).closest('[data-slot="trait-card"]'),
     ).not.toHaveClass('opacity-50')

@@ -4,6 +4,7 @@ query Edges($first: Int = 14, $after: String) {
       id
       name
       slug
+      artwork_url
       category
       minimum_rank
       requirements {

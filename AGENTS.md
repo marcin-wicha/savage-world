@@ -611,6 +611,11 @@ Deployment options:
   GitHub `ENV_FILE_CONTENTS` secret. Keep Caddy's `/data` volume persistent so
   certificates and ACME account data survive deployments. Check certificate
   issuance using `docker compose logs --tail=100 caddy`.
+- Resource artwork for origins, edges, hindrances, skills, and gear is stored in
+  nullable `artwork_url` columns, exposed by GraphQL and editable in the admin UI.
+  Character creation consumes the stored URLs without slug-based fallbacks.
+  `db/data/artwork.yml` supplies defaults for new imports and the initial migration
+  backfill; repeat imports preserve admin overrides, including cleared links.
 - Compose `publish-assets` copies frontend static media to the `public-assets`
   Silo bucket before Nginx starts. Only object reads are public; uploads stay in
   the separate private `AWS_BUCKET`. Nginx proxies media at existing same-origin

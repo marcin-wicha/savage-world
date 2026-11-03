@@ -29,8 +29,6 @@ const attributeLabels: Record<string, string> = {
   vigor: 'Vigor',
 }
 
-const skillArtwork = (slug: string) => `/traits/skills/${slug}.png`
-
 function attributeLabel(attribute: string) {
   const normalizedAttribute = attribute.trim().toLowerCase()
 
@@ -228,7 +226,7 @@ export function SkillsStep() {
           onDieChange={(nextDie) => handleDieChange(skill.id, nextDie)}
         />
       ),
-      backgroundImage: skillArtwork(skill.slug),
+      backgroundImage: skill.artwork_url ?? undefined,
       selected: isSelected,
       disabled: cardDisabled,
     }

@@ -26,6 +26,7 @@ const origins = [
     id: '1',
     name: 'Dunestriders',
     slug: 'dunestriders',
+    artwork_url: 'https://cdn.example.com/custom/OriginStep.jpg',
     description:
       'Keepers of the Old Faith who guide pilgrims across the burning central desert to the Spire. Masters of arid survival.',
     created_at: '',
@@ -35,6 +36,7 @@ const origins = [
     id: '2',
     name: 'Greenbloods',
     slug: 'greenbloods',
+    artwork_url: null,
     description:
       'People of the venomous jungle whose bodies neutralize all known toxins. Chemists, medics, and poisoners.',
     created_at: '',
@@ -97,7 +99,10 @@ describe('OriginStep', () => {
         'Keepers of the Old Faith who guide pilgrims across the burning central desert to the Spire. Masters of arid survival.',
       ),
     ).toBeInTheDocument()
-    expect(document.querySelector('img[src="/origins/dunestriders.webp"]')).toBeInTheDocument()
+    expect(
+      document.querySelector('img[src="https://cdn.example.com/custom/OriginStep.jpg"]'),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Greenbloods' }).querySelector('img')).toBeNull()
     expect(
       document.querySelector('.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3'),
     ).toBeInTheDocument()

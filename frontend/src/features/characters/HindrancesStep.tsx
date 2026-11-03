@@ -28,7 +28,6 @@ const severityLabels: Record<HindranceSeverity, string> = {
 
 type ConcreteHindranceSeverity = Exclude<HindranceSeverity, 'minor_or_major'>
 
-const hindranceArtwork = (slug: string) => `/traits/hindrances/${slug}.png`
 const maxHindrancePoints = 4
 const hindrancePointValues: Record<ConcreteHindranceSeverity, number> = {
   minor: 1,
@@ -166,7 +165,7 @@ export function HindrancesStep() {
             }
           : undefined,
       description: t(hindrance.description || hindrance.requirements_text || '') || undefined,
-      backgroundImage: hindranceArtwork(hindrance.slug),
+      backgroundImage: hindrance.artwork_url ?? undefined,
       selected: isSelected,
       disabled: !isSelected && pointsIfSelected > maxHindrancePoints,
     }

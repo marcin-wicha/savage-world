@@ -25,6 +25,7 @@ const hindrances = [
     id: '1',
     name: 'Bad Eyes',
     slug: 'bad-eyes',
+    artwork_url: 'https://cdn.example.com/custom/HindrancesStep.jpg',
     severity: 'minor',
     requirements_text: '',
     description: 'Vision becomes a serious liability.',
@@ -33,6 +34,7 @@ const hindrances = [
     id: '2',
     name: 'Bloodthirsty',
     slug: 'bloodthirsty',
+    artwork_url: null,
     severity: 'major',
     requirements_text: '',
   },
@@ -41,6 +43,7 @@ const hindrances = [
     id: '4',
     name: 'Hard of Hearing',
     slug: 'hard-of-hearing',
+    artwork_url: null,
     severity: 'minor_or_major',
     requirements_text: '',
   },
@@ -48,6 +51,7 @@ const hindrances = [
     id: '5',
     name: 'Yellow',
     slug: 'yellow',
+    artwork_url: null,
     severity: 'major',
     requirements_text: 'Spirit d4',
   },
@@ -131,7 +135,10 @@ describe('HindrancesStep', () => {
     expect(screen.getByText('0 / 4')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bad Eyes' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Bloodthirsty' })).toBeInTheDocument()
-    expect(document.querySelector('img[src="/traits/hindrances/bad-eyes.png"]')).toBeInTheDocument()
+    expect(
+      document.querySelector('img[src="https://cdn.example.com/custom/HindrancesStep.jpg"]'),
+    ).toBeInTheDocument()
+    expect(document.querySelectorAll('[data-slot="trait-card-artwork"]')).toHaveLength(1)
     expect(screen.getByText('Vision becomes a serious liability.')).toBeInTheDocument()
     expect(document.querySelector('[data-slot="trait-card"][data-size="md"]')).toBeInTheDocument()
 

@@ -47,6 +47,7 @@ const makeEdge = (
   id,
   name: values.name,
   slug: values.slug,
+  artwork_url: id === '1' ? 'https://cdn.example.com/custom/edge.jpg' : null,
   category: values.category ?? 'background',
   minimum_rank: values.minimum_rank ?? 'novice',
   requirements: values.requirements ?? [],
@@ -175,7 +176,10 @@ describe('EdgesStep', () => {
     expect(screen.getByRole('button', { name: 'Ace' })).toBeInTheDocument()
     expect(screen.getByText('Novice · Professional')).toBeInTheDocument()
     expect(screen.getByText('Novice, Agility d8')).toBeInTheDocument()
-    expect(document.querySelector('img[src="/traits/edges/alertness.png"]')).toBeInTheDocument()
+    expect(
+      document.querySelector('img[src="https://cdn.example.com/custom/edge.jpg"]'),
+    ).toBeInTheDocument()
+    expect(document.querySelectorAll('[data-slot="trait-card-artwork"]')).toHaveLength(1)
 
     await waitFor(() => {
       formRef.current?.setValue('hindrance_points_earned', 4)

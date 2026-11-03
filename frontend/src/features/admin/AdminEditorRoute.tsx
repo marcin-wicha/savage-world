@@ -67,11 +67,13 @@ const sourceBookOptions: FieldOption[] = [
 
 const resourceFieldDefinitions: Record<string, FieldDefinition[]> = {
   origins: [
+    { key: 'artwork_url', label: 'Artwork URL', kind: 'text' },
     { key: 'name', label: 'Name', kind: 'text', required: true },
     { key: 'slug', label: 'Slug', kind: 'text' },
     { key: 'description', label: 'Description', kind: 'textarea', required: true },
   ],
   hindrances: [
+    { key: 'artwork_url', label: 'Artwork URL', kind: 'text' },
     { key: 'name', label: 'Name', kind: 'text', required: true },
     { key: 'slug', label: 'Slug', kind: 'text' },
     {
@@ -97,6 +99,7 @@ const resourceFieldDefinitions: Record<string, FieldDefinition[]> = {
     { key: 'description', label: 'Description', kind: 'textarea' },
   ],
   edges: [
+    { key: 'artwork_url', label: 'Artwork URL', kind: 'text' },
     { key: 'name', label: 'Name', kind: 'text', required: true },
     { key: 'slug', label: 'Slug', kind: 'text' },
     {
@@ -150,6 +153,7 @@ const resourceFieldDefinitions: Record<string, FieldDefinition[]> = {
     { key: 'description', label: 'Description', kind: 'textarea' },
   ],
   skills: [
+    { key: 'artwork_url', label: 'Artwork URL', kind: 'text' },
     { key: 'name', label: 'Name', kind: 'text', required: true },
     { key: 'slug', label: 'Slug', kind: 'text' },
     {

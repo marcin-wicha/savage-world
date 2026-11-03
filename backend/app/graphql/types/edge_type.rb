@@ -3,6 +3,7 @@ module Types
     field :id, ID, null: false
     field :name, String, null: false
     field :slug, String, null: false
+    field :artwork_url, String, null: true
     field :category, Types::EdgeCategoryEnum, null: false
     field :minimum_rank, Types::RankEnum, null: false
     field :requirements, [ Types::RequirementType ], null: false

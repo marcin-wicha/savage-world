@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_03_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -71,6 +71,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
     t.datetime "updated_at", null: false
     t.text "description"
     t.jsonb "effects", default: [], null: false
+    t.string "artwork_url"
     t.index ["category", "minimum_rank"], name: "index_edges_on_category_and_minimum_rank"
     t.index ["slug"], name: "index_edges_on_slug", unique: true
     t.index ["source_book"], name: "index_edges_on_source_book"
@@ -111,6 +112,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
+    t.string "artwork_url"
     t.index ["severity", "source_book"], name: "index_hindrances_on_severity_and_source_book"
     t.index ["slug"], name: "index_hindrances_on_slug", unique: true
     t.index ["source_book"], name: "index_hindrances_on_source_book"
@@ -124,6 +126,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
     t.string "name", null: false
     t.string "slug", null: false
     t.text "description", null: false
+    t.string "artwork_url"
     t.index ["slug"], name: "index_origins_on_slug", unique: true
   end
 
@@ -164,6 +167,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
+    t.string "artwork_url"
     t.index ["linked_attribute"], name: "index_skills_on_linked_attribute"
     t.index ["slug"], name: "index_skills_on_slug", unique: true
     t.index ["source_book"], name: "index_skills_on_source_book"

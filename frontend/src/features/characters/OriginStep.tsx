@@ -8,8 +8,6 @@ import { useLanguage } from '@/lib/i18n-context'
 
 import type { CharacterFormValues } from './character-form'
 
-const originArtwork = (slug: string) => `/origins/${slug}.webp`
-
 export function OriginStep() {
   const { t } = useLanguage()
   const form = useFormContext<CharacterFormValues>()
@@ -78,7 +76,7 @@ export function OriginStep() {
               key={origin.id}
               title={t(origin.name)}
               description={t(origin.description)}
-              backgroundImage={originArtwork(origin.slug)}
+              backgroundImage={origin.artwork_url ?? undefined}
               selected={origin.id === selectedId}
               size="md"
               className="justify-self-center"

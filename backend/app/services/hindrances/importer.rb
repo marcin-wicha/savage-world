@@ -19,7 +19,7 @@ module Hindrances
 
       hindrances = records.map do |attributes|
         Hindrance.find_or_initialize_by(slug: attributes["slug"]).tap do |hindrance|
-          hindrance.assign_attributes(attributes)
+          hindrance.assign_attributes(ReferenceData::Artwork.attributes_for(hindrance, attributes))
         end
       end
 

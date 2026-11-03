@@ -21,7 +21,7 @@ module Edges
 
       edges = records.map do |attributes|
         Edge.find_or_initialize_by(slug: attributes["slug"]).tap do |edge|
-          edge.assign_attributes(attributes)
+          edge.assign_attributes(ReferenceData::Artwork.attributes_for(edge, attributes))
         end
       end
 

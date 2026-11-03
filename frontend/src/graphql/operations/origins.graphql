@@ -4,6 +4,7 @@ query Origins($first: Int, $after: String) {
       id
       name
       slug
+      artwork_url
       description
       created_at
       updated_at

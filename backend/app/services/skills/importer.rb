@@ -19,7 +19,7 @@ module Skills
 
       skills = records.map do |attributes|
         Skill.find_or_initialize_by(slug: attributes["slug"]).tap do |skill|
-          skill.assign_attributes(attributes)
+          skill.assign_attributes(ReferenceData::Artwork.attributes_for(skill, attributes))
         end
       end
 

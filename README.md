@@ -91,6 +91,27 @@ or user-uploaded files into `frontend/public` or the public-assets bucket.
 Future upload endpoints still need their own authorization and storage wiring;
 Rails currently continues to use local Active Storage.
 
+### Resource artwork links
+
+Origins, edges, hindrances, skills, and gear store an optional `artwork_url` in
+the database. GraphQL returns that value and character creation renders it
+directly; it does not reconstruct a filename from the resource slug. Missing
+links mean no artwork. The admin editor exposes an **Artwork URL** field for
+all five resources, including clearing an existing link.
+
+The migration backfills existing artwork from `backend/db/data/artwork.yml`.
+New imports use that manifest as a default, but subsequent imports preserve
+stored links (including links cleared by an administrator). Existing nonblank
+gear artwork links are preserved during backfill. When adding bundled artwork,
+add its mapping to the manifest for new imports; use the admin editor to assign
+it to an existing resource.
+
+Manifest links are same-origin paths served from the S3-compatible public
+bucket through Nginx in production. Absolute artwork URLs are also supported.
+A future admin upload can store its resulting public URL in the same field;
+no frontend filename convention or schema change will be required. Powers do
+not currently have artwork assets and are unchanged.
+
 Publishing retains old hashed files so existing clients can finish loading
 across deployments. Unhashed public paths are overwritten on deployment; asset
 removal and old-version cleanup require deliberate bucket maintenance. Back up

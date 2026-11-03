@@ -3,6 +3,7 @@ module Types
     field :id, ID, null: false
     field :name, String, null: false
     field :slug, String, null: false
+    field :artwork_url, String, null: true
     field :attribute, String, null: false
     field :core, Boolean, null: false
     field :description, String, null: true

@@ -4,6 +4,7 @@ query Skills($first: Int = 25, $after: String) {
       id
       name
       slug
+      artwork_url
       attribute
       core
       description

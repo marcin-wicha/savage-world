@@ -33,7 +33,7 @@ const gear = [
     requirements: [],
     effects: { light_radius: '4 inches', duration: '1 hour' },
     description: 'Provides light in a 4-inch radius for one hour.',
-    artwork_url: null,
+    artwork_url: 'https://cdn.example.com/unrelated/lantern.jpg',
     source_book: 'Fantasy Companion',
     source_page: 49,
   },
@@ -103,16 +103,17 @@ describe('GearStep', () => {
     expect(screen.getAllByText('Light Radius:', { exact: false })).toHaveLength(2)
   })
 
-  it('uses local slug artwork when the API does not provide artwork', async () => {
+  it('uses server artwork without a slug fallback for null URLs', async () => {
     renderStep()
 
     await screen.findByText('2 items')
 
     const artwork = document.querySelectorAll('[data-slot="gear-artwork"]')
 
-    expect(artwork).toHaveLength(3)
-    expect(artwork[0]).toHaveAttribute('src', '/gear/torch.webp')
-    expect(artwork[1]).toHaveAttribute('src', '/gear/sword-long.webp')
+    expect(artwork).toHaveLength(2)
+    expect(artwork[0]).toHaveAttribute('src', 'https://cdn.example.com/unrelated/lantern.jpg')
+    expect(artwork[1]).toHaveAttribute('src', 'https://cdn.example.com/unrelated/lantern.jpg')
+    expect(document.querySelector('img[src="/gear/sword-long.webp"]')).toBeNull()
   })
 
   it('filters by category and search', async () => {

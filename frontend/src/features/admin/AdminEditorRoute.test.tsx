@@ -157,6 +157,65 @@ describe('AdminEditorRoute', () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
   })
 
+  it.each(['origins', 'edges', 'hindrances', 'skills'])(
+    'edits and clears the database artwork URL for %s',
+    async (resource) => {
+      const user = userEvent.setup()
+      const mutate = vi.fn()
+      const artworkUrl = 'https://cdn.example.com/custom/reference-illustration.webp'
+      useRestMutationMock.mockReturnValue({ mutate, isPending: false } as never)
+      const resources = { resources: [{ key: resource, label: resource, count: 1 }] }
+      const records = {
+        resource,
+        records: [
+          {
+            id: 7,
+            name: 'Custom reference',
+            slug: 'custom-reference',
+            description: 'A reference entry.',
+            artwork_url: artworkUrl,
+            severity: 'minor',
+            category: 'background',
+            minimum_rank: 'novice',
+            requirements: [],
+            source_book: 'SWADE',
+            source_page: 1,
+            repeatable: false,
+            linked_attribute: 'agility',
+            core: false,
+          },
+        ],
+      }
+      useRestQueryMock.mockImplementation((_key, path) => {
+        return {
+          data: path === '/api/v1/admin/reference_data' ? resources : records,
+          isPending: false,
+          isError: false,
+        } as never
+      })
+
+      renderEditor()
+      await user.click(screen.getByRole('button', { name: /edit/i }))
+      const artworkInput = screen.getByRole('textbox', { name: 'Artwork URL' })
+      expect(artworkInput).toHaveValue(artworkUrl)
+
+      await user.clear(artworkInput)
+      await user.type(artworkInput, 'https://images.example.org/replacement.png')
+      await user.click(screen.getByRole('button', { name: 'Save changes' }))
+      expect(mutate).toHaveBeenLastCalledWith({
+        record: expect.objectContaining({
+          artwork_url: 'https://images.example.org/replacement.png',
+        }),
+      })
+
+      await user.clear(artworkInput)
+      await user.click(screen.getByRole('button', { name: 'Save changes' }))
+      expect(mutate).toHaveBeenLastCalledWith({
+        record: expect.objectContaining({ artwork_url: null }),
+      })
+    },
+  )
+
   it('submits a new record through the REST mutation', async () => {
     const user = userEvent.setup()
     const mutate = vi.fn()
@@ -169,7 +228,7 @@ describe('AdminEditorRoute', () => {
     await user.click(screen.getByRole('button', { name: /create record/i }))
 
     expect(mutate).toHaveBeenCalledWith({
-      record: { name: 'Elf', slug: null, description: 'A graceful origin.' },
+      record: { artwork_url: null, name: 'Elf', slug: null, description: 'A graceful origin.' },
     })
   })
 })

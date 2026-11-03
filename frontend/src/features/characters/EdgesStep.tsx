@@ -35,7 +35,6 @@ const categoryLabels: Record<EdgeCategory, string> = {
 }
 
 const dieValues: Record<string, number> = { d4: 4, d6: 6, d8: 8, d10: 10, d12: 12 }
-const edgeArtwork = (slug: string) => `/traits/edges/${slug}.png`
 const edgeHindrancePointCost = 2
 
 export function EdgesStep() {
@@ -238,7 +237,7 @@ export function EdgesStep() {
       title: t(edge.name),
       eyebrow: minimumRankLabel ? `${minimumRankLabel} · ${categoryLabel}` : categoryLabel,
       description: t(edge.description || edge.requirements_text || '') || undefined,
-      backgroundImage: edgeArtwork(edge.slug),
+      backgroundImage: edge.artwork_url ?? undefined,
       selected: isSelected,
       disabled: !isSelected && availableForEdges < edgeHindrancePointCost,
     }

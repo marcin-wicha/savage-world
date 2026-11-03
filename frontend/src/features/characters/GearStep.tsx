@@ -205,7 +205,9 @@ function GearMoneyBalance({ spent }: { spent: number }) {
 }
 
 function GearArtwork({ item }: { item: GearItem }) {
-  const artworkUrl = item.artwork_url || `/gear/${item.slug}.webp`
+  const artworkUrl = item.artwork_url
+
+  if (!artworkUrl) return null
 
   return (
     <div className="bg-card pb-4">
