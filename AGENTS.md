@@ -601,8 +601,16 @@ Deployment options:
 
 - OCI Compute: Docker Compose runs the Rails API, PostgreSQL 17, PGSTY Silo, and the
   built frontend/Nginx reverse proxy. GitHub Actions deploys `main` over SSH.
-- TLS must terminate at an OCI load balancer or another HTTPS reverse proxy;
-  the frontend container only listens on HTTP port 80.
+- Caddy terminates TLS for `mw-swade.duckdns.org`, automatically obtains and
+  renews certificates, and redirects HTTP to HTTPS. Only Caddy publishes host
+  ports 80 and 443; frontend Nginx and Rails remain internal on port 80.
+- Point the DuckDNS hostname at the server's public IP and allow inbound TCP
+  ports 80 and 443 through OCI security rules and the host firewall before
+  deploying. Any AAAA record must also reach this server.
+- Set `FRONTEND_ORIGINS=https://mw-swade.duckdns.org` in the server `.env` and
+  GitHub `ENV_FILE_CONTENTS` secret. Keep Caddy's `/data` volume persistent so
+  certificates and ACME account data survive deployments. Check certificate
+  issuance using `docker compose logs --tail=100 caddy`.
 - The Compose PostgreSQL and Silo volumes are local to the server. Use an
   appropriate backup plan, or externally managed services for production.
 - Never commit deployment secrets or `.env` files.
