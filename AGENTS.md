@@ -599,11 +599,11 @@ The CI PostgreSQL service uses the `postgres:17` image with `postgres` /
 
 Deployment options:
 
-- OCI Compute: Docker Compose runs the Rails API, PostgreSQL 17, MinIO, and the
+- OCI Compute: Docker Compose runs the Rails API, PostgreSQL 17, PGSTY Silo, and the
   built frontend/Nginx reverse proxy. GitHub Actions deploys `main` over SSH.
 - TLS must terminate at an OCI load balancer or another HTTPS reverse proxy;
   the frontend container only listens on HTTP port 80.
-- The Compose PostgreSQL and MinIO volumes are local to the server. Use an
+- The Compose PostgreSQL and Silo volumes are local to the server. Use an
   appropriate backup plan, or externally managed services for production.
 - Never commit deployment secrets or `.env` files.
 
@@ -612,7 +612,11 @@ For OCI Compose deployment, configure the GitHub repository secrets
 complete root `.env` file and must define `DB_PASSWORD`, `SECRET_KEY_BASE`,
 `RAILS_MASTER_KEY`, `FRONTEND_ORIGINS` (the public HTTPS origin),
 `MINIO_ACCESS_KEY`, and `MINIO_SECRET_KEY`. The Compose stack creates the
-configured MinIO bucket (default `uploads`) on startup.
+configured Silo bucket (default `uploads`) on startup using the image's bundled
+`mcli` client. Silo retains the compatible `MINIO_ROOT_*` server variables;
+the deployment keeps `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, and the
+`miniodata` volume name to preserve existing credentials and data. Back up the
+volume and test recovery before upgrading an existing MinIO deployment.
 The workflow expects the SSH user `ubuntu` and deploys into
 `/var/www/savage-worlds`. The remote host needs Git and Docker Compose v2; it
 must be able to clone the GitHub repository.
