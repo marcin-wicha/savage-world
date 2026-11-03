@@ -13,6 +13,13 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 
 RSpec.configure do |config|
+  config.before(:suite) do
+    # db:prepare seeds newly created test databases; specs require an empty baseline.
+    connection = ActiveRecord::Base.connection
+    tables = connection.tables - %w[schema_migrations ar_internal_metadata]
+    connection.execute("TRUNCATE TABLE #{tables.map { |table| connection.quote_table_name(table) }.join(', ')} RESTART IDENTITY CASCADE") if tables.any?
+  end
+
   config.fixture_paths = [ Rails.root.join("spec/fixtures") ]
   config.use_transactional_fixtures = true
   config.infer_spec_type_from_file_location!
