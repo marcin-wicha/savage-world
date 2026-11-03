@@ -90,6 +90,7 @@ describe('NewCharacterRoute', () => {
     expect(screen.getByLabelText(/character name/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/^concept$/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /back/i })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /next/i })).toBeDisabled()
     expect(document.querySelector('[data-slot="multi-step-flow-footer"]')).toHaveClass(
       'sticky',
       'bottom-0',
@@ -101,13 +102,16 @@ describe('NewCharacterRoute', () => {
 
     renderRoute()
 
-    await user.click(screen.getByRole('button', { name: /next/i }))
-
-    expect(await screen.findByText(/give your character a name/i)).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: /choose an origin/i })).not.toBeInTheDocument()
+    const next = screen.getByRole('button', { name: /next/i })
+    expect(next).toBeDisabled()
 
     await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
-    await user.click(screen.getByRole('button', { name: /next/i }))
+    expect(next).toBeEnabled()
+    await user.type(screen.getByLabelText(/^concept$/i), 'A'.repeat(501))
+    expect(next).toBeDisabled()
+    await user.clear(screen.getByLabelText(/^concept$/i))
+    expect(next).toBeEnabled()
+    await user.click(next)
 
     expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: /derived statistics/i })).toBeInTheDocument()
@@ -122,11 +126,11 @@ describe('NewCharacterRoute', () => {
     await user.click(screen.getByRole('button', { name: /next/i }))
     expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /next/i }))
+    expect(screen.getByRole('button', { name: /next/i })).toBeDisabled()
     expect(screen.getByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
-    expect(screen.getByText(/choose an origin/i)).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Dunestriders' }))
+    await user.click(await screen.findByRole('button', { name: 'Dunestriders' }))
+    expect(screen.getByRole('button', { name: /next/i })).toBeEnabled()
     await user.click(screen.getByRole('button', { name: /next/i }))
     expect(await screen.findByRole('heading', { name: /take hindrances/i })).toBeInTheDocument()
   })

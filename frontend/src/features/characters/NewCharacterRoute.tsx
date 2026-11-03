@@ -187,6 +187,8 @@ export function NewCharacterRoute() {
       ),
     })
   }, [characterQuery.data, form])
+  const formValues = useWatch({ control: form.control })
+  const validation = characterFormSchema.safeParse(formValues)
   const vigor = useWatch({ control: form.control, name: 'attributes.vigor' })
   const earnedHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_earned' }) ?? 0
@@ -304,11 +306,21 @@ export function NewCharacterRoute() {
               }
               onBack={() => navigate('/characters')}
               onBeforeNext={(_step, index) => validateStep(index)}
-              canAdvance={(_step, index) =>
-                index === stepDefinitions.length - 1
-                  ? hindrancePointsBalanced && !saveMutation.isPending
-                  : !saveMutation.isPending
-              }
+              canAdvance={(_step, index) => {
+                if (saveMutation.isPending) return false
+                if (index === stepDefinitions.length - 1) {
+                  return hindrancePointsBalanced && validation.success
+                }
+                if (validation.success) return true
+
+                const fields = characterStepFields[stepDefinitions[index].id]
+                return !validation.error.issues.some((issue) =>
+                  fields.some((field) => {
+                    const path = issue.path.join('.')
+                    return path === field || path.startsWith(`${field}.`)
+                  }),
+                )
+              }}
               onComplete={handleComplete}
             />
             {saveMutation.error ? (
