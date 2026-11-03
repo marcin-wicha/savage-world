@@ -16,7 +16,7 @@ module Origins
 
       origins = records.map do |attributes|
         Origin.find_or_initialize_by(slug: attributes["slug"]).tap do |origin|
-          origin.assign_attributes(ReferenceData::Artwork.attributes_for(origin, attributes))
+          origin.assign_attributes(ReferenceData::Artwork.attributes_for(origin, attributes.except("hidden")))
         end
       end
 

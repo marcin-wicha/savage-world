@@ -95,7 +95,7 @@ export async function request<TData>(
   requestHeaders.set('Accept', 'application/json')
   requestHeaders.set('X-Language', selectedLanguage())
 
-  if (body !== undefined && !requestHeaders.has('Content-Type')) {
+  if (body !== undefined && !(body instanceof FormData) && !requestHeaders.has('Content-Type')) {
     requestHeaders.set('Content-Type', 'application/json')
   }
 
@@ -108,7 +108,7 @@ export async function request<TData>(
     method,
     credentials: 'include',
     headers: requestHeaders,
-    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+    ...(body !== undefined ? { body: body instanceof FormData ? body : JSON.stringify(body) } : {}),
   })
 
   const payload = await parseResponse(response)

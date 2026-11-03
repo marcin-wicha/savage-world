@@ -19,7 +19,7 @@ module Gears
 
       gears = records.map do |attributes|
         Gear.find_or_initialize_by(slug: attributes["slug"]).tap do |gear|
-          gear.assign_attributes(ReferenceData::Artwork.attributes_for(gear, attributes))
+          gear.assign_attributes(ReferenceData::Artwork.attributes_for(gear, attributes.except("hidden")))
         end
       end
 

@@ -51,6 +51,58 @@ RSpec.describe "Admin reference data", type: :request do
   end
 
   describe "reference data CRUD" do
+    %w[origins edges hindrances skills gears].each do |resource|
+      it "allows admins to hide and unhide #{resource} while keeping them in the admin list" do
+        model = { "origins" => Origin, "edges" => Edge, "hindrances" => Hindrance, "skills" => Skill, "gears" => Gear }.fetch(resource)
+        factory = resource == "gears" ? :gear : resource.singularize.to_sym
+        record = create(factory)
+        expect(record.hidden).to be(false)
+
+        patch "/api/v1/admin/#{resource}/#{record.id}",
+          params: { record: { hidden: true } }.to_json,
+          headers: json_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(json.dig("record", "hidden")).to be(true)
+        expect(model.find(record.id).hidden).to be(true)
+
+        get "/api/v1/admin/#{resource}", headers: json_headers
+        expect(json.fetch("records").find { |entry| entry["id"] == record.id }["hidden"]).to be(true)
+
+        patch "/api/v1/admin/#{resource}/#{record.id}",
+          params: { record: { hidden: false } }.to_json,
+          headers: json_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(record.reload.hidden).to be(false)
+      end
+    end
+
+    it "accepts hidden when creating a reference record" do
+      post "/api/v1/admin/origins",
+        params: { record: { name: "Secret Origin", description: "Hidden from the catalog.", hidden: true } }.to_json,
+        headers: json_headers
+
+      expect(response).to have_http_status(:created)
+      expect(json.dig("record", "hidden")).to be(true)
+      expect(Origin.find(json.dig("record", "id")).hidden).to be(true)
+    end
+
+    context "when signed in as a regular user" do
+      let(:role) { :user }
+
+      it "cannot change hidden reference data" do
+        record = create(:origin, hidden: true)
+
+        patch "/api/v1/admin/origins/#{record.id}",
+          params: { record: { hidden: false } }.to_json,
+          headers: json_headers
+
+        expect(response).to have_http_status(:forbidden)
+        expect(record.reload.hidden).to be(true)
+      end
+    end
+
     it "creates, updates, and deletes an origin" do
       post "/api/v1/admin/origins",
         params: {

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
-import { useForm, type UseFormRegister } from 'react-hook-form'
+import { useForm, useWatch, type UseFormRegister } from 'react-hook-form'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { ApiError } from '@/lib/api-client'
+import { ApiError, api } from '@/lib/api-client'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
 import { cn } from '@/lib/utils'
@@ -35,7 +35,7 @@ type RecordsResponse = {
   records: AdminRecord[]
 }
 
-type FieldKind = 'text' | 'textarea' | 'number' | 'json' | 'select'
+type FieldKind = 'text' | 'textarea' | 'number' | 'json' | 'select' | 'checkbox'
 
 type FieldOption = {
   value: string
@@ -310,7 +310,13 @@ function fieldFromRecord(key: string, value: JsonValue | undefined): FieldDefini
 }
 
 function fieldsForResource(resourceKey: string, records: AdminRecord[]) {
-  const knownFields = resourceFieldDefinitions[resourceDefinitionKey(resourceKey)] ?? []
+  const baseFields = resourceFieldDefinitions[resourceDefinitionKey(resourceKey)] ?? []
+  const knownFields = ['origins', 'edges', 'hindrances', 'skills', 'gears'].includes(resourceKey)
+    ? [
+        ...baseFields,
+        { key: 'hidden', label: 'Hidden from character creator', kind: 'checkbox' as const },
+      ]
+    : baseFields
   const knownKeys = new Set(knownFields.map((field) => field.key))
   const extraFields = [...new Set(records.flatMap((record) => Object.keys(record)))]
     .filter((key) => !systemFields.has(key) && !knownKeys.has(key))
@@ -321,7 +327,13 @@ function fieldsForResource(resourceKey: string, records: AdminRecord[]) {
 
 function valueAsString(value: JsonValue | undefined, field: FieldDefinition) {
   if (value == null) {
-    return field.kind === 'json' ? (field.key === 'effects' ? '{}' : '[]') : ''
+    return field.kind === 'json'
+      ? field.key === 'effects'
+        ? '{}'
+        : '[]'
+      : field.kind === 'checkbox'
+        ? 'false'
+        : ''
   }
 
   if (field.kind === 'json') {
@@ -396,7 +408,10 @@ function serializeRecord(values: AdminFormValues, fields: FieldDefinition[]): Ad
       const parsed: unknown = JSON.parse(value)
       if (!isJsonValue(parsed)) throw new Error(`${field.label} must be valid JSON.`)
       record[field.key] = parsed
-    } else if (field.kind === 'select' && (field.key === 'core' || field.key === 'repeatable')) {
+    } else if (
+      field.kind === 'checkbox' ||
+      (field.kind === 'select' && (field.key === 'core' || field.key === 'repeatable'))
+    ) {
       record[field.key] = value === 'true'
     } else {
       record[field.key] = value
@@ -428,9 +443,17 @@ type RecordFieldProps = {
   field: FieldDefinition
   register: UseFormRegister<AdminFormValues>
   message?: string
+  checkboxValue?: boolean
+  onCheckboxChange?: (value: boolean) => void
 }
 
-function RecordField({ field, register, message }: RecordFieldProps) {
+function RecordField({
+  field,
+  register,
+  message,
+  checkboxValue,
+  onCheckboxChange,
+}: RecordFieldProps) {
   const { t } = useLanguage()
   const fieldId = `admin-${field.key}`
   const commonProps = {
@@ -448,7 +471,15 @@ function RecordField({ field, register, message }: RecordFieldProps) {
       )}
     >
       <Label htmlFor={fieldId}>{t(field.label)}</Label>
-      {field.kind === 'textarea' || field.kind === 'json' ? (
+      {field.kind === 'checkbox' ? (
+        <Input
+          id={fieldId}
+          type="checkbox"
+          checked={checkboxValue ?? false}
+          onChange={(event) => onCheckboxChange?.(event.target.checked)}
+          className="h-4 w-4"
+        />
+      ) : field.kind === 'textarea' || field.kind === 'json' ? (
         <Textarea
           {...commonProps}
           rows={field.kind === 'json' ? 6 : 4}
@@ -484,6 +515,9 @@ export function AdminEditorRoute() {
   const [selectedKey, setSelectedKey] = useState('')
   const [editingRecord, setEditingRecord] = useState<AdminRecord | undefined>()
   const [formOpen, setFormOpen] = useState(false)
+  const [artworkFile, setArtworkFile] = useState<File | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState<string | undefined>()
   const [search, setSearch] = useState('')
   const [recordFilters, setRecordFilters] = useState<Record<string, string[]>>({})
@@ -523,6 +557,7 @@ export function AdminEditorRoute() {
     defaultValues: defaultValues(fields),
     mode: 'onTouched',
   })
+  const hiddenValue = useWatch({ control: form.control, name: 'hidden' })
 
   useEffect(() => {
     form.reset(defaultValues(fields, editingRecord))
@@ -533,20 +568,49 @@ export function AdminEditorRoute() {
   }
   const closeForm = () => {
     setEditingRecord(undefined)
+    setArtworkFile(null)
+    setUploadError(null)
     setFormOpen(false)
   }
   const handleMutationError = (error: Error) => {
     form.setError('root', { type: 'server', message: mutationErrorMessage(error) })
   }
-  const handleSaveSuccess = () => {
-    invalidateRecords()
-    closeForm()
+  const handleSaveSuccess = (data: { record: AdminRecord }) => {
+    if (!artworkFile) {
+      invalidateRecords()
+      closeForm()
+      return
+    }
+
+    const file = artworkFile
+    const body = new FormData()
+    body.append('file', file)
+    setIsUploading(true)
+    void api
+      .post<{ artwork_url: string }>(
+        `/api/v1/admin/${encodeURIComponent(activeKey)}/${encodeURIComponent(String(data.record.id))}/artwork`,
+        body,
+      )
+      .then(() => {
+        invalidateRecords()
+        closeForm()
+      })
+      .catch((error: unknown) => {
+        // A newly created record already exists if its artwork upload fails.
+        setEditingRecord(data.record)
+        setUploadError(
+          mutationErrorMessage(
+            error instanceof Error ? error : new Error('Artwork upload failed.'),
+          ),
+        )
+      })
+      .finally(() => setIsUploading(false))
   }
-  const createMutation = useRestMutation<unknown, ResourceMutationVariables>(
+  const createMutation = useRestMutation<{ record: AdminRecord }, ResourceMutationVariables>(
     { path: `/api/v1/admin/${encodeURIComponent(activeKey)}`, method: 'POST' },
     { onSuccess: handleSaveSuccess, onError: handleMutationError },
   )
-  const updateMutation = useRestMutation<unknown, ResourceMutationVariables>(
+  const updateMutation = useRestMutation<{ record: AdminRecord }, ResourceMutationVariables>(
     {
       path: `/api/v1/admin/${encodeURIComponent(activeKey)}/${encodeURIComponent(String(editingRecord?.id ?? ''))}`,
       method: 'PATCH',
@@ -563,7 +627,7 @@ export function AdminEditorRoute() {
       onError: (error) => setDeleteError(mutationErrorMessage(error)),
     },
   )
-  const isSaving = createMutation.isPending || updateMutation.isPending
+  const isSaving = createMutation.isPending || updateMutation.isPending || isUploading
   const selectedResource = resources.find((resource) => resource.key === activeKey)
   const tableFields = fields
 
@@ -572,6 +636,8 @@ export function AdminEditorRoute() {
     setSearch('')
     setRecordFilters({})
     setEditingRecord(undefined)
+    setArtworkFile(null)
+    setUploadError(null)
     setFormOpen(false)
     setDeleteError(undefined)
   }
@@ -579,12 +645,16 @@ export function AdminEditorRoute() {
   const openCreate = () => {
     form.clearErrors()
     setEditingRecord(undefined)
+    setArtworkFile(null)
+    setUploadError(null)
     setFormOpen(true)
   }
 
   const openEdit = (record: AdminRecord) => {
     form.clearErrors()
     setEditingRecord(record)
+    setArtworkFile(null)
+    setUploadError(null)
     setFormOpen(true)
   }
 
@@ -603,6 +673,7 @@ export function AdminEditorRoute() {
 
   const submit = form.handleSubmit((values) => {
     form.clearErrors('root')
+    setUploadError(null)
     let record: AdminRecord
     try {
       record = serializeRecord(values, fields)
@@ -832,16 +903,36 @@ export function AdminEditorRoute() {
                       field={field}
                       register={form.register}
                       message={form.formState.errors[field.key]?.message}
+                      checkboxValue={hiddenValue === 'true'}
+                      onCheckboxChange={(checked) =>
+                        form.setValue(field.key, String(checked), { shouldDirty: true })
+                      }
                     />
                   ))}
+                  {fields.some((field) => field.key === 'artwork_url') ? (
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="admin-artwork-file">{t('Upload artwork')}</Label>
+                      <Input
+                        id="admin-artwork-file"
+                        type="file"
+                        accept="image/png,image/jpeg,image/gif,image/webp"
+                        onChange={(event) => setArtworkFile(event.target.files?.[0] ?? null)}
+                      />
+                      <p className="text-muted-foreground text-sm">
+                        {t(
+                          'PNG, JPEG, GIF, or WebP; maximum 5 MB. Uploading replaces the artwork URL when saved.',
+                        )}
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
-                {form.formState.errors.root?.message ? (
+                {uploadError || form.formState.errors.root?.message ? (
                   <p className="text-danger" role="alert">
-                    {form.formState.errors.root.message}
+                    {uploadError ?? form.formState.errors.root?.message}
                   </p>
                 ) : null}
                 <div className="flex flex-wrap justify-end gap-2">
-                  <Button type="button" variant="ghost" onClick={closeForm}>
+                  <Button type="button" variant="ghost" onClick={closeForm} disabled={isSaving}>
                     {t('Cancel')}
                   </Button>
                   <Button type="submit" disabled={isSaving}>

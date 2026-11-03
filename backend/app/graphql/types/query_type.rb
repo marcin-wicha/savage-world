@@ -26,7 +26,7 @@ module Types
     field :viewer, Types::UserType, null: true
 
     def edges(category: nil, minimum_rank: nil, source_book: nil)
-      scope = Edge.order(:name, :id)
+      scope = Edge.where(hidden: false).order(:name, :id)
       scope = scope.where(category: category) if category
       scope = scope.where(minimum_rank: minimum_rank) if minimum_rank
       scope = scope.where(source_book: source_book) if source_book
@@ -34,21 +34,21 @@ module Types
     end
 
     def gear(category: nil, source_book: nil)
-      scope = Gear.order(:name, :id)
+      scope = Gear.where(hidden: false).order(:name, :id)
       scope = scope.where(category: category) if category
       scope = scope.where(source_book: source_book) if source_book
       scope
     end
 
     def hindrances(severity: nil, source_book: nil)
-      scope = Hindrance.order(:name, :id)
+      scope = Hindrance.where(hidden: false).order(:name, :id)
       scope = scope.where(severity: severity) if severity
       scope = scope.where(source_book: source_book) if source_book
       scope
     end
 
     def origins
-      Origin.order(:id)
+      Origin.where(hidden: false).order(:id)
     end
 
     def powers(rank: nil, source_book: nil)
@@ -59,7 +59,7 @@ module Types
     end
 
     def skills(attribute: nil, core: nil, source_book: nil)
-      scope = Skill.order(:name, :id)
+      scope = Skill.where(hidden: false).order(:name, :id)
       scope = scope.where(linked_attribute: attribute) if attribute
       scope = scope.where(core: core) unless core.nil?
       scope = scope.where(source_book: source_book) if source_book

@@ -75,6 +75,21 @@ describe('api-client', () => {
     expect(headers.get('X-CSRF-Token')).toBe('csrf-token')
   })
 
+  it('sends multipart uploads without setting Content-Type manually', async () => {
+    ensureCsrfTokenMock.mockResolvedValue('csrf-token')
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ artwork_url: '/api/v1/artwork/1' }))
+    vi.stubGlobal('fetch', fetchMock)
+    const body = new FormData()
+    body.append('file', new File(['image'], 'art.png', { type: 'image/png' }))
+
+    await api.post('/api/v1/admin/origins/1/artwork', body)
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(init.body).toBe(body)
+    expect((init.headers as Headers).get('Content-Type')).toBeNull()
+    expect((init.headers as Headers).get('X-CSRF-Token')).toBe('csrf-token')
+  })
+
   it('returns null for empty responses', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }))
     vi.stubGlobal('fetch', fetchMock)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_03_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_03_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -72,6 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_130000) do
     t.text "description"
     t.jsonb "effects", default: [], null: false
     t.string "artwork_url"
+    t.boolean "hidden", default: false, null: false
     t.index ["category", "minimum_rank"], name: "index_edges_on_category_and_minimum_rank"
     t.index ["slug"], name: "index_edges_on_slug", unique: true
     t.index ["source_book"], name: "index_edges_on_source_book"
@@ -94,6 +95,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_130000) do
     t.integer "source_page", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "hidden", default: false, null: false
     t.index ["category", "name"], name: "index_gears_on_category_and_name"
     t.index ["slug"], name: "index_gears_on_slug", unique: true
     t.index ["source_book"], name: "index_gears_on_source_book"
@@ -113,6 +115,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_130000) do
     t.datetime "updated_at", null: false
     t.text "description"
     t.string "artwork_url"
+    t.boolean "hidden", default: false, null: false
     t.index ["severity", "source_book"], name: "index_hindrances_on_severity_and_source_book"
     t.index ["slug"], name: "index_hindrances_on_slug", unique: true
     t.index ["source_book"], name: "index_hindrances_on_source_book"
@@ -127,6 +130,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_130000) do
     t.string "slug", null: false
     t.text "description", null: false
     t.string "artwork_url"
+    t.boolean "hidden", default: false, null: false
     t.index ["slug"], name: "index_origins_on_slug", unique: true
   end
 
@@ -168,10 +172,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_130000) do
     t.datetime "updated_at", null: false
     t.text "description"
     t.string "artwork_url"
+    t.boolean "hidden", default: false, null: false
     t.index ["linked_attribute"], name: "index_skills_on_linked_attribute"
     t.index ["slug"], name: "index_skills_on_slug", unique: true
     t.index ["source_book"], name: "index_skills_on_source_book"
-    t.check_constraint "linked_attribute::text = ANY (ARRAY['agility'::character varying::text, 'smarts'::character varying::text, 'spirit'::character varying::text, 'strength'::character varying::text, 'vigor'::character varying::text])", name: "skills_linked_attribute_valid"
+    t.check_constraint "linked_attribute::text = ANY (ARRAY['agility'::character varying, 'smarts'::character varying, 'spirit'::character varying, 'strength'::character varying, 'vigor'::character varying]::text[])", name: "skills_linked_attribute_valid"
   end
 
   create_table "users", force: :cascade do |t|
