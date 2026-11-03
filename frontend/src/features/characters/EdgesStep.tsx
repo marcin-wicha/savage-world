@@ -71,7 +71,7 @@ export function EdgesStep() {
     useGraphqlInfiniteQuery<EdgesQuery>(
       ['edges'],
       EdgesDocument,
-      (after) => ({ first: 14, after }),
+      (after) => ({ first: 13, after }),
       (page) => (page.edges?.pageInfo.hasNextPage ? page.edges.pageInfo.endCursor : null),
     )
   const isLoadingAll = isPending || hasNextPage

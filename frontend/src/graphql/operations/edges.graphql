@@ -1,4 +1,4 @@
-query Edges($first: Int = 14, $after: String) {
+query Edges($first: Int = 13, $after: String) {
   edges(first: $first, after: $after) {
     nodes {
       id

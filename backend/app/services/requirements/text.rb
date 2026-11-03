@@ -62,7 +62,7 @@ module Requirements
       when 0 then ""
       when 1 then parts.first
       when 2 then parts.join(localized_label(:conjunctions, :or, " or "))
-      else "#{parts[0...-1].join(', ')}#{localized_label(:conjunctions, :or, ", or ")} #{parts.last}"
+      else "#{parts[0...-1].join(', ')}#{localized_label(:conjunctions, :or, ", or ")}#{parts.last}"
       end
     end
   end

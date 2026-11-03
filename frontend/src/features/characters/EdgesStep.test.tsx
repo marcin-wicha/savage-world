@@ -324,13 +324,13 @@ describe('EdgesStep', () => {
     expect(graphqlRequestMock).toHaveBeenNthCalledWith(
       1,
       expect.anything(),
-      { first: 14, after: null },
+      { first: 13, after: null },
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     )
     expect(graphqlRequestMock).toHaveBeenNthCalledWith(
       2,
       expect.anything(),
-      { first: 14, after: 'cursor-1' },
+      { first: 13, after: 'cursor-1' },
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     )
   })
