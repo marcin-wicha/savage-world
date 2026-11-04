@@ -22,12 +22,12 @@ export function AppShell() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       <header className="border-border bg-background/95 border-b backdrop-blur print:hidden">
-        <div className="mx-auto flex max-w-5xl flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
           <NavLink to="/" className="text-foreground font-display text-2xl tracking-wide">
             {t('Savage Worlds Builder')}
           </NavLink>
 
-          <nav aria-label={t('Primary')} className="flex flex-wrap items-center gap-2">
+          <nav aria-label={t('Primary')} className="flex flex-wrap items-center gap-1 sm:gap-2">
             <label className="sr-only" htmlFor="language-selector">
               {t('Language')}
             </label>
@@ -69,7 +69,7 @@ export function AppShell() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-12 print:max-w-none print:p-0">
+      <main className="mx-auto max-w-7xl min-w-0 px-4 py-6 sm:px-6 sm:py-12 print:max-w-none print:p-0">
         <Outlet />
       </main>
     </div>

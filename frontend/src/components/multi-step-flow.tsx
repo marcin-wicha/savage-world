@@ -93,7 +93,10 @@ function MultiStepFlow({
         data-slot="multi-step-flow-header"
         className={cn(headerClassName)}
       >
-        <ol className="grid gap-3 sm:flex sm:items-center">
+        <p className="text-muted-foreground mb-2 text-sm lg:hidden">
+          {t('Step')} {activeStep + 1} {t('of')} {steps.length}
+        </p>
+        <ol className="flex items-center lg:gap-3">
           {steps.map((item, index) => {
             const isComplete = index < activeStep
             const isCurrent = index === activeStep
@@ -102,7 +105,10 @@ function MultiStepFlow({
             return (
               <li
                 key={item.id}
-                className="flex min-w-0 items-center gap-3 sm:flex-1 sm:last:flex-none"
+                className={cn(
+                  'min-w-0 items-center gap-3 lg:flex lg:flex-1 lg:last:flex-none',
+                  isCurrent ? 'flex' : 'hidden',
+                )}
               >
                 <button
                   type="button"
@@ -137,7 +143,7 @@ function MultiStepFlow({
                   </span>
                 </button>
                 {index < steps.length - 1 ? (
-                  <span aria-hidden="true" className="bg-border hidden h-px flex-1 sm:block" />
+                  <span aria-hidden="true" className="bg-border hidden h-px flex-1 lg:block" />
                 ) : null}
               </li>
             )

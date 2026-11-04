@@ -62,6 +62,11 @@ describe('AdminEditorRoute', () => {
     expect(screen.getByText('Human')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^edit$/i }).parentElement).not.toHaveClass(
+      'opacity-0',
+    )
+    expect(screen.getByText('Human').closest('tr')).toHaveClass('block', 'sm:table-row')
+    expect(screen.getAllByText('Slug')).toHaveLength(2)
   })
 
   it('searches and filters records', async () => {

@@ -724,7 +724,7 @@ export function AdminEditorRoute() {
 
       {!referenceData.isPending && !referenceData.isError ? (
         <div
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6"
+          className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
           aria-label={t('Reference resources')}
         >
           {resources.map((resource) => (
@@ -806,9 +806,9 @@ export function AdminEditorRoute() {
                 {t('No records match the current search and filters.')}
               </p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-2xl text-left text-sm">
-                  <thead className="border-border border-b">
+              <div className="min-w-0 sm:overflow-x-auto">
+                <table className="w-full text-left text-sm sm:min-w-2xl">
+                  <thead className="border-border hidden border-b sm:table-header-group">
                     <tr>
                       {tableFields.map((field) => (
                         <th key={field.key} className="px-3 py-3 font-medium">
@@ -817,24 +817,29 @@ export function AdminEditorRoute() {
                       ))}
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="grid gap-3 sm:table-row-group">
                     {visibleRecords.map((record, index) => (
                       <tr
                         key={String(record.id ?? index)}
-                        className="group border-border border-b last:border-0"
+                        className="group border-border bg-card block rounded-lg border p-3 sm:table-row sm:rounded-none sm:border-x-0 sm:border-t-0 sm:bg-transparent sm:p-0 sm:last:border-b-0"
                       >
                         {tableFields.map((field, fieldIndex) => (
                           <td
                             key={field.key}
-                            className="max-w-56 px-3 py-3"
+                            className="flex min-w-0 items-start justify-between gap-3 py-1.5 sm:table-cell sm:max-w-56 sm:px-3 sm:py-3"
                             title={t(displayValue(record[field.key]))}
                           >
+                            {fieldIndex !== 0 ? (
+                              <span className="text-muted-foreground shrink-0 sm:hidden">
+                                {t(field.label)}
+                              </span>
+                            ) : null}
                             {fieldIndex === 0 ? (
-                              <div className="flex items-center gap-3">
-                                <span className="truncate">
+                              <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                                <span className="font-medium break-words sm:truncate sm:font-normal">
                                   {t(displayValue(record[field.key]))}
                                 </span>
-                                <div className="flex shrink-0 gap-2 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+                                <div className="flex shrink-0 gap-2">
                                   <Button
                                     type="button"
                                     size="sm"
@@ -855,7 +860,7 @@ export function AdminEditorRoute() {
                                 </div>
                               </div>
                             ) : (
-                              <span className="block truncate">
+                              <span className="min-w-0 text-right break-words sm:block sm:truncate sm:text-left">
                                 {t(displayValue(record[field.key]))}
                               </span>
                             )}
