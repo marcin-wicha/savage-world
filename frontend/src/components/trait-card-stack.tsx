@@ -10,6 +10,25 @@ import { cn } from '@/lib/utils'
 const traitCardBackImage = '/traits/back.png'
 const traitCardRowGap = 16
 
+function subscribeToViewport(onChange: () => void) {
+  if (!window.matchMedia) return () => {}
+
+  const medium = window.matchMedia('(min-width: 640px)')
+  const large = window.matchMedia('(min-width: 900px)')
+  medium.addEventListener('change', onChange)
+  large.addEventListener('change', onChange)
+  return () => {
+    medium.removeEventListener('change', onChange)
+    large.removeEventListener('change', onChange)
+  }
+}
+
+function visibleColumns() {
+  if (!window.matchMedia) return 3
+  if (window.matchMedia('(min-width: 900px)').matches) return 3
+  return window.matchMedia('(min-width: 640px)').matches ? 2 : 1
+}
+
 function TraitCardBackArt({ className }: { className?: string }) {
   return (
     <img
@@ -61,12 +80,13 @@ function TraitCardStack({
 }: TraitCardStackProps) {
   const [open, setOpen] = React.useState(defaultOpen)
   const [page, setPage] = React.useState(0)
+  const viewportColumns = React.useSyncExternalStore(subscribeToViewport, visibleColumns, () => 3)
   const { width, height } = traitCardSizes[size]
   const columnCount =
     traits.length === 0
       ? 0
-      : Math.min(Math.max(Math.floor(columns ?? revealedCount), 1), traits.length)
-  const rowCount = Math.max(Math.floor(rows), 1)
+      : Math.min(Math.max(Math.floor(columns ?? revealedCount), 1), viewportColumns, traits.length)
+  const rowCount = viewportColumns === 1 ? 1 : Math.max(Math.floor(rows), 1)
   const pageSize = columnCount === 0 ? 0 : Math.min(columnCount * rowCount, traits.length)
   const pageCount = pageSize === 0 ? 0 : Math.ceil(traits.length / pageSize)
   const safePage = pageCount === 0 ? 0 : Math.min(page, pageCount - 1)
@@ -190,7 +210,7 @@ function TraitCardStack({
             size="icon"
             aria-label="Previous trait"
             onClick={() => move(-1)}
-            className="bg-background/90 absolute top-1/2 -left-12 z-30 -translate-y-1/2 rounded-full backdrop-blur-sm"
+            className="bg-background/90 absolute top-1/2 -left-8 z-30 size-10 -translate-y-1/2 rounded-full backdrop-blur-sm sm:-left-12 sm:size-8"
           >
             <ChevronLeft />
           </Button>
@@ -199,7 +219,7 @@ function TraitCardStack({
             size="icon"
             aria-label="Next trait"
             onClick={() => move(1)}
-            className="bg-background/90 absolute top-1/2 -right-12 z-30 -translate-y-1/2 rounded-full backdrop-blur-sm"
+            className="bg-background/90 absolute top-1/2 -right-8 z-30 size-10 -translate-y-1/2 rounded-full backdrop-blur-sm sm:-right-12 sm:size-8"
           >
             <ChevronRight />
           </Button>

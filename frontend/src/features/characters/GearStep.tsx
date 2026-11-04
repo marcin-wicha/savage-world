@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Coins, Minus, PackageOpen, Plus, Search, ShoppingBag, Trash2 } from 'lucide-react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
@@ -326,7 +326,9 @@ export function GearStep() {
   const gearNames = useWatch({ control: form.control, name: 'gear_names' }) ?? {}
   const [category, setCategory] = useState<GearCategoryFilter>(allCategories)
   const [search, setSearch] = useState('')
+  const [visibleCount, setVisibleCount] = useState(12)
   const [activeGearId, setActiveGearId] = useState<string | null>(null)
+  const detailsRef = useRef<HTMLDivElement>(null)
   const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useGraphqlInfiniteQuery<GearQuery>(
       ['gear'],
@@ -428,7 +430,10 @@ export function GearStep() {
               aria-label={t('Search gear')}
               options={searchOptions}
               value={search}
-              onValueChange={setSearch}
+              onValueChange={(value) => {
+                setSearch(value)
+                setVisibleCount(12)
+              }}
               placeholder={t('Search gear, weapons, armor…')}
               className="w-full max-w-xl"
             />
@@ -439,10 +444,13 @@ export function GearStep() {
             </p>
           ) : null}
         </div>
+        <p className="text-muted-foreground text-xs lg:hidden">
+          {t('Swipe to browse categories')} →
+        </p>
         <div
           role="tablist"
           aria-label={t('Gear categories')}
-          className="border-border flex flex-wrap gap-1 border-b pb-2"
+          className="border-border flex min-w-0 gap-1 overflow-x-auto border-b pb-2"
         >
           {categoryOptions.map((option) => (
             <button
@@ -450,7 +458,10 @@ export function GearStep() {
               type="button"
               role="tab"
               aria-selected={category === option.value}
-              onClick={() => setCategory(option.value)}
+              onClick={() => {
+                setCategory(option.value)
+                setVisibleCount(12)
+              }}
               className={cn(
                 'text-muted-foreground hover:bg-muted hover:text-foreground shrink-0 rounded-md px-3 py-1.5 text-sm transition-colors',
                 category === option.value && 'bg-primary text-primary-foreground',
@@ -480,79 +491,104 @@ export function GearStep() {
 
       {!isLoadingAll && !isError && filteredGear.length > 0 ? (
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="columns-1 gap-4 sm:columns-2 xl:columns-3">
-            {filteredGear.map((item) => {
-              const quantity = quantities[item.id] ?? 0
-              const canAdd = item.cost !== null && spent + item.cost <= startingMoney
+          <div className="min-w-0">
+            <div className="columns-1 gap-4 sm:columns-2 xl:columns-3">
+              {filteredGear.slice(0, visibleCount).map((item) => {
+                const quantity = quantities[item.id] ?? 0
+                const canAdd = item.cost !== null && spent + item.cost <= startingMoney
 
-              return (
-                <Card
-                  key={item.id}
-                  data-slot="gear-shop-item"
-                  data-selected={activeItem?.id === item.id || quantity > 0}
-                  className={cn(
-                    'mb-4 break-inside-avoid overflow-hidden transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md',
-                    activeItem?.id === item.id && 'ring-primary/50 ring-2',
-                  )}
-                >
-                  <button
-                    type="button"
-                    aria-label={`${t('View details for')} ${t(item.name)}`}
-                    aria-pressed={activeItem?.id === item.id}
-                    onClick={() => setActiveGearId(item.id)}
-                    className="focus-visible:ring-ring/50 block w-full text-left outline-none focus-visible:ring-3"
+                return (
+                  <Card
+                    key={item.id}
+                    data-slot="gear-shop-item"
+                    data-selected={activeItem?.id === item.id || quantity > 0}
+                    className={cn(
+                      'mb-4 break-inside-avoid overflow-hidden transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md',
+                      activeItem?.id === item.id && 'ring-primary/50 ring-2',
+                    )}
                   >
-                    <GearArtwork item={item} />
-                    <CardHeader className="gap-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <CardTitle className="font-display text-lg leading-tight">
-                          {t(item.name)}
-                        </CardTitle>
-                        {quantity > 0 ? (
-                          <Badge>
-                            {quantity} {t('in pack')}
-                          </Badge>
-                        ) : null}
-                      </div>
-                      <CardDescription>{t(categoryLabels[item.category])}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-3 pt-0">
-                      <p className="text-muted-foreground line-clamp-3 min-h-15 text-sm leading-5">
-                        {item.description
-                          ? t(item.description)
-                          : t('Select this item to inspect its available rules.')}
-                      </p>
-                      <GearEffects item={item} limit={3} />
-                    </CardContent>
-                  </button>
-                  <CardFooter className="flex items-center justify-between gap-3">
-                    <p className="text-foreground text-sm font-semibold">{formatCost(item, t)}</p>
-                    <Button
+                    <button
                       type="button"
-                      size="sm"
-                      onClick={() => addItem(item)}
-                      disabled={!canAdd}
-                      aria-label={`${t('Add')} ${t(item.name)} ${t('to pack')}`}
+                      aria-label={`${t('View details for')} ${t(item.name)}`}
+                      aria-pressed={activeItem?.id === item.id}
+                      onClick={() => {
+                        setActiveGearId(item.id)
+                        if (window.matchMedia?.('(max-width: 1023px)').matches) {
+                          requestAnimationFrame(() =>
+                            detailsRef.current?.scrollIntoView?.({
+                              block: 'start',
+                              behavior: 'smooth',
+                            }),
+                          )
+                        }
+                      }}
+                      className="focus-visible:ring-ring/50 block w-full text-left outline-none focus-visible:ring-3"
                     >
-                      <Plus aria-hidden="true" />
-                      {t('Add')}
-                    </Button>
-                  </CardFooter>
-                </Card>
-              )
-            })}
+                      <GearArtwork item={item} />
+                      <CardHeader className="gap-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <CardTitle className="font-display text-lg leading-tight">
+                            {t(item.name)}
+                          </CardTitle>
+                          {quantity > 0 ? (
+                            <Badge>
+                              {quantity} {t('in pack')}
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <CardDescription>{t(categoryLabels[item.category])}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="grid gap-3 pt-0">
+                        <p className="text-muted-foreground line-clamp-3 min-h-15 text-sm leading-5">
+                          {item.description
+                            ? t(item.description)
+                            : t('Select this item to inspect its available rules.')}
+                        </p>
+                        <GearEffects item={item} limit={3} />
+                      </CardContent>
+                    </button>
+                    <CardFooter className="flex items-center justify-between gap-3">
+                      <p className="text-foreground text-sm font-semibold">{formatCost(item, t)}</p>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => addItem(item)}
+                        disabled={!canAdd}
+                        aria-label={`${t('Add')} ${t(item.name)} ${t('to pack')}`}
+                      >
+                        <Plus aria-hidden="true" />
+                        {t('Add')}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                )
+              })}
+            </div>
+            {filteredGear.length > visibleCount ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => setVisibleCount((count) => count + 12)}
+              >
+                {t('Show more')} ({Math.min(visibleCount, filteredGear.length)} {t('of')}{' '}
+                {filteredGear.length})
+              </Button>
+            ) : null}
           </div>
 
-          <aside className="grid content-start gap-4 lg:sticky lg:top-4">
+          <aside className="order-first flex flex-col gap-4 lg:sticky lg:top-4 lg:order-last">
             {activeItem ? (
-              <GearDetails
-                item={activeItem}
-                onAdd={() => addItem(activeItem)}
-                canAdd={activeItem.cost !== null && spent + activeItem.cost <= startingMoney}
-              />
+              <div ref={detailsRef} className="order-2 scroll-mt-6 lg:order-1">
+                <GearDetails
+                  item={activeItem}
+                  onAdd={() => addItem(activeItem)}
+                  canAdd={activeItem.cost !== null && spent + activeItem.cost <= startingMoney}
+                />
+              </div>
             ) : null}
 
-            <Card data-slot="gear-pack">
+            <Card data-slot="gear-pack" className="order-1 lg:order-2">
               <CardHeader>
                 <div className="flex items-start justify-between gap-3">
                   <div>

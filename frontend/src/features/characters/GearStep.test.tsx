@@ -103,6 +103,31 @@ describe('GearStep', () => {
     expect(screen.getAllByText('Light Radius:', { exact: false })).toHaveLength(2)
   })
 
+  it('keeps the pack accessible and pages a large catalog', async () => {
+    const user = userEvent.setup()
+    graphqlRequestMock.mockResolvedValue({
+      gear: {
+        nodes: Array.from({ length: 25 }, (_, index) => ({
+          ...gear[0],
+          id: String(index + 1),
+          name: `Item ${index + 1}`,
+        })),
+        pageInfo: { hasNextPage: false, endCursor: null },
+      },
+    })
+
+    renderStep()
+    expect(await screen.findByText('25 items')).toBeInTheDocument()
+    expect(document.querySelectorAll('[data-slot="gear-shop-item"]')).toHaveLength(12)
+    expect(screen.getByRole('button', { name: 'Show more (12 of 25)' })).toBeInTheDocument()
+    expect(document.querySelector('[data-slot="gear-pack"]')).toHaveClass('order-1')
+
+    await user.click(screen.getByRole('button', { name: 'Show more (12 of 25)' }))
+    expect(document.querySelectorAll('[data-slot="gear-shop-item"]')).toHaveLength(24)
+    await user.click(screen.getByRole('button', { name: 'Show more (24 of 25)' }))
+    expect(document.querySelectorAll('[data-slot="gear-shop-item"]')).toHaveLength(25)
+  })
+
   it('uses server artwork without a slug fallback for null URLs', async () => {
     renderStep()
 

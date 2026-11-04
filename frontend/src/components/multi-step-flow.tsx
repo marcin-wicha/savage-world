@@ -55,11 +55,20 @@ function MultiStepFlow({
   const { t } = useLanguage()
   const [uncontrolledStep, setUncontrolledStep] = React.useState(defaultStep)
   const [isAdvancing, setIsAdvancing] = React.useState(false)
+  const flowRef = React.useRef<HTMLDivElement>(null)
+  const previousStep = React.useRef(currentStep ?? defaultStep)
   const activeStep = clampStep(currentStep ?? uncontrolledStep, steps.length)
   const step = steps[activeStep]
   const isFirst = activeStep === 0
   const isLast = activeStep === steps.length - 1
   const nextAllowed = step ? (canAdvance?.(step, activeStep) ?? true) : false
+
+  React.useEffect(() => {
+    if (previousStep.current !== activeStep) {
+      previousStep.current = activeStep
+      flowRef.current?.scrollIntoView?.({ block: 'start' })
+    }
+  }, [activeStep])
 
   if (!step) return null
 
@@ -87,7 +96,12 @@ function MultiStepFlow({
   }
 
   return (
-    <div data-slot="multi-step-flow" className={cn('flex flex-col', className)} {...props}>
+    <div
+      ref={flowRef}
+      data-slot="multi-step-flow"
+      className={cn('flex scroll-mt-32 flex-col', className)}
+      {...props}
+    >
       <nav
         aria-label={t(headerLabel)}
         data-slot="multi-step-flow-header"

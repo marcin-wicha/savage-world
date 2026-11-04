@@ -32,6 +32,21 @@ describe('MultiStepFlow', () => {
     expect(screen.getByText('Concept content')).toBeInTheDocument()
   })
 
+  it('returns to the progress heading when changing steps', async () => {
+    const user = userEvent.setup()
+    const scrollIntoView = vi.fn()
+    HTMLElement.prototype.scrollIntoView = scrollIntoView
+
+    try {
+      render(<MultiStepFlow steps={steps} />)
+      expect(scrollIntoView).not.toHaveBeenCalled()
+      await user.click(screen.getByRole('button', { name: /next/i }))
+      expect(scrollIntoView).toHaveBeenCalledWith({ block: 'start' })
+    } finally {
+      Reflect.deleteProperty(HTMLElement.prototype, 'scrollIntoView')
+    }
+  })
+
   it('calls onStepChange when navigating', async () => {
     const user = userEvent.setup()
     const onStepChange = vi.fn()

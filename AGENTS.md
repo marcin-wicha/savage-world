@@ -74,7 +74,7 @@ frontend/
 
 The monorepo and the API/RSpec migration are complete. The current baseline is:
 
-- Rails 8.1.4 API-only backend, PostgreSQL 17, no views/assets/importmap/Hotwire.
+- Rails 8.1.4.1 API-only backend, PostgreSQL 17, no views/assets/importmap/Hotwire.
 - `graphql-ruby` schema at `backend/schema.graphql`, with `viewer`, paginated
   `origins`, and filtered `edges`, `hindrances`, and `skills` queries.
 - Session-cookie authentication with REST session endpoints, CSRF protection,

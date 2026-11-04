@@ -16,6 +16,33 @@ describe('TraitCardStack', () => {
     expect(screen.getByText('Combat')).toBeInTheDocument()
   })
 
+  it('shows one card per page on a phone without widening the stack', async () => {
+    const originalMatchMedia = window.matchMedia
+    window.matchMedia = vi.fn().mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })
+
+    try {
+      const user = userEvent.setup()
+      const { container } = render(
+        <TraitCardStack category="Combat" traits={traits} rows={2} defaultOpen />,
+      )
+
+      expect(container.querySelector('[data-slot="trait-card-stack"]')).toHaveStyle({
+        width: '224px',
+        height: '314px',
+      })
+      expect(screen.getByText('Berserk')).toBeInTheDocument()
+      expect(screen.queryByText('Hard to Kill')).not.toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: 'Next trait' }))
+      expect(screen.getByText('Hard to Kill')).toBeInTheDocument()
+    } finally {
+      window.matchMedia = originalMatchMedia
+    }
+  })
+
   it('renders the shared artwork on every card back', () => {
     const { container } = render(<TraitCardStack category="Combat" traits={traits} />)
 
