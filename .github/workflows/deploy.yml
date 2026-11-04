@@ -33,7 +33,7 @@ jobs:
           echo "SSH_PRIVATE_KEY is present and parses successfully"
 
       - name: Deploy stack over SSH
-        uses: appleboy/ssh-action@v1.2.2
+        uses: appleboy/ssh-action@v1.2.5
         env:
           ENV_FILE_CONTENTS: ${{ secrets.ENV_FILE_CONTENTS }}
         with:
