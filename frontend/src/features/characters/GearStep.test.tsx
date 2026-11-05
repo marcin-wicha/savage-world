@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
 
 import { graphqlRequest } from '@/lib/api-client'
+import { LanguageProvider } from '@/lib/i18n'
 
 import { GearStep } from './GearStep'
 import { characterFormDefaults, type CharacterFormValues } from './character-form'
@@ -75,7 +76,9 @@ function renderStep() {
 
   render(
     <QueryClientProvider client={queryClient}>
-      <Harness formRef={formRef} />
+      <LanguageProvider>
+        <Harness formRef={formRef} />
+      </LanguageProvider>
     </QueryClientProvider>,
   )
 
@@ -83,6 +86,10 @@ function renderStep() {
 }
 
 describe('GearStep', () => {
+  afterEach(() => {
+    window.localStorage.clear()
+  })
+
   beforeEach(() => {
     graphqlRequestMock.mockReset()
     graphqlRequestMock.mockResolvedValue({
@@ -189,5 +196,44 @@ describe('GearStep', () => {
       expect(formRef.current?.getValues('gear')).toEqual({})
     })
     expect(screen.getByRole('status')).toHaveTextContent('$300')
+  })
+
+  it('translates categories, rule tags, and badges into Polish', async () => {
+    const user = userEvent.setup()
+    window.localStorage.setItem('savage-worlds-language', 'pl')
+    graphqlRequestMock.mockResolvedValue({
+      gear: {
+        nodes: [
+          gear[0],
+          {
+            ...gear[1],
+            requirements: [{ kind: 'strength', value: 'd8' }],
+            effects: { damage: 'Str+d8', minimum_strength: 'd6', ap: 1, two_hands: true },
+          },
+        ],
+        pageInfo: { hasNextPage: false, endCursor: null },
+      },
+    })
+
+    renderStep()
+
+    expect(await screen.findByText('2 przedmioty')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Sprzęt ogólny' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Broń do walki wręcz' })).toBeInTheDocument()
+    expect(screen.getAllByText('Promień światła:')).toHaveLength(2)
+    expect(screen.getAllByText('4 cale')).toHaveLength(2)
+    expect(screen.getAllByText('1 godzina')).toHaveLength(2)
+
+    await user.click(screen.getByRole('button', { name: 'Pokaż szczegóły: Long Sword' }))
+
+    const details = document.querySelector('[data-slot="gear-details"]')
+    expect(details).toHaveTextContent('Broń do walki wręcz')
+    expect(details).toHaveTextContent('Siła: d8')
+    expect(details).toHaveTextContent('Obrażenia:')
+    expect(details).toHaveTextContent('Minimalna Siła:')
+    expect(details).toHaveTextContent('PP: 1')
+    expect(details).toHaveTextContent('Oburęczna: Tak')
+    expect(screen.getByText('+1 więcej')).toBeInTheDocument()
+    expect(screen.queryByText('Melee weapons')).not.toBeInTheDocument()
   })
 })

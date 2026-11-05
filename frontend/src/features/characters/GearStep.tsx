@@ -75,6 +75,12 @@ const categoryOrder: GearCategory[] = [
   'lifestyle',
 ]
 
+const effectLabels: Record<string, string> = {
+  ap: 'AP',
+  rof: 'RoF',
+  min_str: 'Minimum Strength',
+}
+
 function isJsonObject(value: unknown): value is JsonObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
@@ -83,14 +89,21 @@ function displayLabel(value: string) {
   return value.replaceAll('_', ' ').replace(/\b\w/g, (character) => character.toUpperCase())
 }
 
-function displayValue(value: unknown): string {
-  if (typeof value === 'string') return value
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
-  if (Array.isArray(value)) return value.map(displayValue).join(', ')
+function effectLabel(key: string) {
+  return effectLabels[key] ?? displayLabel(key)
+}
+
+const identity = (text: string) => text
+
+function displayValue(value: unknown, t: (text: string) => string = identity): string {
+  if (typeof value === 'string') return t(value)
+  if (typeof value === 'number') return String(value)
+  if (typeof value === 'boolean') return t(value ? 'Yes' : 'No')
+  if (Array.isArray(value)) return value.map((item) => displayValue(item, t)).join(', ')
 
   if (isJsonObject(value)) {
     return Object.entries(value)
-      .map(([key, nestedValue]) => `${displayLabel(key)}: ${displayValue(nestedValue)}`)
+      .map(([key, nestedValue]) => `${t(effectLabel(key))}: ${displayValue(nestedValue, t)}`)
       .join(', ')
   }
 
@@ -103,17 +116,19 @@ function effectEntries(item: GearItem) {
   return Object.entries(item.effects).filter(([, value]) => displayValue(value).length > 0)
 }
 
-function requirementLabels(item: GearItem) {
+function requirementLabels(item: GearItem, t: (text: string) => string) {
   if (!Array.isArray(item.requirements)) return []
 
   return item.requirements.flatMap((requirement) => {
     if (!isJsonObject(requirement)) return []
 
-    const text = typeof requirement.text === 'string' ? requirement.text : undefined
-    const value = requirement.value === undefined ? undefined : displayValue(requirement.value)
-    const kind = typeof requirement.kind === 'string' ? displayLabel(requirement.kind) : undefined
+    const text = typeof requirement.text === 'string' ? t(requirement.text) : undefined
+    const value = requirement.value === undefined ? undefined : displayValue(requirement.value, t)
+    const kind = t(
+      typeof requirement.kind === 'string' ? effectLabel(requirement.kind) : 'Requirement',
+    )
 
-    return [text ?? (value ? `${kind ?? 'Requirement'}: ${value}` : (kind ?? 'Requirement'))]
+    return [text ?? (value ? `${kind}: ${value}` : kind)]
   })
 }
 
@@ -235,8 +250,8 @@ function GearEffects({ item, limit }: { item: GearItem; limit?: number }) {
     <div className="flex flex-wrap gap-1.5">
       {visibleEntries.map(([key, value]) => (
         <Badge key={key} variant="outline" className="max-w-full font-normal">
-          <span className="text-muted-foreground">{t(displayLabel(key))}:</span>{' '}
-          <span className="truncate">{t(displayValue(value))}</span>
+          <span className="text-muted-foreground">{t(effectLabel(key))}:</span>{' '}
+          <span className="truncate">{displayValue(value, t)}</span>
         </Badge>
       ))}
       {limit && entries.length > visibleEntries.length ? (
@@ -258,7 +273,7 @@ function GearDetails({
   canAdd: boolean
 }) {
   const { t } = useLanguage()
-  const requirements = requirementLabels(item)
+  const requirements = requirementLabels(item, t)
 
   return (
     <Card data-slot="gear-details" className="overflow-hidden">
@@ -290,7 +305,7 @@ function GearDetails({
               {requirements.map((requirement) => (
                 <li key={requirement} className="flex gap-2">
                   <span aria-hidden="true">·</span>
-                  <span>{t(requirement)}</span>
+                  <span>{requirement}</span>
                 </li>
               ))}
             </ul>

@@ -231,6 +231,77 @@ const translations: Record<string, string> = {
   'Add one': 'Dodaj jedną sztukę:',
   Remove: 'Usuń:',
   'Pack total': 'Łączna wartość ekwipunku',
+  Alchemical: 'Alchemia',
+  Ammunition: 'Amunicja',
+  Animals: 'Zwierzęta',
+  Barding: 'Zbroje dla wierzchowców',
+  'Black powder': 'Broń czarnoprochowa',
+  Cannons: 'Działa',
+  Clothing: 'Ubrania',
+  'Food & drink': 'Jedzenie i picie',
+  'General gear': 'Sprzęt ogólny',
+  Hirelings: 'Najemnicy',
+  Lifestyle: 'Styl życia',
+  Lodging: 'Noclegi',
+  Materials: 'Materiały',
+  'Melee weapons': 'Broń do walki wręcz',
+  Packs: 'Zestawy',
+  Poisons: 'Trucizny',
+  'Ranged weapons': 'Broń dystansowa',
+  Shields: 'Tarcze',
+  'Siege engines': 'Machiny oblężnicze',
+  Travel: 'Podróże',
+  Requirement: 'Wymaganie',
+  AP: 'PP',
+  RoF: 'Szybkostrzelność',
+  Range: 'Zasięg',
+  Damage: 'Obrażenia',
+  Shots: 'Strzały',
+  'Minimum Strength': 'Minimalna Siła',
+  'Min Str': 'Minimalna Siła',
+  Reach: 'Zasięg w walce wręcz',
+  Cover: 'Osłona',
+  'Armor Bonus': 'Premia do pancerza',
+  'Parry Bonus': 'Premia do obrony',
+  'Toughness Bonus': 'Premia do wytrzymałości',
+  Covers: 'Chroni',
+  Coverage: 'Ochrona',
+  Location: 'Lokalizacja',
+  Notes: 'Uwagi',
+  Note: 'Uwaga',
+  Special: 'Specjalne',
+  Effect: 'Efekt',
+  Effects: 'Efekty',
+  Bonus: 'Premia',
+  Penalty: 'Kara',
+  Modifier: 'Modyfikator',
+  Duration: 'Czas trwania',
+  'Light Radius': 'Promień światła',
+  Radius: 'Promień',
+  Area: 'Obszar',
+  'Blast Template': 'Wzornik wybuchu',
+  Template: 'Wzornik',
+  Capacity: 'Pojemność',
+  Contents: 'Zawartość',
+  Uses: 'Użycia',
+  Crew: 'Załoga',
+  Passengers: 'Pasażerowie',
+  Speed: 'Prędkość',
+  'Top Speed': 'Prędkość maksymalna',
+  Handling: 'Manewrowość',
+  Size: 'Rozmiar',
+  Hands: 'Ręce',
+  'Two Hands': 'Oburęczna',
+  'Heavy Weapon': 'Broń ciężka',
+  'Heavy Armor': 'Ciężki pancerz',
+  Reload: 'Przeładowanie',
+  Ammo: 'Amunicja',
+  Dose: 'Dawka',
+  Onset: 'Początek działania',
+  Trait: 'Cecha',
+  Unit: 'Jednostka',
+  Quantity: 'Ilość',
+  Per: 'Za',
   Background: 'Tło',
   Combat: 'Walka',
   Leadership: 'Dowodzenie',
@@ -590,6 +661,68 @@ const translations: Record<string, string> = {
   'Wild Card': 'Dzika karta',
 }
 
+type PluralForms = [one: string, few: string, many: string]
+
+const units: [string[], PluralForms][] = [
+  [
+    ['inch', 'inches'],
+    ['cal', 'cale', 'cali'],
+  ],
+  [
+    ['hour', 'hours'],
+    ['godzina', 'godziny', 'godzin'],
+  ],
+  [
+    ['minute', 'minutes'],
+    ['minuta', 'minuty', 'minut'],
+  ],
+  [
+    ['round', 'rounds'],
+    ['runda', 'rundy', 'rund'],
+  ],
+  [
+    ['day', 'days'],
+    ['dzień', 'dni', 'dni'],
+  ],
+  [
+    ['week', 'weeks'],
+    ['tydzień', 'tygodnie', 'tygodni'],
+  ],
+  [
+    ['mile', 'miles'],
+    ['mila', 'mile', 'mil'],
+  ],
+  [
+    ['yard', 'yards'],
+    ['jard', 'jardy', 'jardów'],
+  ],
+  [
+    ['use', 'uses'],
+    ['użycie', 'użycia', 'użyć'],
+  ],
+  [
+    ['dose', 'doses'],
+    ['dawka', 'dawki', 'dawek'],
+  ],
+  [
+    ['person', 'people'],
+    ['osoba', 'osoby', 'osób'],
+  ],
+]
+
+const unitForms: Record<string, PluralForms> = Object.fromEntries(
+  units.flatMap(([names, forms]) => names.map((name) => [name, forms])),
+)
+
+function polishPlural(count: number, [one, few, many]: PluralForms) {
+  if (count === 1) return one
+  const lastDigit = count % 10
+  const lastTwoDigits = count % 100
+  if (lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14)) return few
+
+  return many
+}
+
 const storageKey = 'savage-worlds-language'
 
 function translateText(text: string): string {
@@ -598,6 +731,12 @@ function translateText(text: string): string {
 
   const dieRequirement = text.match(/^(.+?) d(4|6|8|10|12)\+$/)
   if (dieRequirement) return `${translateText(dieRequirement[1])} d${dieRequirement[2]}+`
+
+  const quantity = text.match(/^(\d+) ([a-z]+)$/)
+  if (quantity) {
+    const forms = unitForms[quantity[2]]
+    if (forms) return `${quantity[1]} ${polishPlural(Number(quantity[1]), forms)}`
+  }
 
   if (text.includes(', ')) {
     return text.split(', ').map(translateText).join(', ')
