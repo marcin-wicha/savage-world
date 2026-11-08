@@ -23,6 +23,9 @@ origins:
   - name: The Shieldborn
     slug: the-shieldborn
     description: "The warrior aristocracy of the Iron Dominion, ruled by a king who united the highlander clans centuries ago. Children are taken at seven to be forged into soldiers in the Shield-Grounds. The king is a god hiding among mortals."
+  - name: Wellwrights
+    slug: wellwrights
+    description: "Water engineers of the Veil, the land of eternal rain, ruled by a queen. Masters of canals, sluices, pumps, and water elevators; great inland sailors who trade water itself to the dry center of the world."
   - name: Wind-wall Barbarians
     slug: wind-wall-barbarians
     description: "The Stormfolk of the world's edge, where the wind wall never relents. Hardened by cold and wind-driven dust, loud of voice, and fearless of death."

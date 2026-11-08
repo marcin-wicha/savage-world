@@ -6,8 +6,8 @@ RSpec.describe "origin seed data" do
   let(:document) { YAML.safe_load_file(path, permitted_classes: [], aliases: false) }
   let(:origins) { document.fetch("origins") }
 
-  it "contains the nine cultures from the worldbuilding source" do
-    expect(origins.size).to eq(9)
+  it "contains the ten cultures from the worldbuilding source" do
+    expect(origins.size).to eq(10)
     expect(origins.map { |origin| origin["slug"] }).to contain_exactly(
       "dunestriders",
       "greenbloods",
@@ -17,6 +17,7 @@ RSpec.describe "origin seed data" do
       "the-leagueborn",
       "the-mirrorfolk",
       "the-shieldborn",
+      "wellwrights",
       "wind-wall-barbarians"
     )
   end

@@ -40,6 +40,11 @@ pl:
           który przed wiekami zjednoczył klany górali. Siedmioletnie dzieci trafiają
           na Pola Tarczy, gdzie kształtuje się z nich żołnierzy. Król jest bogiem
           ukrywającym się wśród śmiertelników.
+      wellwrights:
+        name: Wodomistrze
+        description: Inżynierowie wody z Zasłony, krainy wiecznego deszczu, rządzeni
+          przez królową. Mistrzowie kanałów, śluz, pomp i wodnych wind; wielcy żeglarze
+          śródlądowi, którzy handlują samą wodą z suchym środkiem świata.
       wind-wall-barbarians:
         name: Barbarzyńcy Wichrowej Ściany
         description: Lud Burzy z krańca świata, gdzie wichrowa ściana nigdy nie ustaje.

@@ -433,6 +433,9 @@ const translations: Record<string, string> = {
   'The Shieldborn': 'Zrodzeni z Tarczy',
   'The warrior aristocracy of the Iron Dominion, ruled by a king who united the highlander clans centuries ago. Children are taken at seven to be forged into soldiers in the Shield-Grounds. The king is a god hiding among mortals.':
     'Wojownicza arystokracja Żelaznego Dominium, rządzona przez króla, który przed wiekami zjednoczył klany górali. Siedmioletnie dzieci trafiają na Pola Tarczy, gdzie kształtuje się z nich żołnierzy. Król jest bogiem ukrywającym się wśród śmiertelników.',
+  Wellwrights: 'Wodomistrze',
+  'Water engineers of the Veil, the land of eternal rain, ruled by a queen. Masters of canals, sluices, pumps, and water elevators; great inland sailors who trade water itself to the dry center of the world.':
+    'Inżynierowie wody z Zasłony, krainy wiecznego deszczu, rządzeni przez królową. Mistrzowie kanałów, śluz, pomp i wodnych wind; wielcy żeglarze śródlądowi, którzy handlują samą wodą z suchym środkiem świata.',
   'Wind-wall Barbarians': 'Barbarzyńcy Wichrowej Ściany',
   "The Stormfolk of the world's edge, where the wind wall never relents. Hardened by cold and wind-driven dust, loud of voice, and fearless of death.":
     'Lud Burzy z krańca świata, gdzie wichrowa ściana nigdy nie ustaje. Zahartowani przez chłód i niesiony wiatrem pył, głośni i nieustraszeni wobec śmierci.',
