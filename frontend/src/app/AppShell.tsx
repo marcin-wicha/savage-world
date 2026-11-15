@@ -4,6 +4,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { useAuthHint } from '@/features/auth/auth-hint'
 import { LogoutButton } from '@/features/auth/LogoutButton'
 import { useSession } from '@/features/auth/use-session'
+import { ReportIssueButton } from '@/features/issue-reports/ReportIssueDialog'
 import { useLanguage } from '@/lib/i18n-context'
 import { cn } from '@/lib/utils'
 
@@ -58,6 +59,7 @@ export function AppShell() {
                     </NavLink>
                   </>
                 ) : null}
+                <ReportIssueButton />
                 <LogoutButton />
               </>
             ) : (

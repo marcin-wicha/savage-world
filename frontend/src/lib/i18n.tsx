@@ -11,6 +11,24 @@ const translations: Record<string, string> = {
   Login: 'Zaloguj się',
   'Log out': 'Wyloguj się',
   'Logging out...': 'Wylogowywanie…',
+  'Report an issue': 'Zgłoś problem',
+  'Describe what went wrong. The current page and browser details are attached.':
+    'Opisz, co poszło nie tak. Bieżąca strona i dane przeglądarki zostaną dołączone.',
+  Title: 'Tytuł',
+  'What did you do, what did you expect, and what happened?':
+    'Co zrobiłeś, czego się spodziewałeś i co się stało?',
+  'Title is required.': 'Tytuł jest wymagany.',
+  'Title must be 120 characters or fewer.': 'Tytuł może mieć maksymalnie 120 znaków.',
+  'Description is required.': 'Opis jest wymagany.',
+  'Description must be 5000 characters or fewer.': 'Opis może mieć maksymalnie 5000 znaków.',
+  'Too many reports. Please wait a few minutes and try again.':
+    'Zbyt wiele zgłoszeń. Odczekaj kilka minut i spróbuj ponownie.',
+  'Could not send the report. Please try again.':
+    'Nie udało się wysłać zgłoszenia. Spróbuj ponownie.',
+  'Thanks! Your report was filed as issue': 'Dziękujemy! Zgłoszenie zapisano jako problem',
+  Close: 'Zamknij',
+  'Sending…': 'Wysyłanie…',
+  'Send report': 'Wyślij zgłoszenie',
   'Savage Worlds Builder': 'Kreator Savage Worlds',
   'Build your next legend.': 'Stwórz kolejną legendę.',
   'Create, validate, and advance Savage Worlds characters without losing track of the rules.':

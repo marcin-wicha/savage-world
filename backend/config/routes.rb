@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resource :session, only: %i[show create destroy]
       resources :registrations, only: :create
+      resources :issue_reports, only: :create
       get "admin/users", to: "admin/users#index"
       patch "admin/users/:id/approve", to: "admin/users#approve"
 

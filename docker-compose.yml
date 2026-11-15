@@ -66,6 +66,9 @@ services:
       AWS_REGION: ${AWS_REGION:-us-east-1}
       AWS_BUCKET: ${AWS_BUCKET:-uploads}
       AWS_ENDPOINT: http://object-storage:9000
+      GITHUB_ISSUES_TOKEN: ${GITHUB_ISSUES_TOKEN:-}
+      GITHUB_ISSUES_REPOSITORY: ${GITHUB_ISSUES_REPOSITORY:-marcin-wicha/savage-world}
+      GITHUB_ISSUES_LABELS: ${GITHUB_ISSUES_LABELS:-bug}
     expose:
       - "80"
     volumes:

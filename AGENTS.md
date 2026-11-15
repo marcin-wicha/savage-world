@@ -339,6 +339,16 @@ Routes are defined in `backend/config/routes.rb`:
   create, `200` on update, `401` unauthenticated, `403` for another user's
   character, and `422` for validation or reference errors. Omitted selection
   arrays are left unchanged; provided arrays replace the selection.
+- `POST /api/v1/issue_reports` — authenticated; JSON body:
+  `{ "issue_report": { "title": "...", "description": "...", "page_url": "/characters/new", "language": "en", "viewport": "1280x720", "user_agent": "..." } }`.
+  Creates a GitHub issue through `IssueReports::Create` and returns `201` with
+  `{ "issue": { "number": 1, "url": "..." } }`, `422` for invalid input, `429`
+  after 5 reports per user in 10 minutes, `502` when GitHub rejects the request,
+  and `503` when `GITHUB_ISSUES_TOKEN` is not set. The repository and labels
+  come from `GITHUB_ISSUES_REPOSITORY` (default `marcin-wicha/savage-world`) and
+  `GITHUB_ISSUES_LABELS` (default `bug`). In production these are read from the
+  deploy `.env` (the `ENV_FILE_CONTENTS` secret). The SPA opens the report
+  dialog from the navbar bug icon or Ctrl/⌘+B for signed-in users.
 - `POST /graphql` — GraphQL endpoint. There is intentionally no GET route.
 
 The sign-in endpoint is rate limited to 10 attempts per 3 minutes.
