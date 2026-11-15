@@ -7,7 +7,7 @@ pl:
     skill:
       academics:
         description: >-
-          Wiedza akademicka obejmuje znajomość nauk humanistycznych i społecznych,
+          Erudycja obejmuje znajomość nauk humanistycznych i społecznych,
           literatury, historii, archeologii oraz pokrewnych dziedzin. Pozwala
           przypomnieć sobie na przykład koniec kalendarza Majów albo zacytować
           fragment Makbeta.
@@ -35,11 +35,11 @@ pl:
           i zwyczaje.
       driving:
         description: >-
-          Prowadzenie pozwala kierować dowolnym napędzanym pojazdem lądowym typowym
+          Prowadzenie pojazdów pozwala kierować dowolnym napędzanym pojazdem lądowym typowym
           dla danego świata, w tym samochodem, motocyklem czy czołgiem. Rowery
           i inne pojazdy napędzane siłą mięśni wymagają Atletyki, a pojazdy
           zaprzęgowe — Jeździectwa. W nowoczesnych realiach, gdzie pojazdy są
-          powszechne, zwykła podróż nie wymaga testu Prowadzenia; testy są potrzebne
+          powszechne, zwykła podróż nie wymaga testu Prowadzenia pojazdów; testy są potrzebne
           głównie w niebezpiecznych lub stresujących sytuacjach, takich jak pościgi
           (strona 113).
       electronics:
@@ -53,7 +53,7 @@ pl:
           elektronicznego wymaga Naprawy (strona 34).
       faith:
         description: >-
-          Wiara to Umiejętność nadprzyrodzona wymagana przez Tło nadprzyrodzone
+          Wiara to Umiejętność nadprzyrodzona wymagana przez Nadprzyrodzony dar
           (Cuda); opisano je na stronie 148.
       fighting:
         description: >-
@@ -62,8 +62,8 @@ pl:
           opisano w rozdziale trzecim.
       focus:
         description: >-
-          Skupienie to Umiejętność nadprzyrodzona dla Tła nadprzyrodzonego
-          (Obdarzony); zob. strona 148.
+          Skupienie to Umiejętność nadprzyrodzona dla Nadprzyrodzonego daru
+          (Obdarzony); zob. stronę 148.
       gambling:
         description: >-
           Hazard przydaje się w saloonach Dzikiego Zachodu, kryjówkach przestępców,
@@ -164,7 +164,7 @@ pl:
       psionics:
         description: >-
           Psionika to Umiejętność używana przez psioników do aktywowania i kontrolowania
-          zdolności psionicznych. Zob. Przewagę Tło nadprzyrodzone (Psionika) na
+          zdolności psionicznych. Zob. Przewagę Nadprzyrodzony dar (Psionika) na
           stronie 148.
       repair:
         description: >-
@@ -200,7 +200,7 @@ pl:
       spellcasting:
         description: >-
           Magowie, czarodzieje, czarnoksiężnicy i wiedźmy używają Rzucania zaklęć,
-          by rzucać czary. Zob. Przewagę Tło nadprzyrodzone (Magia) na stronie 148.
+          by rzucać czary. Zob. Przewagę Nadprzyrodzony dar (Magia) na stronie 148.
       stealth:
         description: >-
           Skradanie pozwala ukrywać się i poruszać bezgłośnie. Sukces oznacza uniknięcie
@@ -247,6 +247,5 @@ pl:
         description: >-
           „Szaleni” naukowcy, wynalazcy w światach magii lub technologii znacznie
           wykraczającej poza naszą, alchemicy i rzemieślnicy nadprzyrodzeni używają
-          Dziwnej nauki jako Umiejętności nadprzyrodzonej, choć ich metody mogą się
-          różnić. Więcej informacji zawiera Przewaga Tło nadprzyrodzone (Dziwna
-          nauka) na stronie 148.
+          Szalonej nauki jako Umiejętności nadprzyrodzonej, choć ich metody mogą się
+          różnić. Więcej informacji zawiera Przewaga Nadprzyrodzony dar (Szalona nauka) na stronie 148.

@@ -70,7 +70,7 @@ RSpec.describe "GraphQL hindrances", type: :request do
     execute("{ hindrances { nodes { name description } } }", locale: "pl")
 
     expect(json.dig("data", "hindrances", "nodes", 0)).to include(
-      "name" => "Złote ręce na opak",
+      "name" => "Dwie lewe ręce",
       "description" => "Z powodu wychowania, braku doświadczenia lub zwykłego pecha niektórzy nie radzą sobie z urządzeniami mechanicznymi i technologicznymi. Ułomność ta nakłada karę −2 podczas obsługi urządzeń mechanicznych lub elektrycznych. Jeśli postać wyrzuci Krytyczną Porażkę podczas używania takiego urządzenia (o ile nie ma ono już wbudowanego efektu), urządzenie się psuje. Jeśli Mistrz Gry uzna to za stosowne, można je naprawić testem Naprawy i poświęcając 1k6 godzin."
     )
   end

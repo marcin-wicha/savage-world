@@ -47,11 +47,11 @@ pl:
       ambidextrous:
         name: Oburęczność
       arcane-background:
-        name: Tło magiczne
+        name: Nadprzyrodzony dar
       aristocrat:
         name: Arystokrata
       artificer:
-        name: Wynalazca
+        name: Twórca artefaktów
       assassin:
         name: Zabójca
       attractive:
@@ -65,7 +65,7 @@ pl:
       block:
         name: Blok
       bolster:
-        name: Wzmocnienie
+        name: Podniesienie na duchu
       brave:
         name: Odważny
       brawler:
@@ -73,15 +73,15 @@ pl:
       brawny:
         name: Krzepki
       bruiser:
-        name: Zapaśnik
+        name: Mordobij
       brute:
         name: Siłacz
       calculating:
-        name: Wyrachowany
+        name: Chłodna kalkulacja
       champion:
         name: Czempion
       channeling:
-        name: Przewodzenie
+        name: Ukierunkowanie mocy
       charismatic:
         name: Charyzmatyczny
       chi:
@@ -95,7 +95,7 @@ pl:
       command-presence:
         name: Autorytet dowódcy
       common-bond:
-        name: Wspólnota więzi
+        name: Braterska więź
       concentration:
         name: Koncentracja
       connections:
@@ -105,7 +105,7 @@ pl:
       danger-sense:
         name: Zmysł zagrożenia
       dead-shot:
-        name: Celny strzał
+        name: Zabójczo celny
       dodge:
         name: Unik
       double-tap:
@@ -117,27 +117,27 @@ pl:
       extra-effort:
         name: Dodatkowy wysiłek
       extraction:
-        name: Wycofanie
+        name: Odwrót
       fame:
-        name: Sława
+        name: Rozgłos
       famous:
-        name: Sławny
+        name: Sława
       fast-healer:
-        name: Szybkie leczenie
+        name: Szybkie gojenie
       feint:
         name: Zwód
       fervor:
-        name: Żar
+        name: Żarliwość
       filthy-rich:
         name: Obrzydliwie bogaty
       first-strike:
         name: Pierwsze uderzenie
       fleet-footed:
-        name: Szybkonogi
+        name: Chyży
       followers:
-        name: Zwolennicy
+        name: Poplecznicy
       free-runner:
-        name: Biegacz
+        name: Kocia zwinność
       frenzy:
         name: Furia
       gadgeteer:
@@ -149,39 +149,39 @@ pl:
       hard-to-kill:
         name: Trudny do zabicia
       harder-to-kill:
-        name: Jeszcze trudniejszy do zabicia
+        name: Nie do zabicia
       healer:
         name: Uzdrowiciel
       hold-the-line:
-        name: Utrzymać pozycję!
+        name: Trzymać szyk!
       holy-unholy-warrior:
-        name: Święty/nieświęty wojownik
+        name: Święty/bezbożny wojownik
       humiliate:
         name: Upokorzenie
       improved-block:
-        name: Ulepszony blok
+        name: Doskonały blok
       improved-counterattack:
-        name: Ulepszony kontratak
+        name: Doskonały kontratak
       improved-dodge:
-        name: Ulepszony unik
+        name: Doskonały unik
       improved-extraction:
-        name: Ulepszone wycofanie
+        name: Doskonały odwrót
       improved-first-strike:
-        name: Ulepszone pierwsze uderzenie
+        name: Doskonałe pierwsze uderzenie
       improved-frenzy:
-        name: Ulepszony szał
+        name: Doskonała furia
       improved-nerves-of-steel:
-        name: Ulepszone stalowe nerwy
+        name: Nerwy jak postronki
       improved-rapid-fire:
-        name: Ulepszone szybkie strzelanie
+        name: Huraganowy ostrzał
       improved-rapid-recharge:
-        name: Ulepszone szybkie ładowanie
+        name: Błyskawiczne odnowienie mocy
       improved-sweep:
-        name: Ulepszone zamaszyste cięcie
+        name: Młyniec
       improved-trademark-weapon:
-        name: Ulepszona broń popisowa
+        name: Nieodłączna broń
       improvisational-fighter:
-        name: Improwizujący wojownik
+        name: Walka czym popadnie
       inspire:
         name: Inspiracja
       investigator:
@@ -191,31 +191,31 @@ pl:
       iron-will:
         name: Żelazna wola
       jack-of-all-trades:
-        name: Złota rączka
+        name: Wszechstronny
       killer-instinct:
         name: Instynkt zabójcy
       level-headed:
         name: Zimna krew
       linguist:
-        name: Lingwista
+        name: Poliglota
       liquid-courage:
-        name: Płynna odwaga
+        name: Dla kurażu
       luck:
         name: Szczęście
       marksman:
         name: Strzelec wyborowy
       martial-artist:
-        name: Mistrz sztuk walki
+        name: Adept sztuk walki
       martial-warrior:
-        name: Wojownik
+        name: Mistrz sztuk walki
       master:
         name: Mistrz
       master-tactician:
         name: Mistrz taktyki
       master-of-arms:
-        name: Mistrz broni
+        name: Arcymistrz oręża
       mcgyver:
-        name: McGyver
+        name: Kombinator
       menacing:
         name: Groźny
       mentalist:
@@ -223,7 +223,7 @@ pl:
       mighty-blow:
         name: Potężny cios
       mr-fix-it:
-        name: Pan Złota Rączka
+        name: Złota rączka
       natural-leader:
         name: Urodzony przywódca
       nerves-of-steel:
@@ -237,7 +237,7 @@ pl:
       power-surge:
         name: Przypływ mocy
       professional:
-        name: Profesjonalista
+        name: Fachowiec
       provoke:
         name: Prowokacja
       quick:
@@ -245,9 +245,9 @@ pl:
       rabble-rouser:
         name: Podżegacz
       rapid-fire:
-        name: Szybkie strzelanie
+        name: Szybki ostrzał
       rapid-recharge:
-        name: Szybkie ładowanie
+        name: Szybkie odnowienie mocy
       reliable:
         name: Niezawodny
       retort:
@@ -257,11 +257,11 @@ pl:
       rock-and-roll:
         name: Rock and roll!
       scavenger:
-        name: Zbieracz
+        name: Szperacz
       scholar:
         name: Uczony
       sidekick:
-        name: Pomocnik
+        name: Wierny towarzysz
       soldier:
         name: Żołnierz
       soul-drain:
@@ -269,7 +269,7 @@ pl:
       steady-hands:
         name: Pewna ręka
       streetwise:
-        name: Znajomość ulicy
+        name: Znajomość półświatka
       strong-willed:
         name: Silna wola
       sweep:
@@ -283,28 +283,28 @@ pl:
       tougher-than-nails:
         name: Twardszy niż skała
       trademark-weapon:
-        name: Broń popisowa
+        name: Ulubiona broń
       two-fisted:
-        name: Oburęczny wojownik
+        name: Walka dwiema brońmi
       two-gun-kid:
-        name: Rewolwerowiec
+        name: Strzelanie z obu rąk
       very-attractive:
         name: Bardzo atrakcyjny
       weapon-master:
-        name: Mistrz broni
+        name: Mistrz oręża
       wizard:
-        name: Czarownik
+        name: Czarodziej
       woodsman:
-        name: Leśnik
+        name: Tropiciel
       work-the-crowd:
         name: Rozgrzać tłum
       work-the-room:
         name: Oczarować salę
     hindrance:
       all-thumbs:
-        name: Złote ręce na opak
+        name: Dwie lewe ręce
       anemic:
-        name: Anemiczny
+        name: Chorowity
       arrogant:
         name: Arogancki
       bad-eyes:
@@ -326,13 +326,13 @@ pl:
       clumsy:
         name: Niezdarny
       code-of-honor:
-        name: Kodeks honorowy
+        name: Kodeks honoru
       curious:
         name: Ciekawski
       death-wish:
         name: Pragnienie śmierci
       delusional:
-        name: Urojony
+        name: Urojenia
       doubting-thomas:
         name: Niedowiarek
       driven:
@@ -346,9 +346,9 @@ pl:
       habit:
         name: Nawyk
       hard-of-hearing:
-        name: Niedosłuch
+        name: Przygłuchy
       heroic:
-        name: Heroiczny
+        name: Bohaterski
       hesitant:
         name: Niezdecydowany
       illiterate:
@@ -376,7 +376,7 @@ pl:
       outsider:
         name: Obcy
       overconfident:
-        name: Zbyt pewny siebie
+        name: Zarozumiały
       pacifist:
         name: Pacyfista
       phobia:
@@ -404,20 +404,20 @@ pl:
       timid:
         name: Nieśmiały
       tongue-tied:
-        name: Język w supeł
+        name: Język kołkiem
       ugly:
         name: Brzydki
       vengeful:
         name: Mściwy
       vow:
-        name: Ślub
+        name: Przysięga
       wanted:
         name: Poszukiwany
       young:
         name: Młody
     skill:
       academics:
-        name: Wiedza akademicka
+        name: Erudycja
       athletics:
         name: Atletyka
       battle:
@@ -427,7 +427,7 @@ pl:
       common-knowledge:
         name: Wiedza ogólna
       driving:
-        name: Prowadzenie
+        name: Prowadzenie pojazdów
       electronics:
         name: Elektronika
       faith:
@@ -479,7 +479,7 @@ pl:
       thievery:
         name: Złodziejstwo
       weird-science:
-        name: Dziwna nauka
+        name: Szalona nauka
     attributes:
       agility: Zręczność
       smarts: Spryt
@@ -494,8 +494,8 @@ pl:
       legendary: Legendarny
     requirements:
       wild_card: Dzika karta
-      arcane_background: Tło nadprzyrodzone
+      arcane_background: Nadprzyrodzony dar
     arcane_backgrounds:
-      any: Dowolne
+      any: Dowolny
     conjunctions:
       or: " lub "
