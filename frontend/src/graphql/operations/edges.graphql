@@ -1,4 +1,4 @@
-query Edges($first: Int = 13, $after: String) {
+query Edges($first: Int = 11, $after: String) {
   edges(first: $first, after: $after) {
     nodes {
       id
@@ -23,10 +23,6 @@ query Edges($first: Int = 13, $after: String) {
           die
           skill
           slug
-          name
-          detail
-          text
-          value
         }
       }
       requirements_text
