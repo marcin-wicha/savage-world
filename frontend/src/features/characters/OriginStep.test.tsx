@@ -114,7 +114,7 @@ describe('OriginStep', () => {
 
     renderStep()
 
-    expect(await screen.findByRole('button', { name: 'Wędrowcy Wydm' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Wydmiarze' })).toBeInTheDocument()
     expect(
       screen.getByText(
         'Strażnicy Starej Wiary, którzy prowadzą pielgrzymów przez rozpaloną pustynię do Iglicy. Mistrzowie przetrwania w suchym klimacie.',

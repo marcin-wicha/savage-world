@@ -36,7 +36,7 @@ RSpec.describe "GraphQL", type: :request do
     execute("{ origins { nodes { name description } } }", locale: "pl")
 
     expect(json.dig("data", "origins", "nodes", 0)).to eq(
-      "name" => "Lud Zwierciadeł",
+      "name" => "Lud Lustrzanego Boru",
       "description" => "Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych, którzy uciekli i schronili się za lustrzanym lasem. Mistrzowie kamuflażu i obróbki lustrzanego drewna."
     )
   end

@@ -3,7 +3,7 @@ pl:
   reference_data:
     origin:
       dunestriders:
-        name: Wędrowcy Wydm
+        name: Wydmiarze
         description: Strażnicy Starej Wiary, którzy prowadzą pielgrzymów przez rozpaloną
           pustynię do Iglicy. Mistrzowie przetrwania w suchym klimacie.
       greenbloods:
@@ -11,37 +11,37 @@ pl:
         description: Ludzie z jadowitej dżungli, których organizmy neutralizują wszystkie
           znane toksyny. Chemicy, medycy i truciciele.
       stepperiders:
-        name: Jeźdźcy Stepów
+        name: Stepowcy
         description: Koczowniczy jeźdźcy i łucznicy otwartych równin, związani ze
           swoimi stadami i końmi.
       the-darkfolk:
-        name: Lud Ciemności
+        name: Mroczanie
         description: Ludzie Miasta ukrytego w Ciemności — pozostałości cienia Aznara.
           Widzą w mroku, są przystosowani do dźwięków i ślepi na światło. Pochodzą
           od zbiegów.
       the-emberborn:
-        name: Zrodzeni z Żaru
+        name: Żarliwcy
         description: Lud ognia z Żaropadu — zamknięta społeczność obrabiająca obsydian
           i czekająca na uwolnienie swojego boga. Rządzą nimi Ucho i Dłoń, a żywa
           skała uczy ich prawdomówności.
       the-leagueborn:
-        name: Zrodzeni z Ligi
+        name: Wolnomieszczanie
         description: Obywatele Ligi — federacji wolnych miast połączonych kanałami,
           drogami i umowami. Każdy musi wędrować po świecie i doskonalić rzemiosło,
           zanim przedstawi miastu swoje arcydzieło.
       the-mirrorfolk:
-        name: Lud Zwierciadeł
+        name: Lud Lustrzanego Boru
         description: Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych,
           którzy uciekli i schronili się za lustrzanym lasem. Mistrzowie kamuflażu
           i obróbki lustrzanego drewna.
       the-shieldborn:
-        name: Zrodzeni z Tarczy
+        name: Tarczownicy
         description: Wojownicza arystokracja Żelaznego Dominium, rządzona przez króla,
           który przed wiekami zjednoczył klany górali. Siedmioletnie dzieci trafiają
           na Pola Tarczy, gdzie kształtuje się z nich żołnierzy. Król jest bogiem
           ukrywającym się wśród śmiertelników.
       wind-wall-barbarians:
-        name: Barbarzyńcy Wichrowej Ściany
+        name: Barbarzyńcy z Rubieży
         description: Lud Burzy z krańca świata, gdzie wichrowa ściana nigdy nie ustaje.
           Zahartowani przez chłód i niesiony wiatrem pył, głośni i nieustraszeni wobec
           śmierci.

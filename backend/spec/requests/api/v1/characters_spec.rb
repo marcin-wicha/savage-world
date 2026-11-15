@@ -62,7 +62,7 @@ RSpec.describe "Characters", type: :request do
       get "/api/v1/characters", headers: json_headers.merge("X-Language" => "pl")
 
       expect(response).to have_http_status(:ok)
-      expect(json.dig("characters", 0, "origin_name")).to eq("Wędrowcy Wydm")
+      expect(json.dig("characters", 0, "origin_name")).to eq("Wydmiarze")
     end
 
     it "requires authentication" do
