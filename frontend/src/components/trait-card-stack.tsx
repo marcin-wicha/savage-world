@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { TraitCard, type TraitCardProps } from '@/components/trait-card'
 import { traitCardSizes, type TraitCardSize } from '@/components/trait-card-sizes'
 import { cn } from '@/lib/utils'
@@ -51,7 +52,9 @@ type TraitCardStackTrait = Pick<
   | 'backgroundImage'
   | 'selected'
   | 'disabled'
->
+> & {
+  tooltip?: React.ReactNode
+}
 
 type TraitCardStackProps = Omit<React.ComponentProps<'div'>, 'children' | 'onSelect'> & {
   category: string
@@ -190,14 +193,39 @@ function TraitCardStack({
               }}
               className="animate-in fade-in zoom-in-95 grid h-full w-full place-content-center gap-4 duration-300 motion-reduce:animate-none"
             >
-              {visibleTraits.map((trait, index) => (
-                <TraitCard
-                  key={`${pageStart + index}-${trait.title}`}
-                  {...trait}
-                  size={size}
-                  onClick={onSelect ? () => onSelect(trait, pageStart + index) : undefined}
-                />
-              ))}
+              {visibleTraits.map(({ tooltip, ...trait }, index) => {
+                const card = (
+                  <TraitCard
+                    {...trait}
+                    size={size}
+                    onClick={
+                      onSelect
+                        ? () => onSelect({ tooltip, ...trait }, pageStart + index)
+                        : undefined
+                    }
+                  />
+                )
+                const key = `${pageStart + index}-${trait.title}`
+
+                if (!tooltip) return <React.Fragment key={key}>{card}</React.Fragment>
+
+                return (
+                  <Tooltip key={key}>
+                    <TooltipTrigger asChild>
+                      <div
+                        data-slot="trait-card-tooltip-trigger"
+                        tabIndex={trait.disabled ? 0 : undefined}
+                        className="focus-visible:ring-ring/50 rounded-xl outline-none focus-visible:ring-3"
+                      >
+                        {card}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" align="center" className="items-stretch p-3">
+                      {tooltip}
+                    </TooltipContent>
+                  </Tooltip>
+                )
+              })}
             </div>
           ) : null}
         </div>

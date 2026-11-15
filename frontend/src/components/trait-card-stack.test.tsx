@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
+import { TooltipProvider } from '@/components/ui/tooltip'
+
 import { TraitCardStack, type TraitCardStackTrait } from './trait-card-stack'
 
 const traits: TraitCardStackTrait[] = [
@@ -10,6 +12,42 @@ const traits: TraitCardStackTrait[] = [
 ]
 
 describe('TraitCardStack', () => {
+  it('shows a tooltip for disabled traits on hover without selecting them', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+
+    render(
+      <TooltipProvider>
+        <TraitCardStack
+          category="Combat"
+          traits={[
+            traits[0],
+            {
+              ...traits[1],
+              disabled: true,
+              tooltip: (
+                <ul>
+                  <li>Vigor d8+</li>
+                </ul>
+              ),
+            },
+          ]}
+          defaultOpen
+          onSelect={onSelect}
+        />
+      </TooltipProvider>,
+    )
+
+    const disabledCard = screen.getByRole('button', { name: 'Hard to Kill' })
+    expect(disabledCard).toBeDisabled()
+
+    await user.hover(disabledCard.closest('[data-slot="trait-card-tooltip-trigger"]')!)
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Vigor d8+')
+    await user.click(disabledCard)
+    expect(onSelect).not.toHaveBeenCalled()
+  })
+
   it('shows the category on the card back', () => {
     render(<TraitCardStack category="Combat" traits={traits} />)
 

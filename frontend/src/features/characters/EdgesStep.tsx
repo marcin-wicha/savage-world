@@ -11,7 +11,7 @@ import { useLanguage } from '@/lib/i18n-context'
 import { cn } from '@/lib/utils'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
-import { meetsEdgeRequirements, type EdgeRequirementCharacter } from './edge-requirements'
+import { missingEdgeRequirements, type EdgeRequirementCharacter } from './edge-requirements'
 import { parseEdgeEffects } from './edge-effects'
 import type { CharacterFormValues } from './character-form'
 
@@ -32,6 +32,14 @@ const categoryLabels: Record<EdgeCategory, string> = {
   professional: 'Professional',
   social: 'Social',
   weird: 'Weird',
+}
+
+const rankOrder = rankOptions.map((option) => option.value)
+
+function ranksUpTo(rank: string): string[] {
+  const index = rankOrder.indexOf(rank)
+
+  return index === -1 ? [] : rankOrder.slice(0, index + 1)
 }
 
 const dieValues: Record<string, number> = { d4: 4, d6: 6, d8: 8, d10: 10, d12: 12 }
@@ -64,7 +72,8 @@ export function EdgesStep() {
     useWatch({ control: form.control, name: 'attribute_hindrance_points_spent' }) ?? 0
   const skillHindrancePointsSpent =
     useWatch({ control: form.control, name: 'skill_hindrance_points_spent' }) ?? 0
-  const [ranks, setRanks] = useState<string[]>([])
+  const characterRank = useWatch({ control: form.control, name: 'rank' }) ?? 'novice'
+  const [ranks, setRanks] = useState<string[]>(() => ranksUpTo(characterRank))
   const [onlyRequirementsMet, setOnlyRequirementsMet] = useState(false)
   const [search, setSearch] = useState('')
   const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
@@ -126,8 +135,20 @@ export function EdgesStep() {
   const rankFilteredEdges = edges.filter(
     (edge) => ranks.length === 0 || ranks.includes(edge.minimum_rank),
   )
+  const characterRankIndex = rankOrder.indexOf(characterRank)
+  const missingRequirementsFor = (edge: (typeof edges)[number]) => {
+    const missing = missingEdgeRequirements(edge.requirements, character).map((text) => t(text))
+    const minimumRankIndex = rankOrder.indexOf(edge.minimum_rank)
+
+    if (minimumRankIndex > characterRankIndex) {
+      const rankLabel = rankOptions[minimumRankIndex]?.label ?? edge.minimum_rank
+      missing.unshift(`${t('Rank')}: ${t(rankLabel)}`)
+    }
+
+    return missing
+  }
   const requirementsFilteredEdges = onlyRequirementsMet
-    ? rankFilteredEdges.filter((edge) => meetsEdgeRequirements(edge.requirements, character))
+    ? rankFilteredEdges.filter((edge) => missingRequirementsFor(edge).length === 0)
     : rankFilteredEdges
   const normalizedSearch = search.trim().toLowerCase()
   const filteredEdges = normalizedSearch
@@ -196,6 +217,7 @@ export function EdgesStep() {
     }
 
     if (availableForEdges < edgeHindrancePointCost) return
+    if (missingRequirementsFor(edge).length > 0) return
 
     form.setValue('edges', [...selectedIds, edge.id], { shouldDirty: true, shouldTouch: true })
     form.setValue(
@@ -232,6 +254,7 @@ export function EdgesStep() {
     const minimumRankLabel = t(
       rankOptions.find((rank) => rank.value === edge.minimum_rank)?.label ?? edge.minimum_rank,
     )
+    const missingRequirements = isSelected ? [] : missingRequirementsFor(edge)
 
     return {
       title: t(edge.name),
@@ -239,7 +262,20 @@ export function EdgesStep() {
       description: t(edge.description || edge.requirements_text || '') || undefined,
       backgroundImage: edge.artwork_url ?? undefined,
       selected: isSelected,
-      disabled: !isSelected && availableForEdges < edgeHindrancePointCost,
+      disabled:
+        !isSelected &&
+        (missingRequirements.length > 0 || availableForEdges < edgeHindrancePointCost),
+      tooltip:
+        missingRequirements.length > 0 ? (
+          <div className="grid gap-1.5">
+            <p className="font-medium">{t('Missing requirements')}</p>
+            <ul className="grid list-disc gap-1 pl-4">
+              {missingRequirements.map((requirement) => (
+                <li key={requirement}>{requirement}</li>
+              ))}
+            </ul>
+          </div>
+        ) : undefined,
     }
   })
 

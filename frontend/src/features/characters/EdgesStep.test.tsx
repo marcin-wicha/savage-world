@@ -1,9 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useEffect } from 'react'
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
 
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { graphqlRequest } from '@/lib/api-client'
 
 import { EdgesStep } from './EdgesStep'
@@ -122,11 +123,21 @@ function renderStep(initialValues?: Partial<CharacterFormValues>) {
 
   render(
     <QueryClientProvider client={queryClient}>
-      <Harness formRef={formRef} initialValues={initialValues} />
+      <TooltipProvider>
+        <Harness formRef={formRef} initialValues={initialValues} />
+      </TooltipProvider>
     </QueryClientProvider>,
   )
 
   return formRef
+}
+
+const agileAttributes: CharacterFormValues['attributes'] = {
+  agility: 'd8',
+  smarts: 'd4',
+  spirit: 'd4',
+  strength: 'd4',
+  vigor: 'd4',
 }
 
 async function revealEdges() {
@@ -151,7 +162,7 @@ describe('EdgesStep', () => {
   it('starts expanded when an edge is already selected', async () => {
     const formRef = renderStep({ edges: ['2'] })
 
-    expect(await screen.findByText('5 edges')).toBeInTheDocument()
+    expect(await screen.findByText('2 edges')).toBeInTheDocument()
     expect(formRef.current?.getValues('edges')).toEqual(['2'])
     expect(document.querySelector('[data-slot="trait-card-stack"]')).toHaveAttribute(
       'data-open',
@@ -161,11 +172,11 @@ describe('EdgesStep', () => {
     expect(screen.getByRole('button', { name: 'Ace' })).toHaveAttribute('aria-pressed', 'true')
   })
 
-  it('shows every edge and records the selection against hindrance points', async () => {
-    const formRef = renderStep()
+  it('shows edges for the character rank and records the selection against hindrance points', async () => {
+    const formRef = renderStep({ attributes: agileAttributes })
     const user = userEvent.setup()
 
-    await screen.findByText('5 edges')
+    await screen.findByText('2 edges')
 
     await waitFor(() => {
       expect(formRef.current?.getValues('hindrance_points_earned')).toBe(0)
@@ -204,11 +215,41 @@ describe('EdgesStep', () => {
     expect(screen.getByText('4 / 4')).toBeInTheDocument()
   })
 
+  it('filters edges by the novice rank for a new character by default', async () => {
+    renderStep()
+    const user = await revealEdges()
+
+    expect(screen.getByText('2 edges')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Alertness' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Artificer' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /^Rank filter/ }))
+
+    expect(screen.getByRole('checkbox', { name: 'Novice' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: 'Seasoned' })).not.toBeChecked()
+  })
+
+  it('includes every rank up to the character rank by default', async () => {
+    renderStep({ rank: 'seasoned' })
+    const user = await revealEdges()
+
+    expect(screen.getByText('3 edges')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Artificer' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Fervor' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /^Rank filter/ }))
+
+    expect(screen.getByRole('checkbox', { name: 'Novice' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: 'Seasoned' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: 'Veteran' })).not.toBeChecked()
+  })
+
   it('filters edges by minimum rank', async () => {
     renderStep()
     const user = await revealEdges()
 
-    await user.click(screen.getByRole('button', { name: 'Rank filter' }))
+    await user.click(screen.getByRole('button', { name: /^Rank filter/ }))
+    await user.click(screen.getByRole('checkbox', { name: 'Novice' }))
     await user.click(screen.getByRole('checkbox', { name: 'Veteran' }))
 
     expect(screen.getByText('1 edge')).toBeInTheDocument()
@@ -225,9 +266,63 @@ describe('EdgesStep', () => {
     expect(screen.getByText('5 edges')).toBeInTheDocument()
   })
 
+  it('disables edges with unmet requirements and lists them in a tooltip', async () => {
+    const formRef = renderStep({ hindrance_points_earned: 4 })
+    const user = await revealEdges()
+
+    expect(screen.getByRole('button', { name: 'Alertness' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Ace' })).toBeDisabled()
+
+    await user.hover(
+      screen
+        .getByRole('button', { name: 'Ace' })
+        .closest('[data-slot="trait-card-tooltip-trigger"]')!,
+    )
+
+    const tooltip = await screen.findByRole('tooltip')
+    expect(tooltip).toHaveTextContent('Missing requirements')
+    expect(
+      within(tooltip)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Agility d8+'])
+
+    await user.click(screen.getByRole('button', { name: 'Ace' }))
+    expect(formRef.current?.getValues('edges')).toEqual([])
+
+    await waitFor(() => {
+      formRef.current?.setValue('attributes', agileAttributes)
+    })
+
+    expect(screen.getByRole('button', { name: 'Ace' })).toBeEnabled()
+  })
+
+  it('lists the rank and every unmet requirement for higher-rank edges', async () => {
+    renderStep()
+    const user = await revealEdges()
+
+    await user.click(screen.getByRole('button', { name: 'Clear Rank filter' }))
+    expect(screen.getByRole('button', { name: 'Artificer' })).toBeDisabled()
+
+    await user.hover(
+      screen
+        .getByRole('button', { name: 'Artificer' })
+        .closest('[data-slot="trait-card-tooltip-trigger"]')!,
+    )
+
+    const tooltip = await screen.findByRole('tooltip')
+    expect(
+      within(tooltip)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Rank: Seasoned', 'Arcane Background (Any)'])
+  })
+
   it('filters edges with unmet requirements until the character state satisfies them', async () => {
     const formRef = renderStep()
     const user = await revealEdges()
+
+    expect(screen.getByText('2 edges')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Requirements met' }))
 
@@ -256,6 +351,7 @@ describe('EdgesStep', () => {
       formRef.current?.setValue('edge_hindrance_points_spent', 0)
     })
 
+    await user.click(screen.getByRole('button', { name: 'Clear Rank filter' }))
     await user.click(screen.getByRole('button', { name: 'Requirements met' }))
 
     expect(screen.getByText('5 edges')).toBeInTheDocument()
@@ -268,14 +364,14 @@ describe('EdgesStep', () => {
 
     const search = await screen.findByRole('combobox', { name: 'Search edges' })
 
-    await user.type(search, 'art')
-    await user.click(await screen.findByRole('option', { name: 'Artificer' }))
+    await user.type(search, 'ac')
+    await user.click(await screen.findByRole('option', { name: 'Ace' }))
 
     expect(await screen.findByText('1 edge')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /reveal edges traits/i }))
 
-    expect(screen.getByRole('button', { name: 'Artificer' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Ace' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Alertness' })).not.toBeInTheDocument()
   })
 
@@ -320,7 +416,7 @@ describe('EdgesStep', () => {
 
     renderStep()
 
-    expect(await screen.findByText('5 edges')).toBeInTheDocument()
+    expect(await screen.findByText('2 edges')).toBeInTheDocument()
     expect(graphqlRequestMock).toHaveBeenNthCalledWith(
       1,
       expect.anything(),

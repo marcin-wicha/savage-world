@@ -1,4 +1,4 @@
-import { meetsEdgeRequirements } from './edge-requirements'
+import { meetsEdgeRequirements, missingEdgeRequirements } from './edge-requirements'
 
 const character = {
   attributes: {
@@ -129,5 +129,53 @@ describe('metEdgeRequirements', () => {
         character,
       ),
     ).toBe(false)
+  })
+})
+
+describe('missingEdgeRequirements', () => {
+  it('returns nothing when every requirement is met', () => {
+    expect(
+      missingEdgeRequirements(
+        [requirement('attribute', { attribute: 'agility', die: 8 }), requirement('wild_card')],
+        character,
+      ),
+    ).toEqual([])
+  })
+
+  it('describes each unmet requirement', () => {
+    expect(
+      missingEdgeRequirements(
+        [
+          requirement('attribute', { attribute: 'smarts', die: 8 }),
+          requirement('skill', { skill: 'fighting', die: 8 }),
+          requirement('edge', { slug: 'quick-draw', name: null }),
+          requirement('edge', {
+            slug: 'trademark-weapon',
+            name: 'Trademark Weapon',
+            detail: '(Sword)',
+          }),
+          requirement('hindrance', { slug: 'young' }),
+          requirement('arcane_background', { value: 'magic' }),
+          requirement('special', { text: 'Must be an elf' }),
+          requirement('any', {
+            clauses: [
+              requirement('skill', { skill: 'shooting', die: 8 }),
+              requirement('skill', { skill: 'athletics', die: 10 }),
+            ],
+          }),
+          requirement('skill', { skill: 'athletics', die: 6 }),
+        ],
+        { ...character, edgeSlugs: new Set<string>() },
+      ),
+    ).toEqual([
+      'Smarts d8+',
+      'Fighting d8+',
+      'Quick Draw',
+      'Trademark Weapon (Sword)',
+      'Young',
+      'Arcane Background (Magic)',
+      'Must be an elf',
+      'Shooting d8+ or Athletics d10+',
+    ])
   })
 })

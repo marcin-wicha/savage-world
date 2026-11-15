@@ -137,6 +137,7 @@ const translations: Record<string, string> = {
   'Loading edges…': 'Wczytywanie przewag…',
   'Could not load edges. Try again.': 'Nie udało się wczytać przewag. Spróbuj ponownie.',
   'Requirements met': 'Wymagania spełnione',
+  'Missing requirements': 'Niespełnione wymagania',
   'Spend hindrance points to buy edges. Each edge costs two hindrance points.':
     'Wydaj punkty za ułomności na przewagi. Każda przewaga kosztuje dwa punkty.',
   'No edges match the selected filters or search.':

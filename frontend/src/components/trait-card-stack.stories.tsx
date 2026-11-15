@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { TooltipProvider } from '@/components/ui/tooltip'
+
 import { TraitCardStack, type TraitCardStackTrait } from './trait-card-stack'
 
 const combatTraits: TraitCardStackTrait[] = [
@@ -86,6 +88,36 @@ export const Social: Story = {
     category: 'Social',
     traits: socialTraits,
     defaultOpen: true,
+  },
+}
+
+export const UnmetRequirements: Story = {
+  decorators: [
+    (Story) => (
+      <TooltipProvider>
+        <Story />
+      </TooltipProvider>
+    ),
+  ],
+  args: {
+    defaultOpen: true,
+    traits: combatTraits.map((trait, index) =>
+      index === 0
+        ? trait
+        : {
+            ...trait,
+            disabled: true,
+            tooltip: (
+              <div className="grid gap-1.5">
+                <p className="font-medium">Missing requirements</p>
+                <ul className="grid list-disc gap-1 pl-4">
+                  <li>Rank: Seasoned</li>
+                  <li>Vigor d8+</li>
+                </ul>
+              </div>
+            ),
+          },
+    ),
   },
 }
 

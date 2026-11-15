@@ -10,6 +10,9 @@ type RequirementClauseData = {
   die?: number | null
   skill?: string | null
   slug?: string | null
+  name?: string | null
+  detail?: string | null
+  text?: string | null
   value?: string | null
   clauses?: readonly RequirementClauseData[] | null
 }
@@ -69,6 +72,59 @@ function meetsClause(
     default:
       return false
   }
+}
+
+function titleize(value: string): string {
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+function withDetail(text: string, detail: string | null | undefined, wrap: boolean): string {
+  const trimmed = detail?.trim()
+
+  if (!trimmed) return text
+
+  return wrap ? `${text} (${trimmed})` : `${text} ${trimmed}`
+}
+
+export function describeRequirement(requirement: RequirementClauseData): string {
+  switch (requirement.kind) {
+    case 'any':
+      return (requirement.clauses ?? []).map(describeRequirement).filter(Boolean).join(' or ')
+    case 'attribute':
+      return `${titleize(requirement.attribute ?? '')} d${requirement.die ?? ''}+`
+    case 'skill':
+      return `${titleize(requirement.skill ?? '')} d${requirement.die ?? ''}+`
+    case 'edge':
+      return withDetail(
+        requirement.name || titleize(requirement.slug ?? ''),
+        requirement.detail,
+        false,
+      )
+    case 'hindrance':
+      return withDetail(titleize(requirement.slug ?? ''), requirement.detail, true)
+    case 'arcane_background':
+      return `Arcane Background (${titleize(requirement.value || 'any')})`
+    case 'wild_card':
+      return 'Wild Card'
+    case 'special':
+      return requirement.text ?? ''
+    default:
+      return ''
+  }
+}
+
+export function missingEdgeRequirements(
+  requirements: readonly EdgeRequirementClause[],
+  character: EdgeRequirementCharacter,
+): string[] {
+  return requirements
+    .filter((requirement) => !meetsClause(requirement, character))
+    .map(describeRequirement)
+    .filter(Boolean)
 }
 
 export function meetsEdgeRequirements(

@@ -151,7 +151,7 @@ function TraitCard({
         aria-pressed={selected}
         aria-label={title}
         disabled={disabled}
-        className="absolute inset-0 z-20 cursor-pointer rounded-xl outline-none disabled:cursor-default"
+        className="absolute inset-0 z-20 cursor-pointer rounded-xl outline-none disabled:pointer-events-none disabled:cursor-default"
         {...props}
       />
     </Card>
