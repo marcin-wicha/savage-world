@@ -420,22 +420,22 @@ const translations: Record<string, string> = {
     'Koczowniczy jeźdźcy i łucznicy otwartych równin, związani ze swoimi stadami i końmi.',
   'The Darkfolk': 'Mroczanie',
   "The people of The City inside The Dark — Aznar's lingering shadow. Dark-sighted, sound-adapted, lightblind. Descended from fugitives.":
-    'Ludzie Miasta ukrytego w Ciemności — pozostałości cienia Aznara. Widzą w mroku, są przystosowani do dźwięków i ślepi na światło. Pochodzą od zbiegów.',
+    'Mieszkańcy Miasta skrytego w Mroku — pozostałości cienia Aznara. Widzą w ciemności, są przystosowani do dźwięków i ślepi na światło. Pochodzą od zbiegów.',
   'The Emberborn': 'Żarliwcy',
   "The fire-cult people of the Emberfall — a closed, obsidian-working people who await their god's breaking free. Ruled by the Ear and the Hand, and made honest by the living rock.":
-    'Lud ognia z Żaropadu — zamknięta społeczność obrabiająca obsydian i czekająca na uwolnienie swojego boga. Rządzą nimi Ucho i Dłoń, a żywa skała uczy ich prawdomówności.',
+    'Żarliwi wyznawcy ognia z Żaropadu — zamknięta społeczność obrabiająca obsydian i czekająca na uwolnienie swojego boga. Rządzą nimi Ucho i Dłoń, a żywa skała uczy ich prawdomówności.',
   'The Leagueborn': 'Wolnomieszczanie',
   'Citizens of the League — a federation of free-cities bound by canals, roads, and contracts. Every citizen must wander the world to learn their craft before proving a masterwork to their city.':
     'Obywatele Ligi — federacji wolnych miast połączonych kanałami, drogami i umowami. Każdy musi wędrować po świecie i doskonalić rzemiosło, zanim przedstawi miastu swoje arcydzieło.',
   'The Mirrorfolk': 'Lud Lustrzanego Boru',
   'Hidden herders of the high plateau, descendants of escaped prisoners of war who broke out and hid behind the mirrorwood. Masters of camouflage and mirrorwood craft.':
-    'Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych, którzy uciekli i schronili się za lustrzanym lasem. Mistrzowie kamuflażu i obróbki lustrzanego drewna.',
+    'Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych, którzy uciekli i schronili się za Lustrzanym Borem. Mistrzowie kamuflażu i obróbki lustrzanego drewna.',
   'The Shieldborn': 'Tarczownicy',
   'The warrior aristocracy of the Iron Dominion, ruled by a king who united the highlander clans centuries ago. Children are taken at seven to be forged into soldiers in the Shield-Grounds. The king is a god hiding among mortals.':
     'Wojownicza arystokracja Żelaznego Dominium, rządzona przez króla, który przed wiekami zjednoczył klany górali. Siedmioletnie dzieci trafiają na Pola Tarczy, gdzie kształtuje się z nich żołnierzy. Król jest bogiem ukrywającym się wśród śmiertelników.',
   'Wind-wall Barbarians': 'Barbarzyńcy z Rubieży',
   "The Stormfolk of the world's edge, where the wind wall never relents. Hardened by cold and wind-driven dust, loud of voice, and fearless of death.":
-    'Lud Burzy z krańca świata, gdzie wichrowa ściana nigdy nie ustaje. Zahartowani przez chłód i niesiony wiatrem pył, głośni i nieustraszeni wobec śmierci.',
+    'Klany z rubieży świata, gdzie wichrowa ściana nigdy nie ustaje. Zahartowani przez chłód i niesiony wiatrem pył, głośni i nieustraszeni wobec śmierci.',
   Academics: 'Wiedza akademicka',
   Athletics: 'Atletyka',
   Battle: 'Taktyka',

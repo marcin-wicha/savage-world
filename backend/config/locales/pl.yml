@@ -16,14 +16,10 @@ pl:
           swoimi stadami i końmi.
       the-darkfolk:
         name: Mroczanie
-        description: Ludzie Miasta ukrytego w Ciemności — pozostałości cienia Aznara.
-          Widzą w mroku, są przystosowani do dźwięków i ślepi na światło. Pochodzą
-          od zbiegów.
+        description: Mieszkańcy Miasta skrytego w Mroku — pozostałości cienia Aznara. Widzą w ciemności, są przystosowani do dźwięków i ślepi na światło. Pochodzą od zbiegów.
       the-emberborn:
         name: Żarliwcy
-        description: Lud ognia z Żaropadu — zamknięta społeczność obrabiająca obsydian
-          i czekająca na uwolnienie swojego boga. Rządzą nimi Ucho i Dłoń, a żywa
-          skała uczy ich prawdomówności.
+        description: Żarliwi wyznawcy ognia z Żaropadu — zamknięta społeczność obrabiająca obsydian i czekająca na uwolnienie swojego boga. Rządzą nimi Ucho i Dłoń, a żywa skała uczy ich prawdomówności.
       the-leagueborn:
         name: Wolnomieszczanie
         description: Obywatele Ligi — federacji wolnych miast połączonych kanałami,
@@ -31,9 +27,7 @@ pl:
           zanim przedstawi miastu swoje arcydzieło.
       the-mirrorfolk:
         name: Lud Lustrzanego Boru
-        description: Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych,
-          którzy uciekli i schronili się za lustrzanym lasem. Mistrzowie kamuflażu
-          i obróbki lustrzanego drewna.
+        description: Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych, którzy uciekli i schronili się za Lustrzanym Borem. Mistrzowie kamuflażu i obróbki lustrzanego drewna.
       the-shieldborn:
         name: Tarczownicy
         description: Wojownicza arystokracja Żelaznego Dominium, rządzona przez króla,
@@ -42,9 +36,7 @@ pl:
           ukrywającym się wśród śmiertelników.
       wind-wall-barbarians:
         name: Barbarzyńcy z Rubieży
-        description: Lud Burzy z krańca świata, gdzie wichrowa ściana nigdy nie ustaje.
-          Zahartowani przez chłód i niesiony wiatrem pył, głośni i nieustraszeni wobec
-          śmierci.
+        description: Klany z rubieży świata, gdzie wichrowa ściana nigdy nie ustaje. Zahartowani przez chłód i niesiony wiatrem pył, głośni i nieustraszeni wobec śmierci.
     edge:
       ace:
         name: As
