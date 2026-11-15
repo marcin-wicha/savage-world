@@ -411,31 +411,31 @@ const translations: Record<string, string> = {
   'Not enough money': 'Za mało pieniędzy',
   Dunestriders: 'Wydmiarze',
   'Keepers of the Old Faith who guide pilgrims across the burning central desert to the Spire. Masters of arid survival.':
-    'Strażnicy Starej Wiary, którzy prowadzą pielgrzymów przez rozpaloną pustynię do Iglicy. Mistrzowie przetrwania w suchym klimacie.',
+    'Przez rozpaloną pustynię w sercu świata nikt nie przejdzie bez Wydmiarzy. Czytają wydmy jak pismo, znajdują wodę tam, gdzie jej nie ma, i od pokoleń prowadzą pielgrzymów Starej Wiary do Iglicy. Nie uprawiają ziemi ani nie hodują bydła — ich stadem są wierni, a swoich ślubów dochowują wierniej niż niejeden rycerz.',
   Greenbloods: 'Zielonokrwiści',
   'People of the venomous jungle whose bodies neutralize all known toxins. Chemists, medics, and poisoners.':
-    'Ludzie z jadowitej dżungli, których organizmy neutralizują wszystkie znane toksyny. Chemicy, medycy i truciciele.',
+    'W dżungli, w której truje każdy liść i każdy kieł, przetrwali tylko ci, których krew nauczyła się pokonywać jad. Zielonokrwiści żyją w osadach zawieszonych wysoko nad ziemią i znają soki dżungli jak nikt inny: wiedzą, co leczy, co zabija, a co tylko sprowadza gorączkę. Najmują się jako medycy, kosztujący potraw na książęcych dworach i skrytobójcy — dla nich granica między uzdrowicielem a trucicielem to kwestia zapłaty.',
   Stepperiders: 'Stepowcy',
   'Nomadic riders and archers of the open plains, bound to their herds and horses.':
-    'Koczowniczy jeźdźcy i łucznicy otwartych równin, związani ze swoimi stadami i końmi.',
+    'Dzieci stepu dosiadają konia, zanim nauczą się pewnie chodzić. Mieszkają w namiotach z filcu i skór, które zwija się w godzinę, i wędrują za stadami przez bezkresne równiny. Koń jest dla nich rodziną, a kto straci stado, traci imię. Osiadłe ludy widzą w nich łupieżców — i czasem mają rację.',
   'The Darkfolk': 'Mroczanie',
   "The people of The City inside The Dark — Aznar's lingering shadow. Dark-sighted, sound-adapted, lightblind. Descended from fugitives.":
-    'Mieszkańcy Miasta skrytego w Mroku — pozostałości cienia Aznara. Widzą w ciemności, są przystosowani do dźwięków i ślepi na światło. Pochodzą od zbiegów.',
+    'Daleko od ludzkich szlaków leży Mrok — kraina, w której gaśnie każdy płomień, a dźwięki tracą ostrość. Obcy uważają ją za pustkowie, a jej mieszkańców za dzikusów i wyrzutków. Mroczanie nie wyprowadzają ich z błędu. Poza Mrokiem poruszają się cicho jak cienie, osłaniają oczy przed blaskiem dnia i rzadko mówią więcej, niż muszą.',
   'The Emberborn': 'Żarliwcy',
   "The fire-cult people of the Emberfall — a closed, obsidian-working people who await their god's breaking free. Ruled by the Ear and the Hand, and made honest by the living rock.":
-    'Żarliwi wyznawcy ognia z Żaropadu — zamknięta społeczność obrabiająca obsydian i czekająca na uwolnienie swojego boga. Rządzą nimi Ucho i Dłoń, a żywa skała uczy ich prawdomówności.',
+    'Lud czarnego bazaltu i popiołu, żyjący u stóp ziejących ogniem gór. Każde drżenie ziemi i każda erupcja to dla nich głos boga uwięzionego pod skałą — i powód do świętowania. Swoje miasta wykuwają w zastygłej lawie, a ostrza w obsydianie. Śmierci się nie lękają: najlepsza to ta, którą wybiera się samemu.',
   'The Leagueborn': 'Wolnomieszczanie',
   'Citizens of the League — a federation of free-cities bound by canals, roads, and contracts. Every citizen must wander the world to learn their craft before proving a masterwork to their city.':
-    'Obywatele Ligi — federacji wolnych miast połączonych kanałami, drogami i umowami. Każdy musi wędrować po świecie i doskonalić rzemiosło, zanim przedstawi miastu swoje arcydzieło.',
+    'Obywatele Ligi — wolnych miast rozsianych po delcie wielkiej rzeki i połączonych kanałami, groblami i brukowanymi traktami. Każdy rzemieślnik przechodzi tu lata wędrówki: terminuje u obcych mistrzów, żyje wśród obcych ludów i wraca dopiero z arcydziełem, które wzbogaci jego miasto. Słowo Wolnomieszczanina jest jak pieczęć, a zerwana umowa hańbi całe miasto.',
   'The Mirrorfolk': 'Lud Lustrzanego Boru',
   'Hidden herders of the high plateau, descendants of escaped prisoners of war who broke out and hid behind the mirrorwood. Masters of camouflage and mirrorwood craft.':
-    'Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych, którzy uciekli i schronili się za Lustrzanym Borem. Mistrzowie kamuflażu i obróbki lustrzanego drewna.',
+    'Pasterze wysokiego, mroźnego płaskowyżu, ukryci za drzewami, których kora i liście lśnią jak zwierciadła. Ich przodkowie wyrwali się z niewoli i uciekli tam, dokąd nie podążyła żadna armia. Do dziś nikt obcy nie zna drogi na płaskowyż — a każdy z nich przysięga, że nikt jej nie pozna.',
   'The Shieldborn': 'Tarczownicy',
   'The warrior aristocracy of the Iron Dominion, ruled by a king who united the highlander clans centuries ago. Children are taken at seven to be forged into soldiers in the Shield-Grounds. The king is a god hiding among mortals.':
-    'Wojownicza arystokracja Żelaznego Dominium, rządzona przez króla, który przed wiekami zjednoczył klany górali. Siedmioletnie dzieci trafiają na Pola Tarczy, gdzie kształtuje się z nich żołnierzy. Król jest bogiem ukrywającym się wśród śmiertelników.',
+    'Wojownicza arystokracja Żelaznego Dominium, potomkowie górskich klanów, które przed tysiącem lat zeszły z Rdzawych Wyżyn i podbiły sto ludów. Siedmioletnie dzieci zabiera się z domów na Pola Tarczy, gdzie głód, zimno i dryl czynią z nich żołnierzy. Tarczownik nie zna zbytku ani bogów — zna tylko szyk.',
   'Wind-wall Barbarians': 'Barbarzyńcy z Rubieży',
   "The Stormfolk of the world's edge, where the wind wall never relents. Hardened by cold and wind-driven dust, loud of voice, and fearless of death.":
-    'Klany z rubieży świata, gdzie wichrowa ściana nigdy nie ustaje. Zahartowani przez chłód i niesiony wiatrem pył, głośni i nieustraszeni wobec śmierci.',
+    'Klany z samego skraju świata, gdzie wichrowa ściana nigdy nie cichnie. Niesiony wiatrem pył smaga ich od dziecka, aż ciało pokrywa twarda, poznaczona bliznami skóra. Mówią tak głośno, że słychać ich przez burzę, a cisza oznacza u nich chorobę lub śmierć. Śmierci się nie lękają — kto nie nadąża za klanem, sam odchodzi w ścianę wiatru.',
   Academics: 'Erudycja',
   Athletics: 'Atletyka',
   Battle: 'Taktyka',

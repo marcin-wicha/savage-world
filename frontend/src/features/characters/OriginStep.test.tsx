@@ -117,7 +117,7 @@ describe('OriginStep', () => {
     expect(await screen.findByRole('button', { name: 'Wydmiarze' })).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Strażnicy Starej Wiary, którzy prowadzą pielgrzymów przez rozpaloną pustynię do Iglicy. Mistrzowie przetrwania w suchym klimacie.',
+        'Przez rozpaloną pustynię w sercu świata nikt nie przejdzie bez Wydmiarzy. Czytają wydmy jak pismo, znajdują wodę tam, gdzie jej nie ma, i od pokoleń prowadzą pielgrzymów Starej Wiary do Iglicy. Nie uprawiają ziemi ani nie hodują bydła — ich stadem są wierni, a swoich ślubów dochowują wierniej niż niejeden rycerz.',
       ),
     ).toBeInTheDocument()
   })

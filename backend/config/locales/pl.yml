@@ -4,39 +4,31 @@ pl:
     origin:
       dunestriders:
         name: Wydmiarze
-        description: Strażnicy Starej Wiary, którzy prowadzą pielgrzymów przez rozpaloną
-          pustynię do Iglicy. Mistrzowie przetrwania w suchym klimacie.
+        description: Przez rozpaloną pustynię w sercu świata nikt nie przejdzie bez Wydmiarzy. Czytają wydmy jak pismo, znajdują wodę tam, gdzie jej nie ma, i od pokoleń prowadzą pielgrzymów Starej Wiary do Iglicy. Nie uprawiają ziemi ani nie hodują bydła — ich stadem są wierni, a swoich ślubów dochowują wierniej niż niejeden rycerz.
       greenbloods:
         name: Zielonokrwiści
-        description: Ludzie z jadowitej dżungli, których organizmy neutralizują wszystkie
-          znane toksyny. Chemicy, medycy i truciciele.
+        description: 'W dżungli, w której truje każdy liść i każdy kieł, przetrwali tylko ci, których krew nauczyła się pokonywać jad. Zielonokrwiści żyją w osadach zawieszonych wysoko nad ziemią i znają soki dżungli jak nikt inny: wiedzą, co leczy, co zabija, a co tylko sprowadza gorączkę. Najmują się jako medycy, kosztujący potraw na książęcych dworach i skrytobójcy — dla nich granica między uzdrowicielem a trucicielem to kwestia zapłaty.'
       stepperiders:
         name: Stepowcy
-        description: Koczowniczy jeźdźcy i łucznicy otwartych równin, związani ze
-          swoimi stadami i końmi.
+        description: Dzieci stepu dosiadają konia, zanim nauczą się pewnie chodzić. Mieszkają w namiotach z filcu i skór, które zwija się w godzinę, i wędrują za stadami przez bezkresne równiny. Koń jest dla nich rodziną, a kto straci stado, traci imię. Osiadłe ludy widzą w nich łupieżców — i czasem mają rację.
       the-darkfolk:
         name: Mroczanie
-        description: Mieszkańcy Miasta skrytego w Mroku — pozostałości cienia Aznara. Widzą w ciemności, są przystosowani do dźwięków i ślepi na światło. Pochodzą od zbiegów.
+        description: Daleko od ludzkich szlaków leży Mrok — kraina, w której gaśnie każdy płomień, a dźwięki tracą ostrość. Obcy uważają ją za pustkowie, a jej mieszkańców za dzikusów i wyrzutków. Mroczanie nie wyprowadzają ich z błędu. Poza Mrokiem poruszają się cicho jak cienie, osłaniają oczy przed blaskiem dnia i rzadko mówią więcej, niż muszą.
       the-emberborn:
         name: Żarliwcy
-        description: Żarliwi wyznawcy ognia z Żaropadu — zamknięta społeczność obrabiająca obsydian i czekająca na uwolnienie swojego boga. Rządzą nimi Ucho i Dłoń, a żywa skała uczy ich prawdomówności.
+        description: 'Lud czarnego bazaltu i popiołu, żyjący u stóp ziejących ogniem gór. Każde drżenie ziemi i każda erupcja to dla nich głos boga uwięzionego pod skałą — i powód do świętowania. Swoje miasta wykuwają w zastygłej lawie, a ostrza w obsydianie. Śmierci się nie lękają: najlepsza to ta, którą wybiera się samemu.'
       the-leagueborn:
         name: Wolnomieszczanie
-        description: Obywatele Ligi — federacji wolnych miast połączonych kanałami,
-          drogami i umowami. Każdy musi wędrować po świecie i doskonalić rzemiosło,
-          zanim przedstawi miastu swoje arcydzieło.
+        description: 'Obywatele Ligi — wolnych miast rozsianych po delcie wielkiej rzeki i połączonych kanałami, groblami i brukowanymi traktami. Każdy rzemieślnik przechodzi tu lata wędrówki: terminuje u obcych mistrzów, żyje wśród obcych ludów i wraca dopiero z arcydziełem, które wzbogaci jego miasto. Słowo Wolnomieszczanina jest jak pieczęć, a zerwana umowa hańbi całe miasto.'
       the-mirrorfolk:
         name: Lud Lustrzanego Boru
-        description: Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych, którzy uciekli i schronili się za Lustrzanym Borem. Mistrzowie kamuflażu i obróbki lustrzanego drewna.
+        description: Pasterze wysokiego, mroźnego płaskowyżu, ukryci za drzewami, których kora i liście lśnią jak zwierciadła. Ich przodkowie wyrwali się z niewoli i uciekli tam, dokąd nie podążyła żadna armia. Do dziś nikt obcy nie zna drogi na płaskowyż — a każdy z nich przysięga, że nikt jej nie pozna.
       the-shieldborn:
         name: Tarczownicy
-        description: Wojownicza arystokracja Żelaznego Dominium, rządzona przez króla,
-          który przed wiekami zjednoczył klany górali. Siedmioletnie dzieci trafiają
-          na Pola Tarczy, gdzie kształtuje się z nich żołnierzy. Król jest bogiem
-          ukrywającym się wśród śmiertelników.
+        description: Wojownicza arystokracja Żelaznego Dominium, potomkowie górskich klanów, które przed tysiącem lat zeszły z Rdzawych Wyżyn i podbiły sto ludów. Siedmioletnie dzieci zabiera się z domów na Pola Tarczy, gdzie głód, zimno i dryl czynią z nich żołnierzy. Tarczownik nie zna zbytku ani bogów — zna tylko szyk.
       wind-wall-barbarians:
         name: Barbarzyńcy z Rubieży
-        description: Klany z rubieży świata, gdzie wichrowa ściana nigdy nie ustaje. Zahartowani przez chłód i niesiony wiatrem pył, głośni i nieustraszeni wobec śmierci.
+        description: Klany z samego skraju świata, gdzie wichrowa ściana nigdy nie cichnie. Niesiony wiatrem pył smaga ich od dziecka, aż ciało pokrywa twarda, poznaczona bliznami skóra. Mówią tak głośno, że słychać ich przez burzę, a cisza oznacza u nich chorobę lub śmierć. Śmierci się nie lękają — kto nie nadąża za klanem, sam odchodzi w ścianę wiatru.
     edge:
       ace:
         name: As

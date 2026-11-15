@@ -37,7 +37,7 @@ RSpec.describe "GraphQL", type: :request do
 
     expect(json.dig("data", "origins", "nodes", 0)).to eq(
       "name" => "Lud Lustrzanego Boru",
-      "description" => "Ukryci pasterze z wysokiego płaskowyżu, potomkowie jeńców wojennych, którzy uciekli i schronili się za Lustrzanym Borem. Mistrzowie kamuflażu i obróbki lustrzanego drewna."
+      "description" => "Pasterze wysokiego, mroźnego płaskowyżu, ukryci za drzewami, których kora i liście lśnią jak zwierciadła. Ich przodkowie wyrwali się z niewoli i uciekli tam, dokąd nie podążyła żadna armia. Do dziś nikt obcy nie zna drogi na płaskowyż — a każdy z nich przysięga, że nikt jej nie pozna."
     )
   end
 
