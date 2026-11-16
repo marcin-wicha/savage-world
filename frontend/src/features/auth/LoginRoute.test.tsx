@@ -72,6 +72,29 @@ describe('LoginRoute', () => {
     })
   })
 
+  it("drops the previous account's cached characters when signing in", async () => {
+    const user = userEvent.setup()
+    apiPostMock.mockResolvedValue({
+      user: { id: 2, email_address: 'other', role: 'user' },
+    } as never)
+
+    const queryClient = renderLogin()
+    queryClient.setQueryData(['characters'], { characters: [{ id: 1, name: 'Old hero' }] })
+    queryClient.setQueryData(['character', '1'], { character: { id: 1 } })
+
+    await user.type(screen.getByLabelText(/login/i), 'other')
+    await user.type(screen.getByLabelText(/password/i), 'secret')
+    await user.click(screen.getByRole('button', { name: /sign in/i }))
+
+    expect(await screen.findByRole('heading', { name: /characters page/i })).toBeInTheDocument()
+    expect(queryClient.getQueryData(['characters'])).toBeUndefined()
+    expect(queryClient.getQueryData(['character', '1'])).toBeUndefined()
+    expect(queryClient.getQueryData(sessionQueryKey)).toEqual({
+      user: { id: 2, email_address: 'other', role: 'user' },
+      csrf_token: '',
+    })
+  })
+
   it('shows required field errors without submitting', async () => {
     const user = userEvent.setup()
 

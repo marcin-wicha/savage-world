@@ -1,12 +1,16 @@
+import { QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { createQueryClient } from '@/lib/query-client'
 
 import { clearAuthHint, hasAuthHint } from './auth-hint'
 import { RequireAuth } from './RequireAuth'
 import { useSession } from './use-session'
 
-vi.mock('./use-session', () => ({
+vi.mock('./use-session', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./use-session')>()),
   useSession: vi.fn(),
 }))
 
@@ -17,16 +21,23 @@ function setAuthHint() {
 }
 
 function renderGuard() {
+  const queryClient = createQueryClient()
+  queryClient.setQueryData(['characters'], { characters: [{ id: 1, name: 'Old hero' }] })
+
   render(
-    <MemoryRouter initialEntries={['/characters']}>
-      <Routes>
-        <Route path="/login" element={<h1>Login page</h1>} />
-        <Route element={<RequireAuth />}>
-          <Route path="/characters" element={<h1>Characters page</h1>} />
-        </Route>
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={['/characters']}>
+        <Routes>
+          <Route path="/login" element={<h1>Login page</h1>} />
+          <Route element={<RequireAuth />}>
+            <Route path="/characters" element={<h1>Characters page</h1>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
+
+  return queryClient
 }
 
 describe('RequireAuth', () => {
@@ -88,9 +99,10 @@ describe('RequireAuth', () => {
       isSuccess: true,
     } as never)
 
-    renderGuard()
+    const queryClient = renderGuard()
 
     expect(await screen.findByRole('heading', { name: /login page/i })).toBeInTheDocument()
     await waitFor(() => expect(hasAuthHint()).toBe(false))
+    expect(queryClient.getQueryData(['characters'])).toBeUndefined()
   })
 })

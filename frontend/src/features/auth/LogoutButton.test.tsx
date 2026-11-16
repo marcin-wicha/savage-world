@@ -57,6 +57,7 @@ describe('LogoutButton', () => {
     const user = userEvent.setup()
     apiDeleteMock.mockResolvedValue(undefined as never)
     const queryClient = renderLogout()
+    queryClient.setQueryData(['characters'], { characters: [{ id: 1, name: 'Old hero' }] })
 
     await user.click(screen.getByRole('button', { name: /log out/i }))
 
@@ -66,6 +67,7 @@ describe('LogoutButton', () => {
 
     expect(await screen.findByRole('heading', { name: /login page/i })).toBeInTheDocument()
     expect(hasAuthHint()).toBe(false)
+    expect(queryClient.getQueryData(['characters'])).toBeUndefined()
     expect(queryClient.getQueryData(sessionQueryKey)).toEqual({
       user: null,
       csrf_token: '',

@@ -13,7 +13,7 @@ import { useRestMutation } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
 
 import { refreshAuthHint } from './auth-hint'
-import { type SessionResponse, sessionQueryKey } from './use-session'
+import { type SessionResponse, clearAccountQueries, sessionQueryKey } from './use-session'
 
 const loginSchema = z.object({
   login: z.string().trim().min(1, 'Login is required.'),
@@ -69,6 +69,7 @@ export function LoginRoute() {
     { path: '/api/v1/session', method: 'POST' },
     {
       onSuccess: (data) => {
+        clearAccountQueries(queryClient)
         queryClient.setQueryData<SessionResponse>(sessionQueryKey, (current) => ({
           user: data.user,
           csrf_token: current?.csrf_token ?? '',

@@ -7,7 +7,7 @@ import { useRestMutation } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
 
 import { clearAuthHint } from './auth-hint'
-import { type SessionResponse, sessionQueryKey } from './use-session'
+import { type SessionResponse, clearAccountQueries, sessionQueryKey } from './use-session'
 
 export function LogoutButton() {
   const { t } = useLanguage()
@@ -15,6 +15,7 @@ export function LogoutButton() {
   const queryClient = useQueryClient()
 
   const clearSession = () => {
+    clearAccountQueries(queryClient)
     queryClient.setQueryData<SessionResponse>(sessionQueryKey, (current) => ({
       user: null,
       csrf_token: current?.csrf_token ?? '',
