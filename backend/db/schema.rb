@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_03_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -134,6 +134,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_140000) do
     t.index ["slug"], name: "index_origins_on_slug", unique: true
   end
 
+  create_table "parties", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.bigint "leader_id", null: false
+    t.string "invite_code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invite_code"], name: "index_parties_on_invite_code", unique: true
+    t.index ["leader_id"], name: "index_parties_on_leader_id"
+  end
+
+  create_table "party_memberships", force: :cascade do |t|
+    t.bigint "party_id", null: false
+    t.bigint "character_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_id"], name: "index_party_memberships_on_character_id"
+    t.index ["party_id", "character_id"], name: "index_party_memberships_on_party_id_and_character_id", unique: true
+    t.check_constraint "status = ANY (ARRAY[0, 1])", name: "party_memberships_status_range"
+  end
+
   create_table "powers", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -198,5 +220,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_140000) do
   add_foreign_key "character_skills", "skills"
   add_foreign_key "characters", "origins"
   add_foreign_key "characters", "users"
+  add_foreign_key "parties", "users", column: "leader_id"
+  add_foreign_key "party_memberships", "characters"
+  add_foreign_key "party_memberships", "parties"
   add_foreign_key "sessions", "users"
 end

@@ -63,6 +63,7 @@ describe('AppShell', () => {
 
     expect(screen.getByRole('link', { name: /login/i })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /characters/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /parties/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /approvals/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /log out/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /report an issue/i })).not.toBeInTheDocument()
@@ -74,6 +75,7 @@ describe('AppShell', () => {
     renderShell()
 
     expect(screen.getByRole('link', { name: /characters/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /parties/i })).toHaveAttribute('href', '/parties')
     expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /report an issue/i })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /login/i })).not.toBeInTheDocument()

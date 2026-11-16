@@ -82,6 +82,9 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 - Authenticated REST character listing and creation at `GET`/`POST
   /api/v1/characters`, plus upsert at `PUT /api/v1/characters/:id`, including
   final hindrance-point validation.
+- Authenticated REST party management under `/api/v1/parties` and
+  `/api/v1/party_invites`: leaders invite characters with a shareable code and
+  approve join requests; participants can only leave.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
 - React 19/Vite frontend with TanStack Query, a fetch-based REST/GraphQL client,
   generated GraphQL operation types, shadcn/ui primitives, and Storybook.
@@ -110,7 +113,7 @@ Current gaps, intentionally left for later feature work:
   encumbrance fields.
 - There are no GraphQL mutations yet.
 - There is no password-reset flow or mailer usage.
-- Domain Pundit policies currently cover only character upsert.
+- Domain Pundit policies currently cover character upsert and parties.
 - Frontend feature UI and MSW handlers are still minimal.
 
 ## Agent operating rules
@@ -275,7 +278,7 @@ both in the same change when committing.
   Keep seed data idempotent.
 - Current tables are `users`, `sessions`, `characters`, `character_edges`,
   `character_hindrances`, `character_skills`, `origins`, `edges`, `hindrances`,
-  `skills`, `gears`, and `powers`.
+  `skills`, `gears`, `powers`, `parties`, and `party_memberships`.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
@@ -284,6 +287,11 @@ both in the same change when committing.
   through `character_edges`, `character_hindrances`, and `character_skills`, each
   with a unique character/reference pair; `character_skills` also stores each
   selected skill's base die.
+- `parties` stores a name, optional description, `leader_id` (users), and a
+  unique `invite_code` (`has_secure_token`). `party_memberships` joins parties
+  and characters with a `pending`/`accepted` status and a unique
+  party/character pair. A character may belong to many parties. Deleting a
+  party, its leader, or a character removes the related memberships.
 - `origins` is still a skeleton table with timestamps only.
 - `edges` stores mechanical reference data: name, unique slug, category,
   minimum rank, JSONB requirements and validated JSONB effects, source book/page,
@@ -339,6 +347,29 @@ Routes are defined in `backend/config/routes.rb`:
   create, `200` on update, `401` unauthenticated, `403` for another user's
   character, and `422` for validation or reference errors. Omitted selection
   arrays are left unchanged; provided arrays replace the selection.
+- Parties (all authenticated; payloads never expose other users' emails and
+  use `led_by_me`/`owned_by_me` flags instead):
+  - `GET /api/v1/parties` — parties the user leads or has a character in
+    (including pending requests, reported as `my_status`).
+  - `POST /api/v1/parties` — `{ "party": { "name": "...", "description": "..." } }`;
+    the current user becomes leader. Returns `201`.
+  - `GET /api/v1/parties/:id` — leader or accepted participant. The leader also
+    receives `invite_code` and pending requests; participants see only the
+    accepted roster (character name, rank, origin). `403` otherwise.
+  - `PATCH /api/v1/parties/:id` — leader only; updates `name`/`description` and
+    optionally transfers leadership with `leader_id`, which must be the owner of
+    an accepted member character (`422` otherwise).
+  - `DELETE /api/v1/parties/:id` — leader only; disbands the party (`204`).
+  - `POST /api/v1/parties/:id/invite_code` — leader only; regenerates the code.
+  - `GET /api/v1/party_invites/:code` — previews a party by invite code
+    (`404` for unknown codes).
+  - `POST /api/v1/party_invites/:code/memberships` — `{ "character_id": 1 }`;
+    the character must belong to the current user (`403`). Creates a pending
+    request, or an accepted membership for the leader's own characters; `422`
+    for duplicates.
+  - `PATCH /api/v1/parties/:party_id/memberships/:id/accept` — leader only.
+  - `DELETE /api/v1/parties/:party_id/memberships/:id` — the leader (reject or
+    remove) or the character's owner (leave or cancel a request).
 - `POST /api/v1/issue_reports` — authenticated; JSON body:
   `{ "issue_report": { "title": "...", "description": "...", "page_url": "/characters/new", "language": "en", "viewport": "1280x720", "user_agent": "..." } }`.
   Creates a GitHub issue through `IssueReports::Create` and returns `201` with
@@ -387,7 +418,11 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   wildcard origin with credentials.
 - Pundit is wired through `pundit_user = Current.user`. Add a policy for every
   domain authorization decision. `CharacterPolicy` currently guards character
-  upsert by ownership.
+  upsert by ownership. `PartyPolicy` (leader edits; leader or accepted
+  participant views; scope lists led/joined parties) and
+  `PartyMembershipPolicy` (owner joins and leaves; leader accepts and removes)
+  guard parties. Multi-step party rules live in `Parties::Join` and
+  `Parties::TransferLeadership`.
 
 ### GraphQL
 

@@ -9,6 +9,9 @@ import { AdminApprovalsRoute } from '@/features/admin/AdminApprovalsRoute'
 import { CharactersRoute } from '@/features/characters/CharactersRoute'
 import { CharacterSheetRoute } from '@/features/characters/CharacterSheetRoute'
 import { NewCharacterRoute } from '@/features/characters/NewCharacterRoute'
+import { JoinPartyRoute } from '@/features/parties/JoinPartyRoute'
+import { PartiesRoute } from '@/features/parties/PartiesRoute'
+import { PartyRoute } from '@/features/parties/PartyRoute'
 import { HomeRoute } from '@/routes/HomeRoute'
 import { NotFoundRoute } from '@/routes/NotFoundRoute'
 
@@ -29,6 +32,9 @@ export const router = createBrowserRouter([
           { path: 'characters/new', element: <NewCharacterRoute /> },
           { path: 'characters/:id/edit', element: <NewCharacterRoute /> },
           { path: 'characters/:id/sheet', element: <CharacterSheetRoute /> },
+          { path: 'parties', element: <PartiesRoute /> },
+          { path: 'parties/join/:code', element: <JoinPartyRoute /> },
+          { path: 'parties/:id', element: <PartyRoute /> },
           {
             element: <RequireAdmin />,
             children: [

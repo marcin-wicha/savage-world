@@ -13,6 +13,9 @@ class Character < ApplicationRecord
   has_many :character_skills, dependent: :destroy
   has_many :skills, through: :character_skills
 
+  has_many :party_memberships, dependent: :destroy
+  has_many :parties, through: :party_memberships
+
   normalizes :name, with: ->(name) { name.strip }
 
   validates :name, presence: true

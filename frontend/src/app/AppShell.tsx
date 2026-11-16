@@ -49,6 +49,9 @@ export function AppShell() {
                 <NavLink to="/characters" className={navLinkClass}>
                   {t('Characters')}
                 </NavLink>
+                <NavLink to="/parties" className={navLinkClass}>
+                  {t('Parties')}
+                </NavLink>
                 {isAdmin ? (
                   <>
                     <NavLink to="/admin/reference-data" className={navLinkClass}>

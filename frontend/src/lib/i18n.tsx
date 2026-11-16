@@ -666,6 +666,79 @@ const translations: Record<string, string> = {
   Any: 'dowolne',
   'Arcane Background (Any)': 'Nadprzyrodzony dar (dowolny)',
   'Wild Card': 'Dzika karta',
+  Parties: 'Drużyny',
+  'Gather characters from other players into an adventuring party.':
+    'Zbierz postacie innych graczy w drużynę poszukiwaczy przygód.',
+  'Loading parties…': 'Wczytywanie drużyn…',
+  'Could not load parties. Try again.': 'Nie udało się wczytać drużyn. Spróbuj ponownie.',
+  'You are not in any party yet.': 'Nie należysz jeszcze do żadnej drużyny.',
+  Leader: 'Przywódca',
+  Member: 'Członek',
+  'Awaiting approval': 'Oczekuje na akceptację',
+  Members: 'Członkowie',
+  Open: 'Otwórz',
+  'Create a party': 'Utwórz drużynę',
+  'You will lead the party and can invite characters with a link.':
+    'Zostaniesz przywódcą drużyny i możesz zapraszać postacie linkiem.',
+  'Create party': 'Utwórz drużynę',
+  'Could not create the party. Try again.': 'Nie udało się utworzyć drużyny. Spróbuj ponownie.',
+  'Party name': 'Nazwa drużyny',
+  'Party name is required.': 'Nazwa drużyny jest wymagana.',
+  'Party name must be 100 characters or fewer.': 'Nazwa drużyny może mieć maksymalnie 100 znaków.',
+  'Description must be 2000 characters or fewer.': 'Opis może mieć maksymalnie 2000 znaków.',
+  'Loading party…': 'Wczytywanie drużyny…',
+  'Could not load the party. It may not exist or you are not a member.':
+    'Nie udało się wczytać drużyny. Może nie istnieć lub nie jesteś jej członkiem.',
+  'Back to parties': 'Wróć do drużyn',
+  'Could not update the party. Try again.':
+    'Nie udało się zaktualizować drużyny. Spróbuj ponownie.',
+  'Could not delete the party. Try again.': 'Nie udało się rozwiązać drużyny. Spróbuj ponownie.',
+  'Could not create a new invite link. Try again.':
+    'Nie udało się utworzyć nowego linku z zaproszeniem. Spróbuj ponownie.',
+  'Could not accept the request. Try again.':
+    'Nie udało się zaakceptować prośby. Spróbuj ponownie.',
+  'Could not remove the character. Try again.': 'Nie udało się usunąć postaci. Spróbuj ponownie.',
+  'No characters in this party yet.': 'W tej drużynie nie ma jeszcze postaci.',
+  Leave: 'Opuść',
+  'Remove member': 'Usuń z drużyny',
+  'Join requests': 'Prośby o dołączenie',
+  'No pending requests.': 'Brak oczekujących próśb.',
+  Accept: 'Akceptuj',
+  Reject: 'Odrzuć',
+  'Invite link': 'Link z zaproszeniem',
+  'Share this link. Players choose a character and you approve the request.':
+    'Udostępnij ten link. Gracze wybierają postać, a ty akceptujesz prośbę.',
+  'Copy link': 'Kopiuj link',
+  Copied: 'Skopiowano',
+  'Create new link': 'Utwórz nowy link',
+  'Party details': 'Szczegóły drużyny',
+  'Party leadership': 'Przywództwo drużyny',
+  'Hand leadership to the player of a member character.':
+    'Przekaż przywództwo graczowi jednej z postaci w drużynie.',
+  'No other players can lead this party yet.':
+    'Żaden inny gracz nie może jeszcze przewodzić tej drużynie.',
+  'New leader': 'Nowy przywódca',
+  'Choose a player': 'Wybierz gracza',
+  'Player of': 'Gracz postaci',
+  'Transfer leadership': 'Przekaż przywództwo',
+  'Disband party': 'Rozwiąż drużynę',
+  yours: 'twoja',
+  'Loading invitation…': 'Wczytywanie zaproszenia…',
+  'This invite link is invalid or has expired.':
+    'Ten link z zaproszeniem jest nieprawidłowy lub wygasł.',
+  'Party invitation': 'Zaproszenie do drużyny',
+  'Your character joined the party.': 'Twoja postać dołączyła do drużyny.',
+  'Request sent. The party leader will review it.':
+    'Prośba wysłana. Przywódca drużyny ją rozpatrzy.',
+  'You have no characters that can join this party.':
+    'Nie masz postaci, które mogą dołączyć do tej drużyny.',
+  Character: 'Postać',
+  'Choose a character': 'Wybierz postać',
+  'Add to party': 'Dodaj do drużyny',
+  'Request to join': 'Poproś o dołączenie',
+  'This character is already in the party or awaiting approval.':
+    'Ta postać jest już w drużynie lub oczekuje na akceptację.',
+  'Could not send the request. Try again.': 'Nie udało się wysłać prośby. Spróbuj ponownie.',
 }
 
 type PluralForms = [one: string, few: string, many: string]
