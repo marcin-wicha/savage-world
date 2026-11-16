@@ -266,7 +266,7 @@ export function SkillsStep() {
         <h2 className="text-foreground text-xl font-medium">{t('Choose skills')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
           {t(
-            'Choose skills to spend your skill points. Hindrance points can buy additional skills after the default pool is spent.',
+            'Skills are what your character has learned, such as fighting, shooting, sneaking, or persuading. Like attributes, they use dice from d4 to d12. Core skills everyone knows already start at d4; other skills cost a point to learn and stay untrained until you pick them. You have 12 points to spend, and unspent hindrance points can buy more.',
           )}
         </p>
       </div>

@@ -89,6 +89,8 @@ describe('NewCharacterRoute', () => {
 
     expect(screen.getByLabelText(/character name/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/^concept$/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Character concept' })).toBeInTheDocument()
+    expect(screen.getByText(/this step has no rules effects/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /back/i })).toBeEnabled()
     expect(screen.getByRole('button', { name: /next/i })).toBeDisabled()
     expect(document.querySelector('[data-slot="multi-step-flow-footer"]')).toHaveClass(

@@ -45,7 +45,9 @@ export function OriginStep() {
       <div className="grid max-w-xl gap-2">
         <h2 className="text-foreground text-xl font-medium">{t('Choose an origin')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          {t('Select the culture and background that shaped your character.')}
+          {t(
+            'Pick the people and homeland your character comes from. Your origin sets the culture they grew up in and the story behind them.',
+          )}
         </p>
       </div>
 

@@ -223,7 +223,9 @@ export function HindrancesStep() {
       <div className="grid max-w-xl gap-2">
         <h2 className="text-foreground text-xl font-medium">{t('Take hindrances')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          {t('Choose hindrances to earn points for edges, attributes, and skills.')}
+          {t(
+            'Hindrances are flaws, bad habits, or troubles that make your character more interesting to play, such as greed, stubbornness, or poor eyesight. Each one earns points you can spend later on stronger attributes, more skills, or edges. A Minor hindrance is worth 1 point and a Major one 2, up to 4 points in total.',
+          )}
         </p>
       </div>
 

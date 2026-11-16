@@ -97,43 +97,41 @@ const translations: Record<string, string> = {
   'Could not save character:': 'Nie udało się zapisać postaci:',
   Concept: 'Koncepcja',
   'Character concept': 'Koncepcja postaci',
-  'Name your character and capture the idea that will guide the rest of creation.':
-    'Nadaj postaci imię i opisz pomysł, który pokieruje dalszym tworzeniem.',
   'Choose an origin': 'Wybierz pochodzenie',
-  'Select an ancestry and background package, or build a custom origin.':
-    'Wybierz pakiet pochodzenia i tła lub stwórz własne pochodzenie.',
   Hindrances: 'Ułomności',
   'Take hindrances': 'Wybierz ułomności',
-  'Choose hindrances to earn points for edges, attributes, and skills.':
-    'Wybierz ułomności, aby zdobyć punkty na przewagi, atrybuty i umiejętności.',
   Attributes: 'Atrybuty',
   'Assign attributes': 'Rozdziel atrybuty',
-  'Spend points across Agility, Smarts, Spirit, Strength, and Vigor.':
-    'Wydaj punkty na Zręczność, Spryt, Ducha, Siłę i Wigor.',
   Skills: 'Umiejętności',
   'Choose skills': 'Wybierz umiejętności',
-  'Spend skill points and pick the skills your character has trained.':
-    'Wydaj punkty umiejętności i wybierz te, w których postać się szkoliła.',
   Edges: 'Przewagi',
   'Choose edges': 'Wybierz przewagi',
-  'Spend hindrance points to buy edges the current requirements allow.':
-    'Wydaj punkty za ułomności na przewagi, których wymagania spełniasz.',
   Gear: 'Wyposażenie',
   'Purchase gear': 'Kup wyposażenie',
-  'Spend starting funds on weapons, armor, and equipment.':
-    'Wydaj początkowe środki na broń, pancerz i wyposażenie.',
   Summary: 'Podsumowanie',
   'Review your character': 'Sprawdź postać',
-  'Check the finished character before saving it to your roster.':
-    'Sprawdź gotową postać przed zapisaniem jej na liście.',
+  'Decide who your character is. Give them a name and a one-line idea: what they do, what they are like, or what drives them. This step has no rules effects, but it will help you make choices in the steps that follow.':
+    'Zdecyduj, kim jest Twoja postać. Nadaj jej imię i opisz ją jednym zdaniem: czym się zajmuje, jaka jest lub co nią kieruje. Ten krok nie wpływa na zasady, ale ułatwi Ci wybory w kolejnych krokach.',
+  'Pick the people and homeland your character comes from. Your origin sets the culture they grew up in and the story behind them.':
+    'Wybierz lud i krainę, z których pochodzi Twoja postać. Pochodzenie określa kulturę, w której dorastała, i jej historię.',
+  'Hindrances are flaws, bad habits, or troubles that make your character more interesting to play, such as greed, stubbornness, or poor eyesight. Each one earns points you can spend later on stronger attributes, more skills, or edges. A Minor hindrance is worth 1 point and a Major one 2, up to 4 points in total.':
+    'Ułomności to wady, złe nawyki lub kłopoty, dzięki którym postać jest ciekawsza w grze, np. chciwość, upór albo słaby wzrok. Każda daje punkty, które później wydasz na mocniejsze atrybuty, więcej umiejętności lub przewagi. Lekka ułomność jest warta 1 punkt, a poważna 2, łącznie maksymalnie 4 punkty.',
+  "Attributes are your character's natural talents: Agility (speed and coordination), Smarts (knowledge and quick thinking), Spirit (willpower and nerve), Strength (physical power), and Vigor (health and endurance). Each is rated with a die from d4 (weak) to d12 (exceptional); a bigger die means better rolls. Every attribute starts at d4. You have 5 points, and each point raises one attribute by one die size. Unspent hindrance points can buy more.":
+    'Atrybuty to wrodzone zdolności postaci: Zręczność (szybkość i koordynacja), Spryt (wiedza i bystrość), Duch (siła woli i odwaga), Siła (moc fizyczna) i Wigor (zdrowie i wytrzymałość). Każdy jest oceniany kością od d4 (słabo) do d12 (wyjątkowo); większa kość to lepsze rzuty. Każdy atrybut zaczyna od d4. Masz 5 punktów, a każdy podnosi jeden atrybut o jedną kość. Niewydane punkty za ułomności pozwalają kupić więcej.',
+  'Skills are what your character has learned, such as fighting, shooting, sneaking, or persuading. Like attributes, they use dice from d4 to d12. Core skills everyone knows already start at d4; other skills cost a point to learn and stay untrained until you pick them. You have 12 points to spend, and unspent hindrance points can buy more.':
+    'Umiejętności to to, czego postać się nauczyła, np. walka, strzelanie, skradanie się czy przekonywanie. Tak jak atrybuty, korzystają z kości od d4 do d12. Podstawowe umiejętności, które zna każdy, zaczynają od d4; pozostałe kosztują punkt, a dopóki ich nie wybierzesz, postać ich nie zna. Masz 12 punktów do wydania, a niewydane punkty za ułomności pozwalają kupić więcej.',
+  'Edges are special talents, tricks, and advantages that set your character apart, like being unusually lucky, quick, or brave in combat. Each edge costs 2 hindrance points. Some edges need a minimum rank or a certain attribute or skill die; you can only pick those whose requirements you meet.':
+    'Przewagi to wyjątkowe talenty, sztuczki i atuty, które wyróżniają Twoją postać, np. niezwykłe szczęście, szybkość czy odwaga w walce. Każda przewaga kosztuje 2 punkty za ułomności. Niektóre wymagają odpowiedniej rangi albo określonej kości atrybutu lub umiejętności; możesz wybrać tylko te, których wymagania spełniasz.',
+  'Buy the weapons, armor, and supplies your character starts the adventure with. Each item shows its price and rules; you cannot spend more than your starting funds.':
+    'Kup broń, pancerz i zapasy, z którymi postać rozpocznie przygodę. Przy każdym przedmiocie widać cenę i zasady; nie możesz wydać więcej niż początkowe fundusze.',
+  'Look over everything you chose. If something looks wrong, go back to that step and change it. All hindrance points must be spent before you can save the character.':
+    'Przejrzyj wszystkie wybory. Jeśli coś się nie zgadza, wróć do danego kroku i to zmień. Przed zapisaniem postaci musisz wydać wszystkie punkty za ułomności.',
   'Character name': 'Imię postaci',
   'What should we call this legend?': 'Jak nazwiemy tę legendę?',
   'A wandering monster hunter chasing a debt across the frontier.':
     'Wędrowny łowca potworów ścigający dłużnika na pograniczu.',
   'Sketch the idea that will guide the rest of creation.':
     'Opisz pomysł, który pokieruje dalszym tworzeniem postaci.',
-  'Choose the culture and background that shaped your character.':
-    'Wybierz kulturę i tło, które ukształtowały Twoją postać.',
   'Loading origins…': 'Wczytywanie pochodzeń…',
   'Could not load origins. Try again.': 'Nie udało się wczytać pochodzeń. Spróbuj ponownie.',
   'No origins are available.': 'Brak dostępnych pochodzeń.',
@@ -149,19 +147,13 @@ const translations: Record<string, string> = {
   'Loading skills…': 'Wczytywanie umiejętności…',
   'Could not load skills. Try again.': 'Nie udało się wczytać umiejętności. Spróbuj ponownie.',
   'No skills match the search.': 'Żadna umiejętność nie pasuje do wyszukiwania.',
-  'Choose skills to spend your skill points. Hindrance points can buy additional skills after the default pool is spent.':
-    'Wybierz umiejętności, na które wydasz punkty. Punkty za ułomności pozwalają kupować kolejne umiejętności po wykorzystaniu puli podstawowej.',
   'Search edges': 'Szukaj przewag',
   'Loading edges…': 'Wczytywanie przewag…',
   'Could not load edges. Try again.': 'Nie udało się wczytać przewag. Spróbuj ponownie.',
   'Requirements met': 'Wymagania spełnione',
   'Missing requirements': 'Niespełnione wymagania',
-  'Spend hindrance points to buy edges. Each edge costs two hindrance points.':
-    'Wydaj punkty za ułomności na przewagi. Każda przewaga kosztuje dwa punkty.',
   'No edges match the selected filters or search.':
     'Żadna przewaga nie pasuje do filtrów ani wyszukiwania.',
-  'Check every choice before saving this character to your roster.':
-    'Sprawdź wszystkie wybory przed zapisaniem postaci na liście.',
   'None selected.': 'Nic nie wybrano.',
   'No description available.': 'Brak opisu.',
   'All hindrance points have been spent.': 'Wszystkie punkty za ułomności zostały wydane.',
@@ -175,8 +167,6 @@ const translations: Record<string, string> = {
   Spirit: 'Duch',
   Strength: 'Siła',
   Vigor: 'Wigor',
-  'Start each attribute at d4. The total pool is five default points plus available Hindrance points. Once the total pool is spent, only downgrades are allowed.':
-    'Każdy atrybut zaczyna na d4. Pula to pięć punktów podstawowych oraz dostępne punkty za ułomności. Po ich wydaniu można już tylko obniżać kości.',
   Language: 'Język',
   English: 'Angielski',
   Polish: 'Polski',
@@ -225,8 +215,6 @@ const translations: Record<string, string> = {
   'Hindrance points available': 'Dostępne punkty za ułomności',
   'hindrance points available': 'dostępnych punktów za ułomności',
   'Visit the gear shop': 'Odwiedź sklep z wyposażeniem',
-  'Browse the catalog, inspect the rules, and assemble a useful pack without spending more than your starting funds.':
-    'Przeglądaj katalog, sprawdzaj zasady i skompletuj przydatny ekwipunek, nie przekraczając początkowych funduszy.',
   'All gear': 'Cały sprzęt',
   'Search gear': 'Szukaj wyposażenia',
   'Search gear, weapons, armor…': 'Szukaj wyposażenia, broni, pancerza…',

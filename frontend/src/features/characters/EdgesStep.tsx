@@ -284,7 +284,9 @@ export function EdgesStep() {
       <div className="grid max-w-xl gap-2">
         <h2 className="text-foreground text-xl font-medium">{t('Choose edges')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          {t('Spend hindrance points to buy edges. Each edge costs two hindrance points.')}
+          {t(
+            'Edges are special talents, tricks, and advantages that set your character apart, like being unusually lucky, quick, or brave in combat. Each edge costs 2 hindrance points. Some edges need a minimum rank or a certain attribute or skill die; you can only pick those whose requirements you meet.',
+          )}
         </p>
       </div>
 

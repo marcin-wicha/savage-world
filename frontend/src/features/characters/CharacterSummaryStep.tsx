@@ -197,7 +197,9 @@ export function CharacterSummaryStep() {
       <div className="grid max-w-2xl gap-2">
         <h2 className="text-foreground text-xl font-medium">{t('Review your character')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
-          {t('Check every choice before saving this character to your roster.')}
+          {t(
+            'Look over everything you chose. If something looks wrong, go back to that step and change it. All hindrance points must be spent before you can save the character.',
+          )}
         </p>
       </div>
 

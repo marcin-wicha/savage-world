@@ -115,7 +115,7 @@ export function AttributesStep() {
         <h2 className="text-foreground text-xl font-medium">{t('Assign attributes')}</h2>
         <p className="text-muted-foreground text-sm leading-6">
           {t(
-            'Start each attribute at d4. The total pool is five default points plus available Hindrance points. Once the total pool is spent, only downgrades are allowed.',
+            "Attributes are your character's natural talents: Agility (speed and coordination), Smarts (knowledge and quick thinking), Spirit (willpower and nerve), Strength (physical power), and Vigor (health and endurance). Each is rated with a die from d4 (weak) to d12 (exceptional); a bigger die means better rolls. Every attribute starts at d4. You have 5 points, and each point raises one attribute by one die size. Unspent hindrance points can buy more.",
           )}
         </p>
       </div>

@@ -103,49 +103,57 @@ const stepDefinitions: StepDefinition[] = [
     id: 'concept',
     title: 'Concept',
     heading: 'Character concept',
-    description: 'Name your character and capture the idea that will guide the rest of creation.',
+    description:
+      'Decide who your character is. Give them a name and a one-line idea: what they do, what they are like, or what drives them. This step has no rules effects, but it will help you make choices in the steps that follow.',
   },
   {
     id: 'origin',
     title: 'Origin',
     heading: 'Choose an origin',
-    description: 'Select an ancestry and background package, or build a custom origin.',
+    description:
+      'Pick the people and homeland your character comes from. Your origin sets the culture they grew up in and the story behind them.',
   },
   {
     id: 'hindrances',
     title: 'Hindrances',
     heading: 'Take hindrances',
-    description: 'Choose hindrances to earn points for edges, attributes, and skills.',
+    description:
+      'Hindrances are flaws, bad habits, or troubles that make your character more interesting to play, such as greed, stubbornness, or poor eyesight. Each one earns points you can spend later on stronger attributes, more skills, or edges. A Minor hindrance is worth 1 point and a Major one 2, up to 4 points in total.',
   },
   {
     id: 'attributes',
     title: 'Attributes',
     heading: 'Assign attributes',
-    description: 'Spend points across Agility, Smarts, Spirit, Strength, and Vigor.',
+    description:
+      "Attributes are your character's natural talents: Agility (speed and coordination), Smarts (knowledge and quick thinking), Spirit (willpower and nerve), Strength (physical power), and Vigor (health and endurance). Each is rated with a die from d4 (weak) to d12 (exceptional); a bigger die means better rolls. Every attribute starts at d4. You have 5 points, and each point raises one attribute by one die size. Unspent hindrance points can buy more.",
   },
   {
     id: 'skills',
     title: 'Skills',
     heading: 'Choose skills',
-    description: 'Spend skill points and pick the skills your character has trained.',
+    description:
+      'Skills are what your character has learned, such as fighting, shooting, sneaking, or persuading. Like attributes, they use dice from d4 to d12. Core skills everyone knows already start at d4; other skills cost a point to learn and stay untrained until you pick them. You have 12 points to spend, and unspent hindrance points can buy more.',
   },
   {
     id: 'edges',
     title: 'Edges',
     heading: 'Choose edges',
-    description: 'Spend hindrance points to buy edges the current requirements allow.',
+    description:
+      'Edges are special talents, tricks, and advantages that set your character apart, like being unusually lucky, quick, or brave in combat. Each edge costs 2 hindrance points. Some edges need a minimum rank or a certain attribute or skill die; you can only pick those whose requirements you meet.',
   },
   {
     id: 'gear',
     title: 'Gear',
     heading: 'Purchase gear',
-    description: 'Spend starting funds on weapons, armor, and equipment.',
+    description:
+      'Buy the weapons, armor, and supplies your character starts the adventure with. Each item shows its price and rules; you cannot spend more than your starting funds.',
   },
   {
     id: 'summary',
     title: 'Summary',
     heading: 'Review your character',
-    description: 'Check the finished character before saving it to your roster.',
+    description:
+      'Look over everything you chose. If something looks wrong, go back to that step and change it. All hindrance points must be spent before you can save the character.',
   },
 ]
 

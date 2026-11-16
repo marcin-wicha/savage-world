@@ -117,6 +117,11 @@ describe('OriginStep', () => {
     expect(await screen.findByRole('button', { name: 'Wydmiarze' })).toBeInTheDocument()
     expect(
       screen.getByText(
+        'Wybierz lud i krainę, z których pochodzi Twoja postać. Pochodzenie określa kulturę, w której dorastała, i jej historię.',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
         'Przez rozpaloną pustynię w sercu świata nikt nie przejdzie bez Wydmiarzy. Czytają wydmy jak pismo, znajdują wodę tam, gdzie jej nie ma, i od pokoleń prowadzą pielgrzymów Starej Wiary do Iglicy. Nie uprawiają ziemi ani nie hodują bydła — ich stadem są wierni, a swoich ślubów dochowują wierniej niż niejeden rycerz.',
       ),
     ).toBeInTheDocument()

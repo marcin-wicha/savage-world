@@ -430,7 +430,7 @@ export function GearStep() {
         </div>
         <p className="text-muted-foreground text-sm leading-6">
           {t(
-            'Browse the catalog, inspect the rules, and assemble a useful pack without spending more than your starting funds.',
+            'Buy the weapons, armor, and supplies your character starts the adventure with. Each item shows its price and rules; you cannot spend more than your starting funds.',
           )}
         </p>
       </div>
