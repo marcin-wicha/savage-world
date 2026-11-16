@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 
 const AUTH_HINT_COOKIE = 'sw_authenticated'
 const listeners = new Set<() => void>()
+let signedOutByUser = false
 
 function readCookie(name: string): string | null {
   if (typeof document === 'undefined') {
@@ -35,11 +36,17 @@ export function useAuthHint(): boolean {
   return useSyncExternalStore(subscribe, hasAuthHint, () => false)
 }
 
+export function wasSignedOutByUser(): boolean {
+  return signedOutByUser
+}
+
 export function refreshAuthHint(): void {
+  signedOutByUser = false
   emitChange()
 }
 
-export function clearAuthHint(): void {
+export function clearAuthHint(options: { signedOutByUser?: boolean } = {}): void {
+  signedOutByUser = options.signedOutByUser ?? false
   if (typeof document !== 'undefined') {
     document.cookie = `${AUTH_HINT_COOKIE}=; Max-Age=0; path=/; SameSite=Lax`
   }

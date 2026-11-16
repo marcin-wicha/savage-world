@@ -1,11 +1,11 @@
 import { QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createQueryClient } from '@/lib/query-client'
 
-import { clearAuthHint, hasAuthHint } from './auth-hint'
+import { clearAuthHint, hasAuthHint, refreshAuthHint, wasSignedOutByUser } from './auth-hint'
 import { RequireAuth } from './RequireAuth'
 import { useSession } from './use-session'
 
@@ -20,6 +20,12 @@ function setAuthHint() {
   document.cookie = 'sw_authenticated=1; path=/'
 }
 
+function LoginProbe() {
+  const from = (useLocation().state as { from?: string } | null)?.from
+
+  return <h1>Login page{from ? ` (return to ${from})` : ''}</h1>
+}
+
 function renderGuard() {
   const queryClient = createQueryClient()
   queryClient.setQueryData(['characters'], { characters: [{ id: 1, name: 'Old hero' }] })
@@ -28,7 +34,7 @@ function renderGuard() {
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={['/characters']}>
         <Routes>
-          <Route path="/login" element={<h1>Login page</h1>} />
+          <Route path="/login" element={<LoginProbe />} />
           <Route element={<RequireAuth />}>
             <Route path="/characters" element={<h1>Characters page</h1>} />
           </Route>
@@ -104,5 +110,40 @@ describe('RequireAuth', () => {
     expect(await screen.findByRole('heading', { name: /login page/i })).toBeInTheDocument()
     await waitFor(() => expect(hasAuthHint()).toBe(false))
     expect(queryClient.getQueryData(['characters'])).toBeUndefined()
+  })
+
+  describe('return path', () => {
+    beforeEach(() => {
+      useSessionMock.mockReturnValue({
+        data: undefined,
+        isPending: true,
+        isSuccess: false,
+      } as never)
+    })
+
+    it('keeps the requested page when the user was not signed out on purpose', async () => {
+      renderGuard()
+
+      expect(await screen.findByRole('heading', { name: /login page/i })).toHaveTextContent(
+        'Login page (return to /characters)',
+      )
+    })
+
+    it('drops the requested page after an explicit logout', async () => {
+      clearAuthHint({ signedOutByUser: true })
+
+      renderGuard()
+
+      expect(await screen.findByRole('heading', { name: /login page/i })).toHaveTextContent(
+        /^Login page$/,
+      )
+    })
+
+    it('forgets the explicit logout once the user signs in again', () => {
+      clearAuthHint({ signedOutByUser: true })
+      refreshAuthHint()
+
+      expect(wasSignedOutByUser()).toBe(false)
+    })
   })
 })

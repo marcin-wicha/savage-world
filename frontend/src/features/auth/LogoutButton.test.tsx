@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError, api } from '@/lib/api-client'
 import { createQueryClient } from '@/lib/query-client'
 
-import { clearAuthHint, hasAuthHint } from './auth-hint'
+import { clearAuthHint, hasAuthHint, wasSignedOutByUser } from './auth-hint'
 import { LogoutButton } from './LogoutButton'
 import { sessionQueryKey } from './use-session'
 
@@ -67,6 +67,7 @@ describe('LogoutButton', () => {
 
     expect(await screen.findByRole('heading', { name: /login page/i })).toBeInTheDocument()
     expect(hasAuthHint()).toBe(false)
+    expect(wasSignedOutByUser()).toBe(true)
     expect(queryClient.getQueryData(['characters'])).toBeUndefined()
     expect(queryClient.getQueryData(sessionQueryKey)).toEqual({
       user: null,
@@ -97,5 +98,6 @@ describe('LogoutButton', () => {
     })
     expect(screen.queryByRole('heading', { name: /login page/i })).not.toBeInTheDocument()
     expect(hasAuthHint()).toBe(true)
+    expect(wasSignedOutByUser()).toBe(false)
   })
 })

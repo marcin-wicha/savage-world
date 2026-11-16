@@ -20,7 +20,7 @@ export function LogoutButton() {
       user: null,
       csrf_token: current?.csrf_token ?? '',
     }))
-    clearAuthHint()
+    clearAuthHint({ signedOutByUser: true })
     navigate('/login', { replace: true })
   }
 

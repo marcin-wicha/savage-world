@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
-import { clearAuthHint, hasAuthHint } from './auth-hint'
+import { clearAuthHint, hasAuthHint, wasSignedOutByUser } from './auth-hint'
 import { clearAccountQueries, useSession } from './use-session'
 
 export function RequireAuth() {
@@ -20,6 +20,8 @@ export function RequireAuth() {
   }, [signedOut, queryClient])
 
   if (!hinted || signedOut) {
+    if (wasSignedOutByUser()) return <Navigate to="/login" replace />
+
     const from = `${location.pathname}${location.search}${location.hash}`
 
     return <Navigate to="/login" replace state={{ from }} />
