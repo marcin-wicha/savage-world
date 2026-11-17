@@ -43,7 +43,7 @@ combatant (on either side) within the template radius of the target point.
 | Damage | Armor and AP, raise bonus d6, Shaken/Wounds, Shaken twice wounds (except Hardy), Extras out on any wound, Resilient/Very Resilient, Soak rolls (Iron Jaw), Hold the Line |
 | Recovery | Shaken (Spirit, Combat Reflexes, Command, undead/construct bonus, Benny), Stunned (Vigor), Distracted/Vulnerable until the end of the victim's next turn |
 | Incapacitation | Vigor roll with wound penalties (Hard to Kill), Injury Table, Bleeding Out each round, death on critical failure (Harder to Kill) |
-| Bennies | 3 per hero (+Luck/Great Luck), template Bennies for enemy Wild Cards, GM pool of one per hero, used for soaking, recovering, and rerolling attacks (Elan) |
+| Bennies | 3 per hero (+Luck/Great Luck), template Bennies for enemy Wild Cards, GM pool of one per hero, Jokers add more. Wild Cards spend them to soak, recover from Shaken, redraw a low Action Card, and re-roll missed attacks and failed Tests (Elan +2), weak damage (No Mercy +2), Stunned recovery, and incapacitation and bleeding-out rolls. Critical failures are never re-rolled |
 | Morale | Optional setting: when half the enemy Extras are down, the rest roll Spirit or flee |
 
 ## AI
@@ -54,6 +54,11 @@ ranged weapon; otherwise advances and runs to close distance. It uses Sweep when
 several foes are adjacent, Wild Attacks when only one foe threatens it, called
 shots when ordinary damage cannot beat Toughness, and Defend when a badly
 wounded hero is alone without Bennies.
+
+Benny policy: always soak a wound and always re-roll survival rolls; recover
+from Shaken and Stunned when possible; redraw Action Cards of 5 or lower while
+keeping a Benny in reserve; re-roll attacks, damage, and Tests on a Joker turn,
+against a Wild Card one wound from being taken out, or with 3+ Bennies.
 
 ## Not yet simulated
 

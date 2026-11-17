@@ -112,4 +112,31 @@ describe('battle log formatting', () => {
   it('skips events without a description', () => {
     expect(formatEvent(event('benny', { actor: 'character-1' }), names, identity)).toBeNull()
   })
+
+  it('formats Benny redraws and marks re-rolled results', () => {
+    expect(
+      formatEvent(
+        event('initiative_redraw', {
+          actor: 'character-1',
+          from: { label: '3♣' },
+          to: { label: 'Q♥' },
+        }),
+        names,
+        identity,
+      )?.text,
+    ).toBe('Valeria spends a Benny to draw a new card: 3♣ → Q♥.')
+
+    expect(
+      formatEvent(
+        event('bleeding_out', {
+          actor: 'character-1',
+          outcome: 'stabilized',
+          rerolled: true,
+          roll: { die: 'd8', trait: [[9]], wild: [2], modifier: -1, totals: [8] },
+        }),
+        names,
+        identity,
+      )?.detail,
+    ).toBe('d8: 9 · Wild Die: 2 · -1 · = 8 · Benny reroll')
+  })
 })

@@ -61,6 +61,28 @@ RSpec.describe Battles::Engine do
       expect(engine.combatants.first.card).to be_joker
     end
 
+    it "lets a Wild Card spend a Benny to redraw a low card" do
+      engine = with_deck(build_engine([ hero.merge("bennies" => 2), orc ]), card(3), card(10), card(7))
+
+      engine.send(:deal_initiative)
+
+      expect(engine.combatants.first.card.rank).to eq(10)
+      expect(engine.combatants.first.bennies).to eq(1)
+      expect(engine.instance_variable_get(:@log)).to include(hash_including(type: "initiative_redraw", actor: "hero"))
+    end
+
+    it "keeps a low card when Bennies are short or for Extras" do
+      engine = with_deck(build_engine([ hero.merge("bennies" => 1), orc ]), card(3), card(7))
+      engine.send(:deal_initiative)
+      expect(engine.combatants.first.card.rank).to eq(3)
+
+      extra = battle_definition("goblin", side: "enemies", wild_card: false)
+      engine = with_deck(build_engine([ hero, extra ]), card(9), card(2))
+      engine.instance_variable_set(:@gm_bennies, 5)
+      engine.send(:deal_initiative)
+      expect(engine.combatants.last.card.rank).to eq(2)
+    end
+
     it "deals Extras of the same group a single shared card" do
       goblins = (1..3).map { |index| battle_definition("goblin-#{index}", side: "enemies", wild_card: false, group: "goblins") }
       engine = with_deck(build_engine([ hero, *goblins ]), card(5), card(10))
@@ -109,6 +131,19 @@ RSpec.describe Battles::Engine do
 
       expect(actor.shaken).to be(false)
       expect(actor.bennies).to eq(0)
+    end
+
+    it "spends a Benny to re-roll a failed Stunned recovery" do
+      engine = build_engine([ hero.merge("bennies" => 1), orc ], starting_distance: 30)
+      actor = engine.combatants.first
+      actor.stunned = true
+      script_dice(engine, 2, 3, 5, 1, 1)
+
+      engine.send(:take_turn, actor)
+
+      expect(actor.stunned).to be(false)
+      expect(actor.bennies).to eq(0)
+      expect(engine.instance_variable_get(:@log)).to include(hash_including(type: "recover", condition: "stunned", rerolled: true))
     end
 
     it "keeps conditions until the end of the target's next turn" do

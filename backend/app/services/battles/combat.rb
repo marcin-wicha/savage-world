@@ -39,11 +39,9 @@ module Battles
       total_modifier = modifiers.sum(&:last)
 
       roll = dice.trait(die, wild_card: attacker.wild_card?, modifier: total_modifier, count: count)
-      rerolled = false
-      if roll.best < target_number && !roll.critical_failure && @engine.tactics.reroll_attack?(attacker, target) && @engine.spend_benny(attacker)
-        reroll = dice.trait(die, wild_card: attacker.wild_card?, modifier: total_modifier + (attacker.edge?("elan") ? 2 : 0), count: count)
-        rerolled = true
-        roll = reroll if reroll.best > roll.best && !reroll.critical_failure
+      wanted = roll.best < target_number && @engine.tactics.reroll_attack?(attacker, target)
+      roll, rerolled = reroll_if(attacker, roll, wanted) do
+        dice.trait(die, wild_card: attacker.wild_card?, modifier: total_modifier + elan_bonus(attacker), count: count)
       end
 
       hits = roll.critical_failure ? [] : roll.totals.select { |total| total >= target_number }
@@ -117,8 +115,14 @@ module Battles
         return
       end
 
-      roll = dice.trait(attacker.skill_or_unskilled(skill), wild_card: attacker.wild_card?, modifier: base_modifiers(attacker, 0).sum(&:last))
+      skill_die = attacker.skill_or_unskilled(skill)
+      modifier = base_modifiers(attacker, 0).sum(&:last)
+      roll = dice.trait(skill_die, wild_card: attacker.wild_card?, modifier: modifier)
       resist = dice.trait(target.attribute(attribute), wild_card: target.wild_card?, modifier: target.trait_penalty)
+      wanted = (roll.best < 4 || roll.best <= resist.best) && @engine.tactics.reroll_test?(attacker)
+      roll, rerolled = reroll_if(attacker, roll, wanted) do
+        dice.trait(skill_die, wild_card: attacker.wild_card?, modifier: modifier + elan_bonus(attacker))
+      end
       outcome =
         if roll.critical_failure || roll.best < 4 || roll.best <= resist.best
           "failure"
@@ -133,7 +137,7 @@ module Battles
         target.shaken = true if outcome == "raise"
       end
 
-      @engine.emit(:test, actor: attacker.id, target: target.id, skill: skill, roll: roll.as_json, resist: resist.as_json, outcome: outcome)
+      @engine.emit(:test, actor: attacker.id, target: target.id, skill: skill, roll: roll.as_json, resist: resist.as_json, outcome: outcome, rerolled: rerolled)
     end
 
     def damage(attacker, target, weapon, raise:, wild_attack:, called_head:, label: nil)
@@ -145,6 +149,12 @@ module Battles
       modifier += attacker.weapon_modifiers(weapon)["damage"]
       roll = dice.damage(sides, modifier: modifier)
       toughness = target.toughness(weapon.ap) + @engine.toughness_aura(target)
+      rerolled = false
+      if roll.total < toughness + 4 && @engine.tactics.reroll_damage?(attacker, target) && @engine.spend_benny(attacker)
+        rerolled = true
+        reroll = dice.damage(sides, modifier: modifier + (attacker.edge?("no-mercy") ? 2 : 0))
+        roll = reroll if reroll.total > roll.total
+      end
       event = @engine.emit(
         :damage,
         actor: attacker&.id,
@@ -153,7 +163,8 @@ module Battles
         roll: roll.as_json,
         raise_bonus: raise,
         armor_piercing: weapon.ap,
-        toughness: toughness
+        toughness: toughness,
+        rerolled: rerolled
       )
       outcome = apply_damage(target, roll.total, toughness)
       event&.merge!(
@@ -186,8 +197,15 @@ module Battles
       { result: target.incapacitated ? "incapacitated" : "wounded", wounds: remaining }
     end
 
+    def reroll_if(combatant, roll, wanted)
+      return [ roll, false ] if roll.critical_failure || !wanted || !@engine.spend_benny(combatant)
+
+      reroll = yield
+      [ reroll.best > roll.best && !reroll.critical_failure ? reroll : roll, true ]
+    end
+
     def bleed(combatant)
-      roll = dice.trait(combatant.attribute("vigor"), wild_card: combatant.wild_card?, modifier: survival_modifier(combatant))
+      roll, rerolled = survival_roll(combatant)
       outcome =
         if roll.critical_failure || roll.best < 4
           die_or_survive(combatant) ? "dead" : "survived"
@@ -197,10 +215,21 @@ module Battles
         else
           "bleeding"
         end
-      @engine.emit(:bleeding_out, actor: combatant.id, roll: roll.as_json, outcome: outcome)
+      @engine.emit(:bleeding_out, actor: combatant.id, roll: roll.as_json, outcome: outcome, rerolled: rerolled)
     end
 
     private
+
+    def survival_roll(combatant)
+      roll_vigor = -> { dice.trait(combatant.attribute("vigor"), wild_card: combatant.wild_card?, modifier: survival_modifier(combatant)) }
+      roll = roll_vigor.call
+      wanted = roll.best < 4 && @engine.tactics.reroll_survival?(combatant)
+      reroll_if(combatant, roll, wanted) { roll_vigor.call }
+    end
+
+    def elan_bonus(combatant)
+      combatant.edge?("elan") ? 2 : 0
+    end
 
     def attack_skill(weapon, mode)
       return "fighting" if mode == :melee
@@ -350,7 +379,7 @@ module Battles
         return
       end
 
-      roll = dice.trait(target.attribute("vigor"), wild_card: true, modifier: survival_modifier(target))
+      roll, rerolled = survival_roll(target)
       outcome =
         if roll.critical_failure
           die_or_survive(target) ? "dead" : "bleeding_out"
@@ -362,7 +391,7 @@ module Battles
       target.bleeding_out = true if outcome == "bleeding_out"
       injury = outcome == "dead" ? nil : roll_injury
       target.injuries << injury if injury
-      @engine.emit(:incapacitated, actor: target.id, roll: roll.as_json, outcome: outcome, injury: injury)
+      @engine.emit(:incapacitated, actor: target.id, roll: roll.as_json, outcome: outcome, injury: injury, rerolled: rerolled)
       @engine.after_incapacitation(target)
     end
 

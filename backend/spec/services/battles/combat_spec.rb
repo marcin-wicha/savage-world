@@ -181,4 +181,79 @@ RSpec.describe Battles::Combat do
       expect(foe.dead).to be(true)
     end
   end
+
+  describe "Benny re-rolls" do
+    let(:attacker) { battle_definition("attacker", edges: [ "no-mercy" ]) }
+
+    def log_event(type)
+      engine.instance_variable_get(:@log).find { |event| event[:type] == type }
+    end
+
+    it "re-rolls weak damage with the No Mercy bonus" do
+      hero.bennies = 3
+      script_dice(engine, 2, 1, 5, 4)
+
+      engine.combat.damage(hero, foe, hero.weapons.first, raise: false, wild_attack: false, called_head: false)
+
+      expect(log_event("damage")).to include(rerolled: true, roll: hash_including(total: 11, modifier: 2))
+      expect(hero.bennies).to eq(2)
+      expect(foe.wounds).to eq(1)
+    end
+
+    it "does not re-roll without Bennies" do
+      script_dice(engine, 2, 1)
+
+      engine.combat.damage(hero, foe, hero.weapons.first, raise: false, wild_attack: false, called_head: false)
+
+      expect(log_event("damage")).to include(rerolled: false)
+    end
+
+    it "re-rolls a failed Test" do
+      bully = build_engine([ battle_definition("bully", skills: { "intimidation" => "d8" }, bennies: 3), defender ])
+      actor, target = bully.combatants
+      script_dice(bully, 2, 1, 3, 2, 8, 4, 1)
+
+      bully.combat.test(actor, target, "intimidation")
+
+      expect(target).to be_vulnerable
+      expect(target.shaken).to be(true)
+      expect(actor.bennies).to eq(2)
+    end
+
+    it "re-rolls a failed incapacitation roll" do
+      foe.wounds = 3
+      foe.bennies = 1
+      script_dice(engine, 2, 3, 6, 2, 1, 3, 4, 1)
+
+      engine.combat.send(:incapacitate, foe)
+
+      expect(log_event("incapacitated")).to include(outcome: "injured", rerolled: true)
+      expect(foe.bleeding_out).to be(false)
+      expect(foe.bennies).to eq(0)
+    end
+
+    it "never re-rolls a critical failure" do
+      foe.wounds = 3
+      foe.bennies = 1
+      script_dice(engine, 1, 1)
+
+      engine.combat.send(:incapacitate, foe)
+
+      expect(foe.dead).to be(true)
+      expect(foe.bennies).to eq(1)
+    end
+
+    it "re-rolls a failed bleeding out roll" do
+      foe.wounds = 3
+      foe.incapacitated = true
+      foe.bleeding_out = true
+      foe.bennies = 1
+      script_dice(engine, 2, 3, 6, 6, 2, 1)
+
+      engine.combat.bleed(foe)
+
+      expect(log_event("bleeding_out")).to include(outcome: "stabilized", rerolled: true)
+      expect(foe.dead).to be(false)
+    end
+  end
 end

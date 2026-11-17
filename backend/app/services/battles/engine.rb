@@ -189,6 +189,7 @@ module Battles
       groups = combatants.select(&:active?).group_by(&:group).values
       dealt = groups.map do |members|
         card = draw_card(members.first)
+        card = benny_redraw(members.first, card) if members.length == 1
         members.each { |member| member.card = card }
         award_joker_bennies(members.first) if card.joker?
         [ card, members ]
@@ -209,6 +210,14 @@ module Battles
       end
 
       cards.max
+    end
+
+    def benny_redraw(combatant, card)
+      return card unless tactics.redraw_initiative?(combatant, card) && spend_benny(combatant)
+
+      new_card = @deck.deal
+      emit(:initiative_redraw, actor: combatant.id, from: card.as_json, to: new_card.as_json)
+      [ card, new_card ].max
     end
 
     def quick_draw(combatant)
@@ -246,7 +255,9 @@ module Battles
 
     def recover(combatant)
       if combatant.stunned
-        roll = dice.trait(combatant.attribute("vigor"), wild_card: combatant.wild_card?, modifier: recovery_bonus(combatant) + combatant.trait_penalty)
+        roll_vigor = -> { dice.trait(combatant.attribute("vigor"), wild_card: combatant.wild_card?, modifier: recovery_bonus(combatant) + combatant.trait_penalty) }
+        roll = roll_vigor.call
+        roll, rerolled = combat.reroll_if(combatant, roll, roll.best < 4 && tactics.reroll_recovery?(combatant)) { roll_vigor.call }
         if roll.best >= 4 && !roll.critical_failure
           combatant.stunned = false
           if roll.best >= 8
@@ -254,7 +265,7 @@ module Battles
             combatant.vulnerable = 0
           end
         end
-        emit(:recover, actor: combatant.id, condition: "stunned", roll: roll.as_json, recovered: !combatant.stunned)
+        emit(:recover, actor: combatant.id, condition: "stunned", roll: roll.as_json, recovered: !combatant.stunned, rerolled: rerolled)
         return false if combatant.stunned
       end
 

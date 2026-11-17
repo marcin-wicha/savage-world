@@ -919,6 +919,8 @@ const translations: Record<string, string> = {
   wounds: 'rany',
   'raise bonus d6': 'premia za przebicie d6',
   'The battle begins.': 'Bitwa się rozpoczyna.',
+  '{actor} spends a Benny to draw a new card: {from} → {to}.':
+    '{actor} wydaje Fuksa na nową kartę: {from} → {to}.',
   '{actor} draws a Joker and every hero gains a Benny.':
     '{actor} dobiera Jokera i każdy bohater otrzymuje Fuksa.',
   '{actor} draws a Joker and the GM gains a Benny.': '{actor} dobiera Jokera i MG otrzymuje Fuksa.',

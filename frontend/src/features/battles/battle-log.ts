@@ -132,6 +132,20 @@ export function formatEvent(
   names: Record<string, string>,
   t: Translate,
 ): FormattedEvent | null {
+  const formatted = describeEvent(event, names, t)
+  if (!formatted || event.type === 'attack' || event.rerolled !== true) return formatted
+
+  return {
+    ...formatted,
+    detail: [formatted.detail, t('Benny reroll')].filter(Boolean).join(' · '),
+  }
+}
+
+function describeEvent(
+  event: BattleEvent,
+  names: Record<string, string>,
+  t: Translate,
+): FormattedEvent | null {
   const name = (key: string) => names[text(event[key])] ?? text(event[key])
   const say = (template: string, values: Record<string, string | number> = {}) =>
     fill(t(template), { actor: name('actor'), target: name('target'), ...values })
@@ -159,6 +173,18 @@ export function formatEvent(
         ),
         emphasis: 'outcome',
       }
+    case 'initiative_redraw': {
+      const label = (value: unknown) => {
+        const card = value as { label?: string } | null
+        return card?.label === 'Joker' ? t('Joker') : (card?.label ?? '')
+      }
+      return {
+        text: say('{actor} spends a Benny to draw a new card: {from} → {to}.', {
+          from: label(event.from),
+          to: label(event.to),
+        }),
+      }
+    }
     case 'quick_redraw':
       return { text: say('{actor} redraws a low card (Quick).') }
     case 'turn_start':

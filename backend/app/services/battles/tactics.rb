@@ -29,6 +29,27 @@ module Battles
       @engine.bennies_available(attacker) >= 3
     end
 
+    alias reroll_damage? reroll_attack?
+
+    def reroll_test?(attacker)
+      return false unless attacker.wild_card? && @engine.bennies_available(attacker).positive?
+
+      attacker.card&.joker? || @engine.bennies_available(attacker) >= 3
+    end
+
+    def redraw_initiative?(combatant, card)
+      return false unless combatant.wild_card? && !card.joker? && card.rank <= 5
+      return false if combatant.edge?("quick")
+
+      @engine.bennies_available(combatant) >= 2
+    end
+
+    def reroll_recovery?(combatant)
+      combatant.wild_card? && @engine.bennies_available(combatant).positive?
+    end
+
+    alias reroll_survival? reroll_recovery?
+
     def soak?(target, wounds)
       return false unless @engine.bennies_available(target).positive?
       return true if target.wild_card?
