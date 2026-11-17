@@ -3,6 +3,7 @@ class Party < ApplicationRecord
 
   has_many :party_memberships, dependent: :destroy
   has_many :characters, through: :party_memberships
+  has_many :battles, dependent: :destroy
 
   has_secure_token :invite_code
 

@@ -2,7 +2,7 @@ module Api
   module V1
     class CharactersController < ApplicationController
       def index
-        characters = Current.user.characters.includes(:origin, :edges, :hindrances, character_skills: :skill).order(updated_at: :desc, id: :desc)
+        characters = Current.user.characters.includes(:origin, :edges, :hindrances, character_skills: :skill, character_gears: :gear).order(updated_at: :desc, id: :desc)
         render json: {
           characters: characters.map do |character|
             character_payload(character)
@@ -74,6 +74,8 @@ module Api
           edge_ids: [],
           hindrance_ids: [],
           skill_ids: [],
+          equipped_gear_ids: [],
+          gear: {},
           attributes: {},
           skill_dice: {},
           hindrance_severities: {}
@@ -81,6 +83,7 @@ module Api
       end
 
       def character_payload(character)
+        effective_traits = Characters::EffectiveTraits.new(character).as_json
         {
           id: character.id,
           name: character.name,
@@ -103,7 +106,19 @@ module Api
           skill_dice: character.character_skills.each_with_object({}) do |selection, dice|
             dice[selection.skill_id] = selection.die
           end,
-          effective_traits: Characters::EffectiveTraits.new(character).as_json
+          gear: character.character_gears.sort_by(&:gear_id).map do |selection|
+            profile = selection.combat_profile
+            {
+              gear_id: selection.gear_id,
+              name: selection.gear.name,
+              category: selection.gear.category,
+              quantity: selection.quantity,
+              equipped: selection.equipped,
+              combat: profile.combat? ? profile.as_json : nil
+            }
+          end,
+          effective_traits: effective_traits,
+          derived: Characters::DerivedStats.new(character, effective_traits: effective_traits).as_json
         }
       end
     end

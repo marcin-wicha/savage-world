@@ -6,6 +6,9 @@ import { RequireAdmin } from '@/features/auth/RequireAdmin'
 import { RequireAuth } from '@/features/auth/RequireAuth'
 import { AdminEditorRoute } from '@/features/admin/AdminEditorRoute'
 import { AdminApprovalsRoute } from '@/features/admin/AdminApprovalsRoute'
+import { BattleRoute } from '@/features/battles/BattleRoute'
+import { NewBattleRoute } from '@/features/battles/NewBattleRoute'
+import { BestiaryRoute } from '@/features/bestiary/BestiaryRoute'
 import { CharactersRoute } from '@/features/characters/CharactersRoute'
 import { CharacterSheetRoute } from '@/features/characters/CharacterSheetRoute'
 import { NewCharacterRoute } from '@/features/characters/NewCharacterRoute'
@@ -35,6 +38,9 @@ export const router = createBrowserRouter([
           { path: 'parties', element: <PartiesRoute /> },
           { path: 'parties/join/:code', element: <JoinPartyRoute /> },
           { path: 'parties/:id', element: <PartyRoute /> },
+          { path: 'parties/:id/battles/new', element: <NewBattleRoute /> },
+          { path: 'battles/:id', element: <BattleRoute /> },
+          { path: 'bestiary', element: <BestiaryRoute /> },
           {
             element: <RequireAdmin />,
             children: [

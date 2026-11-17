@@ -23,6 +23,7 @@ module Characters
       return false if errors.any?
 
       prepare_skill_dice
+      prepare_gear
       return false if errors.any?
 
       Character.transaction do
@@ -32,6 +33,7 @@ module Characters
         character.save!
         apply_selections
         apply_skill_dice
+        apply_gear
       end
 
       true
@@ -92,6 +94,47 @@ module Characters
 
         @skill_dice[id] = die
       end
+    end
+
+    def prepare_gear
+      if @attributes.key?(:gear)
+        @gear = normalize_gear(@attributes[:gear])
+        return if errors.key?(:gear)
+      end
+
+      return unless @attributes.key?(:equipped_gear_ids)
+
+      ids, invalid = normalize_ids(@attributes[:equipped_gear_ids])
+      owned_ids = @gear ? @gear.keys : character.character_gears.map(&:gear_id)
+      if invalid.any? || (ids - owned_ids).any?
+        errors[:equipped_gear_ids] = [ "may only include owned gear ids" ]
+        return
+      end
+
+      @equipped_gear_ids = ids
+    end
+
+    def normalize_gear(value)
+      unless value.is_a?(Hash)
+        errors[:gear] = [ "must be an object keyed by gear id" ]
+        return nil
+      end
+
+      gear = {}
+      value.each do |raw_id, raw_quantity|
+        id = Integer(raw_id.to_s, 10, exception: false)
+        quantity = Integer(raw_quantity.to_s, 10, exception: false)
+        unless id && quantity&.between?(1, 99)
+          errors[:gear] = [ "must map gear ids to quantities between 1 and 99" ]
+          return nil
+        end
+
+        gear[id] = quantity
+      end
+
+      missing = gear.keys - Gear.where(id: gear.keys, hidden: false).pluck(:id)
+      errors[:gear] = [ "contains unknown ids: #{missing.join(', ')}" ] if missing.any?
+      gear
     end
 
     def prepare_origin
@@ -186,6 +229,26 @@ module Characters
         selection.die = @skill_dice&.fetch(selection.skill_id, nil) || default_die(selection.skill)
         selection.save!
       end
+    end
+
+    def apply_gear
+      return unless @gear || @equipped_gear_ids
+
+      if @gear
+        character.character_gears.where.not(gear_id: @gear.keys).destroy_all
+        existing = character.character_gears.index_by(&:gear_id)
+        @gear.each do |gear_id, quantity|
+          selection = existing[gear_id] || character.character_gears.build(gear_id: gear_id)
+          selection.quantity = quantity
+          selection.equipped = @equipped_gear_ids.include?(gear_id) if @equipped_gear_ids
+          selection.save!
+        end
+      else
+        character.character_gears.each do |selection|
+          selection.update!(equipped: @equipped_gear_ids.include?(selection.gear_id))
+        end
+      end
+      character.character_gears.reset
     end
 
     def default_die(skill)

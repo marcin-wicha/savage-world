@@ -13,6 +13,9 @@ class Character < ApplicationRecord
   has_many :character_skills, dependent: :destroy
   has_many :skills, through: :character_skills
 
+  has_many :character_gears, dependent: :destroy
+  has_many :gears, through: :character_gears
+
   has_many :party_memberships, dependent: :destroy
   has_many :parties, through: :party_memberships
 

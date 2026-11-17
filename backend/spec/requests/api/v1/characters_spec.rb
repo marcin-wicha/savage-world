@@ -452,4 +452,34 @@ RSpec.describe "Characters", type: :request do
       expect(Character.count).to eq(0)
     end
   end
+
+  describe "character gear" do
+    it "saves equipped gear and returns derived statistics" do
+      armor = create(:gear, name: "Leather", category: "armor", effects: { "armor" => 2 })
+      sword = create(:gear, name: "Sword", category: "melee_weapon", effects: { "damage" => "Str+d8" })
+
+      put_character(character_id, {
+        name: "Armored",
+        rank: "novice",
+        attributes: { agility: "d4", smarts: "d4", spirit: "d4", strength: "d4", vigor: "d6" },
+        gear: { armor.id.to_s => 1, sword.id.to_s => 1 },
+        equipped_gear_ids: [ armor.id ]
+      })
+
+      expect(response).to have_http_status(:created)
+      expect(json.dig("character", "gear")).to contain_exactly(
+        hash_including("gear_id" => armor.id, "name" => "Leather", "quantity" => 1, "equipped" => true),
+        hash_including("gear_id" => sword.id, "equipped" => false, "combat" => hash_including("skill" => "fighting"))
+      )
+      expect(json.dig("character", "derived", "toughness")).to include("value" => 7, "armor" => 2)
+      expect(json.dig("character", "derived", "pace", "value")).to eq(6)
+    end
+
+    it "rejects unknown gear ids" do
+      put_character(character_id, { name: "Broke", gear: { "999999" => 1 } })
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "gear")).to be_present
+    end
+  end
 end

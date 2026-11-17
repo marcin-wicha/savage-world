@@ -85,6 +85,11 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
 - Authenticated REST party management under `/api/v1/parties` and
   `/api/v1/party_invites`: leaders invite characters with a shareable code and
   approve join requests; participants can only leave.
+- Character gear persistence (`character_gears`) and server-side derived
+  statistics (`Characters::DerivedStats`: Pace, Parry, Toughness with armor).
+- An owner-scoped bestiary of enemy stat blocks at `/api/v1/enemy_templates`.
+- A fully automated SWADE battle simulator under `/api/v1/parties/:id/battles`
+  and `/api/v1/battles/:id`; see `docs/battle-simulator.md` for rules coverage.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
 - React 19/Vite frontend with TanStack Query, a fetch-based REST/GraphQL client,
   generated GraphQL operation types, shadcn/ui primitives, and Storybook.
@@ -98,7 +103,8 @@ Current gaps, intentionally left for later feature work:
 - The SWADE character domain is still partial: characters persist attribute
   dice, selected edges/hindrances/skills, and skill dice; supported Edge effects
   are applied to effective traits for the character API and creation summary.
-  Character-owned powers, advances, and gear are not implemented; the Power
+  Characters own gear with quantities and equipped flags. Character-owned
+  powers and advances are not implemented; the Power
   reference catalog is available through a paginated GraphQL query.
 - There is no GraphQL API for characters yet.
 - `Origin` currently has only `id`, `created_at`, and `updated_at`.
@@ -278,7 +284,8 @@ both in the same change when committing.
   Keep seed data idempotent.
 - Current tables are `users`, `sessions`, `characters`, `character_edges`,
   `character_hindrances`, `character_skills`, `origins`, `edges`, `hindrances`,
-  `skills`, `gears`, `powers`, `parties`, and `party_memberships`.
+  `skills`, `gears`, `powers`, `parties`, `party_memberships`,
+  `character_gears`, `enemy_templates`, and `battles`.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
@@ -292,6 +299,16 @@ both in the same change when committing.
   and characters with a `pending`/`accepted` status and a unique
   party/character pair. A character may belong to many parties. Deleting a
   party, its leader, or a character removes the related memberships.
+- `character_gears` joins characters and gear with a 1–99 `quantity` and an
+  `equipped` flag; equipped weapons, armor, and shields feed derived stats and
+  battles. `Gears::CombatProfile` parses the documented combat keys in gear
+  `effects` (see `db/data/gear/README.md`).
+- `enemy_templates` belongs to `users` and stores a stat block: Wild Card flag,
+  JSONB `attribute_dice` and `skills` (dice such as `d12+2`), Pace, Parry,
+  Toughness (including armor), armor, Size, Bennies, JSONB `weapons`,
+  `edge_slugs`, and `abilities` (validated by `EnemyTemplates::Validator`).
+- `battles` belongs to a party and its creating user and stores the seed, run
+  count, settings, roster snapshot, summary, first-run log, and final state.
 - `origins` is still a skeleton table with timestamps only.
 - `edges` stores mechanical reference data: name, unique slug, category,
   minimum rank, JSONB requirements and validated JSONB effects, source book/page,
@@ -347,6 +364,9 @@ Routes are defined in `backend/config/routes.rb`:
   create, `200` on update, `401` unauthenticated, `403` for another user's
   character, and `422` for validation or reference errors. Omitted selection
   arrays are left unchanged; provided arrays replace the selection.
+  `gear` (`{ "<gear_id>": quantity }`) and `equipped_gear_ids` follow the same
+  rule. Character payloads include `gear` (with each item's combat profile) and
+  server-calculated `derived` Pace, Parry, and Toughness.
 - Parties (all authenticated; payloads never expose other users' emails and
   use `led_by_me`/`owned_by_me` flags instead):
   - `GET /api/v1/parties` — parties the user leads or has a character in
@@ -370,6 +390,18 @@ Routes are defined in `backend/config/routes.rb`:
   - `PATCH /api/v1/parties/:party_id/memberships/:id/accept` — leader only.
   - `DELETE /api/v1/parties/:party_id/memberships/:id` — the leader (reject or
     remove) or the character's owner (leave or cancel a request).
+- Enemy templates (authenticated, owner only): `GET`/`POST
+  /api/v1/enemy_templates`, `GET`/`PATCH`/`DELETE /api/v1/enemy_templates/:id`.
+  `POST` defaults Wild Card Bennies to 2. Another user's template returns `403`.
+- Battles (authenticated; leader or accepted participant of the party):
+  - `GET /api/v1/parties/:party_id/battles` — up to 50 recent battles without logs.
+  - `POST /api/v1/parties/:party_id/battles` —
+    `{ "battle": { "enemies": [{ "enemy_template_id": 1, "count": 3 }], "runs": 50, "seed": 42, "settings": { "starting_distance": 12, "illumination": "bright", "cover": "none", "max_rounds": 20, "morale": false } } }`.
+    Runs the simulation synchronously and returns `201` with the summary and
+    first-run log. `422` for invalid input, no accepted characters, or more than
+    30 combatants; `403` for non-members or another user's templates.
+  - `GET /api/v1/battles/:id` — full result including the log and `can_delete`.
+  - `DELETE /api/v1/battles/:id` — the battle's creator or the party leader.
 - `POST /api/v1/issue_reports` — authenticated; JSON body:
   `{ "issue_report": { "title": "...", "description": "...", "page_url": "/characters/new", "language": "en", "viewport": "1280x720", "user_agent": "..." } }`.
   Creates a GitHub issue through `IssueReports::Create` and returns `201` with
@@ -422,7 +454,9 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   participant views; scope lists led/joined parties) and
   `PartyMembershipPolicy` (owner joins and leaves; leader accepts and removes)
   guard parties. Multi-step party rules live in `Parties::Join` and
-  `Parties::TransferLeadership`.
+  `Parties::TransferLeadership`. `EnemyTemplatePolicy` limits templates to their
+  owner, and `BattlePolicy` lets party leaders and accepted participants run and
+  view battles while only the creator or leader may delete them.
 
 ### GraphQL
 

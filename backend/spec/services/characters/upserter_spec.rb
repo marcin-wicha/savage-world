@@ -179,4 +179,68 @@ RSpec.describe Characters::Upserter do
     expect(upserter.errors[:name]).to be_present
     expect(character).not_to be_persisted
   end
+
+  describe "gear" do
+    let(:character) { create(:character, user: user) }
+    let(:sword) { create(:gear, category: "melee_weapon", effects: { "damage" => "Str+d8" }) }
+    let(:armor) { create(:gear, category: "armor", effects: { "armor" => 2 }) }
+
+    def upsert(attributes)
+      described_class.new(character: character, attributes: attributes).tap(&:call)
+    end
+
+    it "stores gear quantities and equipped items" do
+      upserter = upsert(gear: { sword.id.to_s => 1, armor.id.to_s => 2 }, equipped_gear_ids: [ sword.id ])
+
+      expect(upserter.errors).to be_empty
+      expect(character.character_gears.order(:gear_id).pluck(:gear_id, :quantity, :equipped)).to eq(
+        [ [ sword.id, 1, true ], [ armor.id, 2, false ] ]
+      )
+    end
+
+    it "replaces gear and keeps equipped flags for retained items" do
+      create(:character_gear, character: character, gear: sword, equipped: true)
+      create(:character_gear, character: character, gear: armor)
+
+      upsert(gear: { sword.id.to_s => 3 })
+
+      expect(character.character_gears.reload.pluck(:gear_id, :quantity, :equipped)).to eq([ [ sword.id, 3, true ] ])
+    end
+
+    it "updates equipped flags without replacing gear" do
+      create(:character_gear, character: character, gear: sword, equipped: true)
+      create(:character_gear, character: character, gear: armor)
+
+      upsert(equipped_gear_ids: [ armor.id ])
+
+      expect(character.character_gears.reload.order(:gear_id).pluck(:equipped)).to eq([ false, true ])
+    end
+
+    it "leaves gear unchanged when omitted" do
+      create(:character_gear, character: character, gear: sword)
+
+      upsert(name: "Renamed")
+
+      expect(character.character_gears.reload.pluck(:gear_id)).to eq([ sword.id ])
+    end
+
+    it "rejects unknown or hidden gear" do
+      hidden = create(:gear, hidden: true)
+      upserter = upsert(gear: { hidden.id.to_s => 1, "999999" => 1 })
+
+      expect(upserter.errors[:gear].first).to include("unknown ids")
+      expect(character.character_gears).to be_empty
+    end
+
+    it "rejects invalid quantities" do
+      expect(upsert(gear: { sword.id.to_s => 0 }).errors[:gear]).to be_present
+      expect(upsert(gear: [ sword.id ]).errors[:gear]).to be_present
+    end
+
+    it "rejects equipping gear the character does not own" do
+      upserter = upsert(gear: { sword.id.to_s => 1 }, equipped_gear_ids: [ armor.id ])
+
+      expect(upserter.errors[:equipped_gear_ids]).to eq([ "may only include owned gear ids" ])
+    end
+  end
 end

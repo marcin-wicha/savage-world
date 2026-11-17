@@ -4,6 +4,8 @@ import { Link, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useRestQuery } from '@/lib/queries'
 
+import { formatDamage, type DamageExpression } from './gear-format'
+
 const rankLabels: Record<string, string> = {
   novice: 'Novice',
   seasoned: 'Seasoned',
@@ -22,6 +24,19 @@ const attributeLabels = {
 
 type SheetSkill = { id: number; name: string; attribute: string; die: string }
 type SheetItem = { id: number; name: string }
+type SheetGear = {
+  gear_id: number
+  name: string
+  quantity: number
+  equipped: boolean
+  combat: {
+    damage: DamageExpression | null
+    range: number[] | null
+    rof: number
+    ap: number
+  } | null
+}
+type DerivedValue = { value: number; armor?: number }
 type CharacterSheet = {
   id: number
   name: string
@@ -31,6 +46,8 @@ type CharacterSheet = {
   skills: SheetSkill[]
   edges: SheetItem[]
   hindrances: SheetItem[]
+  gear?: SheetGear[]
+  derived?: { pace: DerivedValue; parry: DerivedValue; toughness: DerivedValue }
 }
 type CharacterResponse = { character: CharacterSheet }
 
@@ -75,7 +92,12 @@ export function CharacterSheetRoute() {
   }
 
   const vigor = Number(character.attributes.vigor.slice(1))
-  const toughness = 2 + vigor / 2
+  const derived = character.derived
+  const toughness = derived
+    ? `${derived.toughness.value}${derived.toughness.armor ? ` (${derived.toughness.armor})` : ''}`
+    : `${2 + vigor / 2}`
+  const gear = character.gear ?? []
+  const weapons = gear.filter((item) => item.equipped && item.combat?.damage)
   const skills = [...character.skills].sort((a, b) => a.name.localeCompare(b.name))
 
   return (
@@ -139,9 +161,9 @@ export function CharacterSheetRoute() {
             </SheetSection>
             <SheetSection title="Stats">
               <div className="grid grid-cols-3 gap-1 text-center">
-                <StatBox label="Pace" value="6" />
-                <StatBox label="Parry" value="2" />
-                <StatBox label="Toughness" value={`${toughness}`} />
+                <StatBox label="Pace" value={`${derived?.pace.value ?? 6}`} />
+                <StatBox label="Parry" value={`${derived?.parry.value ?? 2}`} />
+                <StatBox label="Toughness" value={toughness} />
               </div>
               <div className="mt-2 grid grid-cols-3 gap-1 text-center">
                 <StatBox label="Bennies" value="○ ○ ○" />
@@ -174,7 +196,19 @@ export function CharacterSheetRoute() {
               <NameList items={character.edges} emptyLines={4} />
             </SheetSection>
             <SheetSection title="Gear & Equipment">
-              <BlankLines count={4} />
+              {gear.length ? (
+                <ul className="grid gap-1">
+                  {gear.map((item) => (
+                    <li key={item.gear_id} className="sheet-list-row">
+                      {item.name}
+                      {item.quantity > 1 ? ` ×${item.quantity}` : ''}
+                      {item.equipped ? ' (equipped)' : ''}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <BlankLines count={4} />
+              )}
             </SheetSection>
           </div>
 
@@ -186,7 +220,18 @@ export function CharacterSheetRoute() {
                 <span>Damage</span>
                 <span>RoF</span>
               </div>
-              <BlankLines count={4} />
+              {weapons.map((item) => (
+                <div key={item.gear_id} className="sheet-table-head font-normal">
+                  <span>{item.name}</span>
+                  <span>{item.combat?.range ? item.combat.range.join('/') : 'Melee'}</span>
+                  <span>
+                    {item.combat?.damage ? formatDamage(item.combat.damage) : ''}
+                    {item.combat?.ap ? ` AP ${item.combat.ap}` : ''}
+                  </span>
+                  <span>{item.combat?.range ? item.combat.rof : '—'}</span>
+                </div>
+              ))}
+              <BlankLines count={Math.max(0, 4 - weapons.length)} />
             </SheetSection>
             <SheetSection title="Powers">
               <BlankLines count={4} />

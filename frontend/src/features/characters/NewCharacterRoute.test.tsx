@@ -222,6 +222,8 @@ describe('NewCharacterRoute', () => {
         hindrance_severities: {},
         hindrance_points_earned: 0,
         hindrance_points_spent: 0,
+        gear: {},
+        equipped_gear_ids: [],
       },
     })
     expect(screen.getByRole('heading', { name: /characters page/i })).toBeInTheDocument()

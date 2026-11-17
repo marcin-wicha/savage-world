@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Coins, Minus, PackageOpen, Plus, Search, ShoppingBag, Trash2 } from 'lucide-react'
+import { Coins, Minus, PackageOpen, Plus, Search, Shield, ShoppingBag, Trash2 } from 'lucide-react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { AutocompleteInput } from '@/components/autocomplete-input'
@@ -50,6 +50,14 @@ const categoryLabels: Record<GearCategory, string> = {
   siege_engine: 'Siege engines',
   travel: 'Travel',
 }
+
+const equippableCategories = new Set<GearCategory>([
+  'melee_weapon',
+  'ranged_weapon',
+  'black_powder_weapon',
+  'armor',
+  'shield',
+])
 
 const categoryOrder: GearCategory[] = [
   'general',
@@ -339,6 +347,7 @@ export function GearStep() {
   const form = useFormContext<CharacterFormValues>()
   const quantities = useWatch({ control: form.control, name: 'gear' }) ?? {}
   const gearNames = useWatch({ control: form.control, name: 'gear_names' }) ?? {}
+  const equippedGear = useWatch({ control: form.control, name: 'equipped_gear' }) ?? []
   const [category, setCategory] = useState<GearCategoryFilter>(allCategories)
   const [search, setSearch] = useState('')
   const [visibleCount, setVisibleCount] = useState(12)
@@ -405,6 +414,21 @@ export function GearStep() {
 
     form.setValue('gear', nextQuantities, { shouldDirty: true, shouldTouch: true })
     form.setValue('gear_names', nextNames, { shouldDirty: true, shouldTouch: true })
+    if (quantity <= 0 && equippedGear.includes(item.id)) {
+      form.setValue(
+        'equipped_gear',
+        equippedGear.filter((id) => id !== item.id),
+        { shouldDirty: true },
+      )
+    }
+  }
+
+  const toggleEquipped = (item: GearItem) => {
+    const nextEquipped = equippedGear.includes(item.id)
+      ? equippedGear.filter((id) => id !== item.id)
+      : [...equippedGear, item.id]
+
+    form.setValue('equipped_gear', nextEquipped, { shouldDirty: true })
   }
 
   const addItem = (item: GearItem) => {
@@ -632,6 +656,19 @@ export function GearStep() {
                           {formatMoney((item.cost ?? 0) * quantity)}
                         </p>
                       </div>
+                      {equippableCategories.has(item.category) ? (
+                        <Button
+                          type="button"
+                          variant={equippedGear.includes(item.id) ? 'default' : 'outline'}
+                          size="xs"
+                          aria-pressed={equippedGear.includes(item.id)}
+                          aria-label={`${t('Equip')} ${t(item.name)}`}
+                          onClick={() => toggleEquipped(item)}
+                        >
+                          <Shield aria-hidden="true" />
+                          {equippedGear.includes(item.id) ? t('Equipped') : t('Equip')}
+                        </Button>
+                      ) : null}
                       <Button
                         type="button"
                         variant="outline"

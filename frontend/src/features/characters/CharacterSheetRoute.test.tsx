@@ -59,6 +59,49 @@ describe('CharacterSheetRoute', () => {
     expect(apiGetMock).toHaveBeenCalledWith('/api/v1/characters/12', expect.any(Object))
   })
 
+  it('shows server derived statistics and equipped weapons', async () => {
+    apiGetMock.mockResolvedValue({
+      character: {
+        id: 12,
+        name: 'Katarina Voss',
+        rank: 'novice',
+        origin_name: null,
+        attributes: { agility: 'd6', smarts: 'd8', spirit: 'd4', strength: 'd6', vigor: 'd8' },
+        skills: [],
+        edges: [],
+        hindrances: [],
+        gear: [
+          {
+            gear_id: 1,
+            name: 'Long Sword',
+            quantity: 1,
+            equipped: true,
+            combat: {
+              damage: { strength: true, dice: [{ count: 1, sides: 8 }], modifier: 0 },
+              range: null,
+              rof: 1,
+              ap: 0,
+            },
+          },
+          { gear_id: 2, name: 'Rope', quantity: 2, equipped: false, combat: null },
+        ],
+        derived: {
+          pace: { value: 6 },
+          parry: { value: 5 },
+          toughness: { value: 9, armor: 3 },
+        },
+      },
+    })
+
+    renderSheet()
+
+    expect(await screen.findByText('9 (3)')).toBeInTheDocument()
+    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.getByText('Str+d8')).toBeInTheDocument()
+    expect(screen.getByText('Long Sword (equipped)')).toBeInTheDocument()
+    expect(screen.getByText('Rope ×2')).toBeInTheDocument()
+  })
+
   it('lets the player fill in Player and Notes on the sheet', async () => {
     const user = userEvent.setup()
     apiGetMock.mockResolvedValue({

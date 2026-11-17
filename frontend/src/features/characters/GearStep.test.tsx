@@ -198,6 +198,33 @@ describe('GearStep', () => {
     expect(screen.getByRole('status')).toHaveTextContent('$300')
   })
 
+  it('equips weapons and armor and unequips removed items', async () => {
+    const user = userEvent.setup()
+    const formRef = renderStep()
+
+    await screen.findByText('2 items')
+    await user.click(screen.getByRole('button', { name: 'Add Torch to pack' }))
+    await user.click(screen.getByRole('button', { name: 'Add Long Sword to pack' }))
+
+    expect(screen.queryByRole('button', { name: 'Equip Torch' })).not.toBeInTheDocument()
+    const equip = screen.getByRole('button', { name: 'Equip Long Sword' })
+    expect(equip).toHaveAttribute('aria-pressed', 'false')
+
+    await user.click(equip)
+    await waitFor(() => {
+      expect(formRef.current?.getValues('equipped_gear')).toEqual(['2'])
+    })
+    expect(screen.getByRole('button', { name: 'Equip Long Sword' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Remove Long Sword' }))
+    await waitFor(() => {
+      expect(formRef.current?.getValues('equipped_gear')).toEqual([])
+    })
+  })
+
   it('translates categories, rule tags, and badges into Polish', async () => {
     const user = userEvent.setup()
     window.localStorage.setItem('savage-worlds-language', 'pl')

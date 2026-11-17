@@ -10,9 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_16_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "battles", force: :cascade do |t|
+    t.bigint "party_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "seed", null: false
+    t.integer "runs", null: false
+    t.jsonb "settings", default: {}, null: false
+    t.jsonb "roster", default: [], null: false
+    t.jsonb "summary", default: {}, null: false
+    t.jsonb "log", default: [], null: false
+    t.jsonb "final_state", default: [], null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["party_id", "created_at"], name: "index_battles_on_party_id_and_created_at"
+    t.index ["user_id"], name: "index_battles_on_user_id"
+    t.check_constraint "jsonb_typeof(log) = 'array'::text", name: "battles_log_array"
+    t.check_constraint "jsonb_typeof(roster) = 'array'::text", name: "battles_roster_array"
+    t.check_constraint "runs >= 1 AND runs <= 200", name: "battles_runs_range"
+  end
 
   create_table "character_edges", force: :cascade do |t|
     t.bigint "character_id", null: false
@@ -22,6 +41,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
     t.index ["character_id", "edge_id"], name: "index_character_edges_on_character_id_and_edge_id", unique: true
     t.index ["character_id"], name: "index_character_edges_on_character_id"
     t.index ["edge_id"], name: "index_character_edges_on_edge_id"
+  end
+
+  create_table "character_gears", force: :cascade do |t|
+    t.bigint "character_id", null: false
+    t.bigint "gear_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.boolean "equipped", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_id", "gear_id"], name: "index_character_gears_on_character_id_and_gear_id", unique: true
+    t.index ["gear_id"], name: "index_character_gears_on_gear_id"
+    t.check_constraint "quantity >= 1 AND quantity <= 99", name: "character_gears_quantity_range"
   end
 
   create_table "character_hindrances", force: :cascade do |t|
@@ -79,6 +110,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
     t.check_constraint "jsonb_typeof(effects) = 'array'::text", name: "edges_effects_array"
     t.check_constraint "jsonb_typeof(requirements) = 'array'::text", name: "edges_requirements_array"
     t.check_constraint "minimum_rank >= 0 AND minimum_rank <= 4", name: "edges_minimum_rank_range"
+  end
+
+  create_table "enemy_templates", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "wild_card", default: false, null: false
+    t.jsonb "attribute_dice", default: {"vigor" => "d4", "smarts" => "d4", "spirit" => "d4", "agility" => "d4", "strength" => "d4"}, null: false
+    t.jsonb "skills", default: {}, null: false
+    t.integer "pace", default: 6, null: false
+    t.integer "parry", default: 2, null: false
+    t.integer "toughness", default: 5, null: false
+    t.integer "armor", default: 0, null: false
+    t.integer "size", default: 0, null: false
+    t.integer "bennies", default: 0, null: false
+    t.jsonb "weapons", default: [], null: false
+    t.jsonb "edge_slugs", default: [], null: false
+    t.jsonb "abilities", default: [], null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_enemy_templates_on_user_id"
+    t.check_constraint "jsonb_typeof(abilities) = 'array'::text", name: "enemy_templates_abilities_array"
+    t.check_constraint "jsonb_typeof(attribute_dice) = 'object'::text", name: "enemy_templates_attribute_dice_object"
+    t.check_constraint "jsonb_typeof(edge_slugs) = 'array'::text", name: "enemy_templates_edge_slugs_array"
+    t.check_constraint "jsonb_typeof(skills) = 'object'::text", name: "enemy_templates_skills_object"
+    t.check_constraint "jsonb_typeof(weapons) = 'array'::text", name: "enemy_templates_weapons_array"
   end
 
   create_table "gears", force: :cascade do |t|
@@ -212,14 +269,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120000) do
     t.check_constraint "role >= 0 AND role <= 1", name: "users_role_range"
   end
 
+  add_foreign_key "battles", "parties", on_delete: :cascade
+  add_foreign_key "battles", "users", on_delete: :cascade
   add_foreign_key "character_edges", "characters"
   add_foreign_key "character_edges", "edges"
+  add_foreign_key "character_gears", "characters", on_delete: :cascade
+  add_foreign_key "character_gears", "gears"
   add_foreign_key "character_hindrances", "characters"
   add_foreign_key "character_hindrances", "hindrances"
   add_foreign_key "character_skills", "characters"
   add_foreign_key "character_skills", "skills"
   add_foreign_key "characters", "origins"
   add_foreign_key "characters", "users"
+  add_foreign_key "enemy_templates", "users", on_delete: :cascade
   add_foreign_key "parties", "users", column: "leader_id"
   add_foreign_key "party_memberships", "characters"
   add_foreign_key "party_memberships", "parties"

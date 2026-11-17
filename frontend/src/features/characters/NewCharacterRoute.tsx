@@ -48,6 +48,8 @@ type CharacterSaveRequest = {
     hindrance_severities: Record<string, 'minor' | 'major'>
     hindrance_points_earned: number
     hindrance_points_spent: number
+    gear: Record<string, number>
+    equipped_gear_ids: number[]
   }
 }
 
@@ -69,6 +71,7 @@ type CharacterResponse = {
     skill_ids: number[]
     attributes: CharacterFormValues['attributes']
     skill_dice: Record<string, CharacterFormValues['skill_dice'][string]>
+    gear?: { gear_id: number; name: string; quantity: number; equipped: boolean }[]
     effective_traits: {
       attributes: Record<string, { base_die: string; die: string; modifier: number }>
       skills: Record<string, { base_die: string; die: string; modifier: number }>
@@ -193,6 +196,15 @@ export function NewCharacterRoute() {
       hindrance_severities: Object.fromEntries(
         character.hindrance_ids.map((hindranceId) => [String(hindranceId), 'minor']),
       ),
+      gear: Object.fromEntries(
+        (character.gear ?? []).map((item) => [String(item.gear_id), item.quantity]),
+      ),
+      gear_names: Object.fromEntries(
+        (character.gear ?? []).map((item) => [String(item.gear_id), item.name]),
+      ),
+      equipped_gear: (character.gear ?? [])
+        .filter((item) => item.equipped)
+        .map((item) => String(item.gear_id)),
     })
   }, [characterQuery.data, form])
   const formValues = useWatch({ control: form.control })
@@ -285,6 +297,8 @@ export function NewCharacterRoute() {
           hindrance_severities: values.hindrance_severities,
           hindrance_points_earned: values.hindrance_points_earned,
           hindrance_points_spent: values.hindrance_points_spent,
+          gear: values.gear,
+          equipped_gear_ids: ids(values.equipped_gear.filter((gearId) => gearId in values.gear)),
         },
       })
     })()

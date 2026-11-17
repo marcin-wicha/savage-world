@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useLanguage } from '@/lib/i18n-context'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
+import { PartyBattles } from '@/features/battles/PartyBattles'
 
 import { PartyForm } from './PartyForm'
 import type { PartyFormValues } from './party-form'
@@ -185,6 +186,8 @@ function PartyView({ party }: { party: PartyDetail }) {
           )}
         </CardContent>
       </Card>
+
+      <PartyBattles partyId={party.id} canSimulate={accepted.length > 0} />
 
       {party.led_by_me ? (
         <>
