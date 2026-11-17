@@ -1,11 +1,22 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { graphqlRequest } from '@/lib/api-client'
 
 import { CharacterSummaryStep } from './CharacterSummaryStep'
 import { characterFormDefaults, type CharacterFormValues } from './character-form'
+
+vi.mock('@/lib/api-client', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/api-client')>()
+
+  return { ...actual, graphqlRequest: vi.fn() }
+})
+
+const graphqlRequestMock = vi.mocked(graphqlRequest)
+const emptyPage = { hasNextPage: false, endCursor: null }
 
 function SummaryHarness({ values }: { values: CharacterFormValues }) {
   const form = useForm<CharacterFormValues>({ defaultValues: values })
@@ -19,8 +30,14 @@ function SummaryHarness({ values }: { values: CharacterFormValues }) {
   )
 }
 
+function renderWithQueryClient(ui: React.ReactElement) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+
+  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+}
+
 function renderSummaryWithDescriptions() {
-  render(
+  renderWithQueryClient(
     <SummaryHarness
       values={{
         ...characterFormDefaults,
@@ -35,14 +52,94 @@ function renderSummaryWithDescriptions() {
         edges: ['4'],
         edge_names: { '4': 'Alertness' },
         edge_descriptions: { '4': 'Notice danger before it catches you unaware.' },
+        edge_effects: { '4': [] },
       }}
     />,
   )
 }
 
 describe('CharacterSummaryStep', () => {
+  beforeEach(() => {
+    graphqlRequestMock.mockReset()
+    graphqlRequestMock.mockResolvedValue({
+      hindrances: {
+        nodes: [
+          {
+            id: '2',
+            name: 'Bloodthirsty',
+            slug: 'bloodthirsty',
+            severity: 'major',
+            requirements_text: '',
+            description: 'A dangerous hunger for violence.',
+          },
+        ],
+        pageInfo: emptyPage,
+      },
+      skills: {
+        nodes: [
+          {
+            id: '3',
+            name: 'Fighting',
+            slug: 'fighting',
+            attribute: 'agility',
+            core: false,
+            description: 'The ability to fight in close combat.',
+          },
+        ],
+        pageInfo: emptyPage,
+      },
+      edges: {
+        nodes: [
+          {
+            id: '4',
+            name: 'Alertness',
+            slug: 'alertness',
+            requirements: [],
+            requirements_text: '',
+            effects: [{ kind: 'trait_modifier', target: 'skill', trait: 'fighting', modifier: 2 }],
+            description: 'Notice danger before it catches you unaware.',
+          },
+        ],
+        pageInfo: emptyPage,
+      },
+    })
+  })
+
+  it('resolves selections that only have IDs from the reference catalogs', async () => {
+    const user = userEvent.setup()
+
+    renderWithQueryClient(
+      <SummaryHarness
+        values={{
+          ...characterFormDefaults,
+          hindrances: ['2'],
+          skills: ['3'],
+          skill_dice: { '3': 'd6' },
+          edges: ['4'],
+        }}
+      />,
+    )
+
+    expect(await screen.findByRole('button', { name: 'Bloodthirsty (major)' })).toBeInTheDocument()
+    expect(await screen.findByRole('img', { name: 'Fighting die: d6+2' })).toBeInTheDocument()
+    expect(screen.getByText('Alertness: Fighting +2')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^\d+/ })).not.toBeInTheDocument()
+
+    await user.hover(screen.getByRole('button', { name: 'Alertness' }))
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Notice danger before it catches you unaware.',
+    )
+    expect(screen.queryByText('No description available.')).not.toBeInTheDocument()
+  })
+
+  it('does not fetch reference catalogs when selections already carry their details', () => {
+    renderSummaryWithDescriptions()
+
+    expect(graphqlRequestMock).not.toHaveBeenCalled()
+  })
+
   it('shows the selected character details', () => {
-    render(
+    renderWithQueryClient(
       <SummaryHarness
         values={{
           ...characterFormDefaults,
@@ -84,7 +181,7 @@ describe('CharacterSummaryStep', () => {
   })
 
   it('shows edge-adjusted trait dice and modifiers in the sheet summary', () => {
-    render(
+    renderWithQueryClient(
       <SummaryHarness
         values={{
           ...characterFormDefaults,
@@ -123,7 +220,7 @@ describe('CharacterSummaryStep', () => {
   })
 
   it('warns when hindrance points remain', () => {
-    render(
+    renderWithQueryClient(
       <SummaryHarness
         values={{
           ...characterFormDefaults,
