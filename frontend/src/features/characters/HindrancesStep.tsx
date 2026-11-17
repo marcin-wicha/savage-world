@@ -4,16 +4,12 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { AutocompleteInput } from '@/components/autocomplete-input'
 import { FilterButton, type FilterOption } from '@/components/filter-button'
 import { TraitCardStack, type TraitCardStackTrait } from '@/components/trait-card-stack'
-import {
-  HindrancesDocument,
-  type HindranceSeverity,
-  type HindrancesQuery,
-} from '@/graphql/generated/graphql'
-import { useGraphqlInfiniteQuery } from '@/lib/queries'
+import type { HindranceSeverity } from '@/graphql/generated/graphql'
 import { useLanguage } from '@/lib/i18n-context'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import type { CharacterFormValues } from './character-form'
+import { useHindranceCatalog } from './reference-catalogs'
 
 const severityOptions: FilterOption[] = [
   { value: 'minor', label: 'Minor' },
@@ -49,24 +45,7 @@ export function HindrancesStep() {
     useWatch({ control: form.control, name: 'hindrance_descriptions' }) ?? {}
   const [severities, setSeverities] = useState<string[]>([])
   const [search, setSearch] = useState('')
-  const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useGraphqlInfiniteQuery<HindrancesQuery>(
-      ['hindrances'],
-      HindrancesDocument,
-      (after) => ({ first: 40, after }),
-      (page) => (page.hindrances.pageInfo.hasNextPage ? page.hindrances.pageInfo.endCursor : null),
-    )
-  const isLoadingAll = isPending || hasNextPage
-
-  useEffect(() => {
-    if (!isError && hasNextPage && !isFetchingNextPage) {
-      void fetchNextPage()
-    }
-  }, [fetchNextPage, hasNextPage, isError, isFetchingNextPage])
-
-  const hindrances = (data?.pages ?? [])
-    .flatMap((page) => page.hindrances.nodes ?? [])
-    .flatMap((hindrance) => (hindrance ? [hindrance] : []))
+  const { items: hindrances, isLoadingAll, isError } = useHindranceCatalog()
   const severityFilteredHindrances = hindrances.filter((hindrance) => {
     if (severities.length === 0) return true
     if (hindrance.severity === 'minor_or_major') return true

@@ -5,13 +5,12 @@ import { AutocompleteInput } from '@/components/autocomplete-input'
 import { SkillDie } from '@/components/skill-die'
 import { skillDieTypes, type SkillDieType } from '@/components/dice-types'
 import { TraitCardStack, type TraitCardStackTrait } from '@/components/trait-card-stack'
-import { SkillsDocument, type SkillsQuery } from '@/graphql/generated/graphql'
-import { useGraphqlInfiniteQuery } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
 
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { SkillPointsBalance } from './SkillPointsBalance'
 import type { CharacterFormValues } from './character-form'
+import { useSkillCatalog } from './reference-catalogs'
 
 const defaultSkillPoints = 12
 const dieSteps: Record<SkillDieType, number> = {
@@ -61,24 +60,7 @@ export function SkillsStep() {
   const skillHindrancePointsSpent =
     useWatch({ control: form.control, name: 'skill_hindrance_points_spent' }) ?? 0
   const [search, setSearch] = useState('')
-  const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useGraphqlInfiniteQuery<SkillsQuery>(
-      ['skills'],
-      SkillsDocument,
-      (after) => ({ first: 25, after }),
-      (page) => (page.skills.pageInfo.hasNextPage ? page.skills.pageInfo.endCursor : null),
-    )
-  const isLoadingAll = isPending || hasNextPage
-
-  useEffect(() => {
-    if (!isError && hasNextPage && !isFetchingNextPage) {
-      void fetchNextPage()
-    }
-  }, [fetchNextPage, hasNextPage, isError, isFetchingNextPage])
-
-  const skills = (data?.pages ?? [])
-    .flatMap((page) => page.skills.nodes ?? [])
-    .flatMap((skill) => (skill ? [skill] : []))
+  const { items: skills, isLoadingAll, isError } = useSkillCatalog()
   const skillById = new Map(skills.map((skill) => [skill.id, skill]))
   const normalizedSearch = search.trim().toLowerCase()
   const filteredSkills = normalizedSearch

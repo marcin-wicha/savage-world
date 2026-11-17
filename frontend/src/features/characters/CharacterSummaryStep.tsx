@@ -9,6 +9,7 @@ import { useLanguage } from '@/lib/i18n-context'
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { applyEdgeEffects, describeEdgeEffect, parseEdgeEffects } from './edge-effects'
 import type { CharacterFormValues } from './character-form'
+import { useEdgeCatalog, useHindranceCatalog, useSkillCatalog } from './reference-catalogs'
 
 const attributeLabels: Record<keyof CharacterFormValues['attributes'], string> = {
   agility: 'Agility',
@@ -166,27 +167,64 @@ export function CharacterSummaryStep() {
   const selectedEdges = values.edges ?? []
   const edgeNames = values.edge_names ?? {}
   const edgeEffects = values.edge_effects ?? {}
-  const selectedEffects = selectedEdges.flatMap((id) => parseEdgeEffects(edgeEffects[id]))
   const edgeSlugs = values.edge_slugs ?? {}
   const edgeDescriptions = values.edge_descriptions ?? {}
+  const hindranceCatalog = useHindranceCatalog({
+    enabled: selectedHindrances.some((id) => !hindranceNames[id] || !hindranceDescriptions[id]),
+  })
+  const skillCatalog = useSkillCatalog({
+    enabled: selectedSkills.some((id) => !skillNames[id] || !skillDescriptions[id]),
+  })
+  const edgeCatalog = useEdgeCatalog({
+    enabled: selectedEdges.some(
+      (id) => !edgeNames[id] || !edgeDescriptions[id] || !edgeEffects[id],
+    ),
+  })
+  const hindranceById = new Map(hindranceCatalog.items.map((item) => [item.id, item]))
+  const skillById = new Map(skillCatalog.items.map((item) => [item.id, item]))
+  const edgeById = new Map(edgeCatalog.items.map((item) => [item.id, item]))
+  const edgeEffectsFor = (id: string) =>
+    edgeEffects[id]
+      ? parseEdgeEffects(edgeEffects[id])
+      : parseEdgeEffects(edgeById.get(id)?.effects)
+  const edgeNameFor = (id: string) =>
+    edgeNames[id] ?? edgeById.get(id)?.name ?? humanize(edgeSlugs[id] ?? id)
+  const selectedEffects = selectedEdges.flatMap(edgeEffectsFor)
   const gearNames = values.gear_names ?? {}
   const gearQuantities = values.gear ?? {}
 
-  const hindrances = selectedHindrances.map((id) => ({
-    id,
-    name: `${t(hindranceNames[id] ?? humanize(hindranceSlugs[id] ?? id))} (${t(hindranceSeverities[id] ?? 'minor')})`,
-    description: t(hindranceDescriptions[id] ?? 'No description available.'),
-  }))
-  const skills = selectedSkills.map((id) => ({
-    id,
-    name: t(skillNames[id] ?? humanize(skillSlugs[id] ?? id)),
-    description: t(skillDescriptions[id] ?? 'No description available.'),
-    ...applyEdgeEffects(skillDices[id] ?? 'd4', selectedEffects, 'skill', skillSlugs[id] ?? ''),
-  }))
+  const noDescription = 'No description available.'
+  const hindrances = selectedHindrances.map((id) => {
+    const reference = hindranceById.get(id)
+    const referenceSeverity =
+      reference && reference.severity !== 'minor_or_major' ? reference.severity : undefined
+    const severity = hindranceSeverities[id] ?? referenceSeverity ?? 'minor'
+
+    return {
+      id,
+      name: `${t(hindranceNames[id] ?? reference?.name ?? humanize(hindranceSlugs[id] ?? id))} (${t(severity)})`,
+      description: t(hindranceDescriptions[id] || reference?.description || noDescription),
+    }
+  })
+  const skills = selectedSkills.map((id) => {
+    const reference = skillById.get(id)
+
+    return {
+      id,
+      name: t(skillNames[id] ?? reference?.name ?? humanize(skillSlugs[id] ?? id)),
+      description: t(skillDescriptions[id] || reference?.description || noDescription),
+      ...applyEdgeEffects(
+        skillDices[id] ?? 'd4',
+        selectedEffects,
+        'skill',
+        skillSlugs[id] ?? reference?.slug ?? '',
+      ),
+    }
+  })
   const edges = selectedEdges.map((id) => ({
     id,
-    name: t(edgeNames[id] ?? humanize(edgeSlugs[id] ?? id)),
-    description: t(edgeDescriptions[id] ?? 'No description available.'),
+    name: t(edgeNameFor(id)),
+    description: t(edgeDescriptions[id] || edgeById.get(id)?.description || noDescription),
   }))
   const gear = Object.entries(gearQuantities).map(
     ([id, quantity]) => `${t(gearNames[id] ?? humanize(id))} × ${quantity}`,
@@ -285,9 +323,9 @@ export function CharacterSummaryStep() {
             {selectedEffects.length > 0 ? (
               <ul className="text-muted-foreground border-border grid gap-1 border-t pt-2 text-sm">
                 {selectedEdges.flatMap((id) =>
-                  parseEdgeEffects(edgeEffects[id]).map((effect, index) => (
+                  edgeEffectsFor(id).map((effect, index) => (
                     <li key={`${id}-${index}`}>
-                      {t(edgeNames[id] ?? 'Edge')}: {t(describeEdgeEffect(effect))}
+                      {t(edgeNameFor(id))}: {t(describeEdgeEffect(effect))}
                     </li>
                   )),
                 )}

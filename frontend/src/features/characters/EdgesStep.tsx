@@ -5,8 +5,7 @@ import { AutocompleteInput } from '@/components/autocomplete-input'
 import { FilterButton, type FilterOption } from '@/components/filter-button'
 import { TraitCardStack, type TraitCardStackTrait } from '@/components/trait-card-stack'
 import { Button } from '@/components/ui/button'
-import { EdgesDocument, type EdgeCategory, type EdgesQuery } from '@/graphql/generated/graphql'
-import { useGraphqlInfiniteQuery } from '@/lib/queries'
+import type { EdgeCategory } from '@/graphql/generated/graphql'
 import { useLanguage } from '@/lib/i18n-context'
 import { cn } from '@/lib/utils'
 
@@ -14,6 +13,7 @@ import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { missingEdgeRequirements, type EdgeRequirementCharacter } from './edge-requirements'
 import { parseEdgeEffects } from './edge-effects'
 import type { CharacterFormValues } from './character-form'
+import { useEdgeCatalog } from './reference-catalogs'
 
 const rankOptions: FilterOption[] = [
   { value: 'novice', label: 'Novice' },
@@ -76,24 +76,7 @@ export function EdgesStep() {
   const [ranks, setRanks] = useState<string[]>(() => ranksUpTo(characterRank))
   const [onlyRequirementsMet, setOnlyRequirementsMet] = useState(false)
   const [search, setSearch] = useState('')
-  const { data, isPending, isError, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useGraphqlInfiniteQuery<EdgesQuery>(
-      ['edges'],
-      EdgesDocument,
-      (after) => ({ first: 11, after }),
-      (page) => (page.edges?.pageInfo.hasNextPage ? page.edges.pageInfo.endCursor : null),
-    )
-  const isLoadingAll = isPending || hasNextPage
-
-  useEffect(() => {
-    if (!isError && hasNextPage && !isFetchingNextPage) {
-      void fetchNextPage()
-    }
-  }, [fetchNextPage, hasNextPage, isError, isFetchingNextPage])
-
-  const edges = (data?.pages ?? [])
-    .flatMap((page) => page.edges?.nodes ?? [])
-    .flatMap((edge) => (edge ? [edge] : []))
+  const { items: edges, isLoadingAll, isError } = useEdgeCatalog()
   const edgeById = useMemo(() => new Map(edges.map((edge) => [edge.id, edge])), [edges])
 
   useEffect(() => {
