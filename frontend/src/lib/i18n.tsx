@@ -228,10 +228,19 @@ const translations: Record<string, string> = {
   'You need 2 free hindrance points for an edge. Go back to the Attributes or Skills step and lower a die to free points spent there.':
     'Przewaga wymaga 2 wolnych punktów za ułomności. Wróć do etapu Atrybuty lub Umiejętności i obniż kość, aby odzyskać wydane tam punkty.',
   'Draft restored from': 'Przywrócono szkic z',
-  'Your progress is saved as a draft on this device.':
-    'Twoje postępy są zapisywane jako szkic na tym urządzeniu.',
+  'Your progress is saved as a draft as you go.':
+    'Twoje postępy są na bieżąco zapisywane jako szkic.',
+  'Saving draft…': 'Zapisywanie szkicu…',
+  'Draft saved.': 'Szkic zapisany.',
+  'Could not save the draft. Keep this page open and try again shortly.':
+    'Nie udało się zapisać szkicu. Nie zamykaj tej strony i spróbuj ponownie za chwilę.',
+  'Loading draft…': 'Wczytywanie szkicu…',
+  'Could not load this draft. It may have been finished or discarded.':
+    'Nie udało się wczytać szkicu. Mógł zostać ukończony lub odrzucony.',
+  'Last saved': 'Ostatni zapis',
+  'Could not discard the draft. Try again.': 'Nie udało się odrzucić szkicu. Spróbuj ponownie.',
   'Start over': 'Zacznij od nowa',
-  'Unfinished character': 'Niedokończona postać',
+  'Unfinished characters': 'Niedokończone postacie',
   'Unnamed character': 'Postać bez imienia',
   'Continue draft': 'Kontynuuj szkic',
   'Discard draft': 'Odrzuć szkic',

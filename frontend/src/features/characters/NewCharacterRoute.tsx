@@ -2,12 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 
 import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-flow'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { useSession } from '@/features/auth/use-session'
 import { ApiError, api } from '@/lib/api-client'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
@@ -21,10 +20,13 @@ import { OriginStep } from './OriginStep'
 
 import { HindrancesStep } from './HindrancesStep'
 import {
-  clearCharacterDraft,
+  type CharacterDraftResponse,
+  type DraftSaveStatus,
+  type RestoredCharacterDraft,
   hasDraftContent,
-  loadCharacterDraft,
-  saveCharacterDraft,
+  restoreCharacterDraft,
+  toDraftData,
+  useCharacterDraftAutosave,
 } from './character-draft'
 import { GearStep } from './GearStep'
 import { SkillsStep } from './SkillsStep'
@@ -169,15 +171,72 @@ const stepDefinitions: StepDefinition[] = [
   },
 ]
 
+type DraftNavigationState = { keepEditor: true }
+
+const keepsEditor = (state: unknown): state is DraftNavigationState =>
+  Boolean(state && typeof state === 'object' && 'keepEditor' in state)
+
 export function NewCharacterRoute() {
   const { id } = useParams<{ id: string }>()
-  const userId = useSession().data?.user?.id
-  const draftUserId = id ? undefined : userId
+  const [searchParams] = useSearchParams()
+  const location = useLocation()
+  const draftParam = id ? null : searchParams.get('draft')
+  const [editor, setEditor] = useState({ key: location.key, locationKey: location.key })
 
-  return <CharacterEditor key={draftUserId ?? 'none'} draftUserId={draftUserId} />
+  if (location.key !== editor.locationKey) {
+    setEditor({
+      key: keepsEditor(location.state) ? editor.key : location.key,
+      locationKey: location.key,
+    })
+  }
+
+  if (id) return <CharacterEditor key={`edit-${id}`} initialDraft={null} />
+
+  return <DraftLoader key={editor.key} draftParam={draftParam} />
 }
 
-function CharacterEditor({ draftUserId }: { draftUserId: number | undefined }) {
+function DraftLoader({ draftParam }: { draftParam: string | null }) {
+  const { t } = useLanguage()
+  const [draftId] = useState(() => {
+    const parsed = Number(draftParam)
+    return draftParam !== null && Number.isInteger(parsed) && parsed > 0 ? parsed : null
+  })
+  const draftQuery = useRestQuery<CharacterDraftResponse>(
+    ['character-draft', draftId],
+    `/api/v1/character_drafts/${draftId ?? ''}`,
+    { enabled: draftId !== null, gcTime: 0, staleTime: 0 },
+  )
+
+  if (draftId === null) return <CharacterEditor initialDraft={null} />
+
+  if (draftQuery.isPending) {
+    return <p className="text-muted-foreground text-sm">{t('Loading draft…')}</p>
+  }
+
+  if (draftQuery.isError) {
+    return (
+      <div className="grid gap-3">
+        <p className="text-danger text-sm" role="alert">
+          {t('Could not load this draft. It may have been finished or discarded.')}
+        </p>
+        <Button asChild variant="outline" className="w-fit">
+          <Link to="/characters/new">{t('Create a character')}</Link>
+        </Button>
+      </div>
+    )
+  }
+
+  return <CharacterEditor initialDraft={restoreCharacterDraft(draftQuery.data.character_draft)} />
+}
+
+const draftStatusMessages: Record<DraftSaveStatus, string> = {
+  idle: 'Your progress is saved as a draft as you go.',
+  saving: 'Saving draft…',
+  saved: 'Draft saved.',
+  error: 'Could not save the draft. Keep this page open and try again shortly.',
+}
+
+function CharacterEditor({ initialDraft }: { initialDraft: RestoredCharacterDraft | null }) {
   const { t, language } = useLanguage()
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
@@ -195,14 +254,19 @@ function CharacterEditor({ draftUserId }: { draftUserId: number | undefined }) {
     `/api/v1/characters/${id ?? ''}`,
     { enabled: isEditing },
   )
-  const [initialDraft] = useState(() =>
-    draftUserId === undefined ? null : loadCharacterDraft(draftUserId),
-  )
   const [step, setStep] = useState(() =>
     Math.min(initialDraft?.step ?? 0, stepDefinitions.length - 1),
   )
-  const [draftRestoredAt, setDraftRestoredAt] = useState(initialDraft?.saved_at ?? null)
+  const [draftRestoredAt, setDraftRestoredAt] = useState(initialDraft?.updated_at ?? null)
   const characterSaved = useRef(false)
+  const draft = useCharacterDraftAutosave({
+    initialDraftId: initialDraft?.id ?? null,
+    onCreated: (draftId) =>
+      navigate(`/characters/new?draft=${draftId}`, {
+        replace: true,
+        state: { keepEditor: true } satisfies DraftNavigationState,
+      }),
+  })
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(characterFormSchema),
     defaultValues: initialDraft?.values ?? characterFormDefaults,
@@ -248,20 +312,29 @@ function CharacterEditor({ draftUserId }: { draftUserId: number | undefined }) {
   const spentHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_spent' }) ?? 0
   const hindrancePointsBalanced = earnedHindrancePoints === spentHindrancePoints
-  const draftActive = draftUserId !== undefined
+  const { draftId, schedule: scheduleDraftSave } = draft
+  const skipRestoredSave = useRef(initialDraft !== null)
   useEffect(() => {
-    if (draftUserId === undefined || characterSaved.current) return
+    if (isEditing || characterSaved.current) return
+    if (skipRestoredSave.current) {
+      skipRestoredSave.current = false
+      return
+    }
     const values = form.getValues()
-    if (step === 0 && draftRestoredAt === null && !hasDraftContent(values)) return
+    if (draftId === null && step === 0 && !hasDraftContent(values)) return
 
-    saveCharacterDraft(draftUserId, values, step)
-  }, [draftRestoredAt, draftUserId, form, formValues, step])
+    scheduleDraftSave({ data: toDraftData(values), step })
+  }, [draftId, form, formValues, isEditing, scheduleDraftSave, step])
 
-  const startOver = () => {
-    if (draftUserId !== undefined) clearCharacterDraft(draftUserId)
+  const startOver = async () => {
+    await draft.discard()
     form.reset(characterFormDefaults)
     setStep(0)
     setDraftRestoredAt(null)
+    navigate('/characters/new', {
+      replace: true,
+      state: { keepEditor: true } satisfies DraftNavigationState,
+    })
   }
   const saveMutation = useRestMutation<CharacterSaveResponse, CharacterSaveRequest>(
     {
@@ -271,9 +344,9 @@ function CharacterEditor({ draftUserId }: { draftUserId: number | undefined }) {
     {
       onSuccess: async (response) => {
         const characterId = response.character.id
-        if (draftUserId !== undefined) {
+        if (!isEditing) {
           characterSaved.current = true
-          clearCharacterDraft(draftUserId)
+          await draft.finish()
         }
         const avatarFailure = await syncAvatar(characterId)
         void queryClient.invalidateQueries({ queryKey: ['characters'] })
@@ -402,18 +475,25 @@ function CharacterEditor({ draftUserId }: { draftUserId: number | undefined }) {
         {t(isEditing ? 'Edit character' : 'Create a character')}
       </h1>
 
-      {draftActive ? (
+      {!isEditing ? (
         <div className="border-border mt-4 flex max-w-2xl flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
-          <p className="text-muted-foreground text-sm" role="status">
-            {draftRestoredAt
-              ? `${t('Draft restored from')} ${new Intl.DateTimeFormat(
-                  language === 'pl' ? 'pl-PL' : 'en-US',
-                  { dateStyle: 'medium', timeStyle: 'short' },
-                ).format(new Date(draftRestoredAt))}.`
-              : t('Your progress is saved as a draft on this device.')}
-          </p>
-          {draftRestoredAt ? (
-            <Button type="button" size="sm" variant="outline" onClick={startOver}>
+          <div className="grid gap-1 text-sm" role="status">
+            {draftRestoredAt ? (
+              <p className="text-foreground">
+                {t('Draft restored from')}{' '}
+                {new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-US', {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                }).format(new Date(draftRestoredAt))}
+                .
+              </p>
+            ) : null}
+            <p className={draft.status === 'error' ? 'text-danger' : 'text-muted-foreground'}>
+              {t(draftStatusMessages[draft.status])}
+            </p>
+          </div>
+          {draftId !== null ? (
+            <Button type="button" size="sm" variant="outline" onClick={() => void startOver()}>
               {t('Start over')}
             </Button>
           ) : null}

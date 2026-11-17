@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,6 +31,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
     t.check_constraint "jsonb_typeof(log) = 'array'::text", name: "battles_log_array"
     t.check_constraint "jsonb_typeof(roster) = 'array'::text", name: "battles_roster_array"
     t.check_constraint "runs >= 1 AND runs <= 200", name: "battles_runs_range"
+  end
+
+  create_table "character_drafts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.jsonb "data", default: {}, null: false
+    t.integer "step", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "updated_at"], name: "index_character_drafts_on_user_id_and_updated_at"
+    t.check_constraint "jsonb_typeof(data) = 'object'::text", name: "character_drafts_data_object"
+    t.check_constraint "step >= 0", name: "character_drafts_step_non_negative"
   end
 
   create_table "character_edges", force: :cascade do |t|
@@ -83,7 +94,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "origin_id"
-    t.jsonb "attribute_dice", default: {"vigor"=>"d4", "smarts"=>"d4", "spirit"=>"d4", "agility"=>"d4", "strength"=>"d4"}, null: false
+    t.jsonb "attribute_dice", default: {"vigor" => "d4", "smarts" => "d4", "spirit" => "d4", "agility" => "d4", "strength" => "d4"}, null: false
     t.string "avatar_filename"
     t.index ["origin_id"], name: "index_characters_on_origin_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
@@ -118,7 +129,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
     t.string "name", null: false
     t.text "description"
     t.boolean "wild_card", default: false, null: false
-    t.jsonb "attribute_dice", default: {"vigor"=>"d4", "smarts"=>"d4", "spirit"=>"d4", "agility"=>"d4", "strength"=>"d4"}, null: false
+    t.jsonb "attribute_dice", default: {"vigor" => "d4", "smarts" => "d4", "spirit" => "d4", "agility" => "d4", "strength" => "d4"}, null: false
     t.jsonb "skills", default: {}, null: false
     t.integer "pace", default: 6, null: false
     t.integer "parry", default: 2, null: false
@@ -272,6 +283,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
 
   add_foreign_key "battles", "parties", on_delete: :cascade
   add_foreign_key "battles", "users", on_delete: :cascade
+  add_foreign_key "character_drafts", "users", on_delete: :cascade
   add_foreign_key "character_edges", "characters"
   add_foreign_key "character_edges", "edges"
   add_foreign_key "character_gears", "characters", on_delete: :cascade

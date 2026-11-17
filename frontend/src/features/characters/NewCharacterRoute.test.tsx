@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
@@ -7,7 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { api } from '@/lib/api-client'
 
 import { NewCharacterRoute } from './NewCharacterRoute'
-import { loadCharacterDraft, saveCharacterDraft } from './character-draft'
+import { toDraftData } from './character-draft'
 import { characterFormDefaults } from './character-form'
 
 vi.mock('@/lib/api-client', async (importOriginal) => {
@@ -19,6 +19,7 @@ vi.mock('@/lib/api-client', async (importOriginal) => {
       ...actual.api,
       post: vi.fn().mockResolvedValue({ character: { id: 1 } }),
       put: vi.fn().mockResolvedValue({ character: { id: 9 } }),
+      patch: vi.fn(),
       get: vi.fn(),
       delete: vi.fn().mockResolvedValue(null),
     },
@@ -77,6 +78,7 @@ function renderRoute(path = '/characters/new') {
 const apiPostMock = vi.mocked(api.post)
 const apiGetMock = vi.mocked(api.get)
 const apiDeleteMock = vi.mocked(api.delete)
+const apiPatchMock = vi.mocked(api.patch)
 
 describe('NewCharacterRoute', () => {
   beforeEach(() => {
@@ -363,117 +365,188 @@ describe('NewCharacterRoute', () => {
   })
 
   describe('drafts', () => {
+    const storedDraft = (data: unknown, step: number) => ({
+      character_draft: { id: 5, name: '', step, updated_at: '2026-11-17T10:00:00Z', data },
+    })
+
     beforeEach(() => {
-      window.localStorage.clear()
-      apiGetMock.mockImplementation((path: string) =>
+      apiPostMock.mockImplementation((path: string) =>
         Promise.resolve(
-          path === '/api/v1/session'
-            ? {
-                user: { id: 7, email_address: 'player@example.com', role: 'user' },
-                csrf_token: 'token',
-              }
-            : undefined,
+          path === '/api/v1/character_drafts' ? storedDraft({}, 0) : { character: { id: 1 } },
         ),
       )
+      apiPatchMock.mockReset().mockResolvedValue(storedDraft({}, 0))
+      apiDeleteMock.mockClear()
+      apiGetMock.mockReset()
     })
 
     afterEach(() => {
+      apiPostMock.mockReset().mockResolvedValue({ character: { id: 1 } })
       apiGetMock.mockReset()
-      window.localStorage.clear()
     })
 
-    it('autosaves progress and resumes on the saved step', async () => {
+    it('does not create a draft before anything is entered', async () => {
+      renderRoute()
+
+      expect(screen.getByText('Your progress is saved as a draft as you go.')).toBeInTheDocument()
+      await new Promise((resolve) => setTimeout(resolve, 900))
+      expect(apiPostMock).not.toHaveBeenCalledWith('/api/v1/character_drafts', expect.anything())
+    })
+
+    it('creates a server draft as the player works and keeps updating it', async () => {
       const user = userEvent.setup()
 
       renderRoute()
-      expect(
-        await screen.findByText('Your progress is saved as a draft on this device.'),
-      ).toBeInTheDocument()
 
       await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
+      await waitFor(
+        () => {
+          expect(apiPostMock).toHaveBeenCalledWith('/api/v1/character_drafts', {
+            character_draft: {
+              data: expect.objectContaining({
+                concept: { name: 'Katarina Voss', description: '' },
+              }),
+              step: 0,
+            },
+          })
+        },
+        { timeout: 3000 },
+      )
+      expect(await screen.findByText('Draft saved.')).toBeInTheDocument()
+      expect(apiPostMock.mock.calls[0][1]).not.toHaveProperty('character_draft.data.avatar_file')
+
       await user.click(screen.getByRole('button', { name: /next/i }))
       expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
 
-      await waitFor(() => {
-        expect(loadCharacterDraft(7)).toMatchObject({
-          step: 1,
-          values: { concept: { name: 'Katarina Voss' } },
-        })
-      })
-
-      cleanup()
-      renderRoute()
-
-      expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
-      expect(screen.getByText(/draft restored from/i)).toBeInTheDocument()
-      await user.click(screen.getByRole('button', { name: /back/i }))
-      expect(screen.getByLabelText(/character name/i)).toHaveValue('Katarina Voss')
+      await waitFor(
+        () => {
+          expect(apiPatchMock).toHaveBeenCalledWith('/api/v1/character_drafts/5', {
+            character_draft: expect.objectContaining({ step: 1 }),
+          })
+        },
+        { timeout: 3000 },
+      )
+      expect(
+        apiPostMock.mock.calls.filter(([path]) => path === '/api/v1/character_drafts'),
+      ).toHaveLength(1)
     })
 
-    it('starts over from a blank character and clears the draft', async () => {
+    it('resumes a draft from the server on its saved step', async () => {
       const user = userEvent.setup()
-      saveCharacterDraft(
-        7,
-        { ...characterFormDefaults, concept: { name: 'Mira', description: '' } },
-        0,
+      apiGetMock.mockResolvedValue(
+        storedDraft(
+          toDraftData({ ...characterFormDefaults, concept: { name: 'Mira', description: '' } }),
+          1,
+        ),
       )
 
-      renderRoute()
+      renderRoute('/characters/new?draft=5')
+
+      expect(screen.getByText('Loading draft…')).toBeInTheDocument()
+      expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
+      expect(apiGetMock).toHaveBeenCalledWith(
+        '/api/v1/character_drafts/5',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      )
+      expect(screen.getByText(/draft restored from/i)).toBeInTheDocument()
+
+      await new Promise((resolve) => setTimeout(resolve, 900))
+      expect(apiPatchMock).not.toHaveBeenCalled()
+
+      await user.click(screen.getByRole('button', { name: /back/i }))
+      expect(screen.getByLabelText(/character name/i)).toHaveValue('Mira')
+      await waitFor(
+        () => {
+          expect(apiPatchMock).toHaveBeenCalledWith('/api/v1/character_drafts/5', {
+            character_draft: expect.objectContaining({ step: 0 }),
+          })
+        },
+        { timeout: 3000 },
+      )
+    })
+
+    it('explains when a draft cannot be loaded', async () => {
+      apiGetMock.mockRejectedValue(new Error('Not found'))
+
+      renderRoute('/characters/new?draft=99')
+
+      expect(
+        await screen.findByText(
+          'Could not load this draft. It may have been finished or discarded.',
+        ),
+      ).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: /create a character/i })).toHaveAttribute(
+        'href',
+        '/characters/new',
+      )
+    })
+
+    it('starts over by discarding the server draft', async () => {
+      const user = userEvent.setup()
+      apiGetMock.mockResolvedValue(
+        storedDraft(
+          toDraftData({ ...characterFormDefaults, concept: { name: 'Mira', description: '' } }),
+          0,
+        ),
+      )
+
+      renderRoute('/characters/new?draft=5')
 
       await user.click(await screen.findByRole('button', { name: 'Start over' }))
 
+      await waitFor(() => {
+        expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/character_drafts/5')
+      })
       expect(screen.getByLabelText(/character name/i)).toHaveValue('')
-      expect(loadCharacterDraft(7)).toBeNull()
+      expect(screen.queryByRole('button', { name: 'Start over' })).not.toBeInTheDocument()
     })
 
-    it('removes the draft once the character is saved', async () => {
+    it('deletes the draft once the character is saved', async () => {
       const user = userEvent.setup()
+      apiGetMock.mockResolvedValue(
+        storedDraft(
+          toDraftData({
+            ...characterFormDefaults,
+            concept: { name: 'Katarina Voss', description: '' },
+          }),
+          0,
+        ),
+      )
 
-      renderRoute()
-      expect(
-        await screen.findByText('Your progress is saved as a draft on this device.'),
-      ).toBeInTheDocument()
-      await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
+      renderRoute('/characters/new?draft=5')
+      expect(await screen.findByLabelText(/character name/i)).toHaveValue('Katarina Voss')
       await completeFlow(user)
 
       expect(await screen.findByRole('heading', { name: /characters page/i })).toBeInTheDocument()
-      expect(loadCharacterDraft(7)).toBeNull()
+      expect(apiPostMock).toHaveBeenCalledWith('/api/v1/characters', expect.anything())
+      expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/character_drafts/5')
     })
 
     it('does not use drafts when editing an existing character', async () => {
-      saveCharacterDraft(
-        7,
-        { ...characterFormDefaults, concept: { name: 'Mira', description: '' } },
-        2,
-      )
-      apiGetMock.mockImplementation((path: string) =>
-        Promise.resolve(
-          path === '/api/v1/session'
-            ? { user: { id: 7, email_address: 'p@example.com', role: 'user' }, csrf_token: 't' }
-            : {
-                character: {
-                  id: 9,
-                  name: 'Katarina Voss',
-                  avatar_url: null,
-                  rank: 'novice',
-                  origin_id: 1,
-                  origin_name: 'Dunestriders',
-                  edge_ids: [],
-                  hindrance_ids: [],
-                  skill_ids: [],
-                  attributes: characterFormDefaults.attributes,
-                  skill_dice: {},
-                  effective_traits: { attributes: {}, skills: {} },
-                },
-              },
-        ),
-      )
+      apiGetMock.mockResolvedValue({
+        character: {
+          id: 9,
+          name: 'Katarina Voss',
+          avatar_url: null,
+          rank: 'novice',
+          origin_id: 1,
+          origin_name: 'Dunestriders',
+          edge_ids: [],
+          hindrance_ids: [],
+          skill_ids: [],
+          attributes: characterFormDefaults.attributes,
+          skill_dice: {},
+          effective_traits: { attributes: {}, skills: {} },
+        },
+      })
 
       renderRoute('/characters/9/edit')
 
       expect(await screen.findByLabelText(/character name/i)).toHaveValue('Katarina Voss')
       expect(screen.queryByText(/draft/i)).not.toBeInTheDocument()
-      expect(loadCharacterDraft(7)?.values.concept.name).toBe('Mira')
+      await new Promise((resolve) => setTimeout(resolve, 900))
+      expect(apiPostMock).not.toHaveBeenCalledWith('/api/v1/character_drafts', expect.anything())
+      expect(apiPatchMock).not.toHaveBeenCalled()
     })
   })
 })

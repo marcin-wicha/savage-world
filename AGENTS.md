@@ -121,9 +121,10 @@ Current gaps, intentionally left for later feature work:
 - There is no password-reset flow or mailer usage.
 - Domain Pundit policies currently cover character upsert and parties.
 - Frontend feature UI and MSW handlers are still minimal.
-- Unfinished character creation is autosaved as a per-user draft in browser
-  `localStorage` (`features/characters/character-draft.ts`); drafts are not
-  stored on the server and do not include an unsaved avatar file.
+- Unfinished character creation is autosaved as server-side character drafts
+  (`/api/v1/character_drafts`, `features/characters/character-draft.ts`).
+  Drafts store an opaque form snapshot and do not include an unsaved avatar
+  file; game rules are validated only when the character is saved.
 
 ## Agent operating rules
 
@@ -288,7 +289,7 @@ both in the same change when committing.
 - Current tables are `users`, `sessions`, `characters`, `character_edges`,
   `character_hindrances`, `character_skills`, `origins`, `edges`, `hindrances`,
   `skills`, `gears`, `powers`, `parties`, `party_memberships`,
-  `character_gears`, `enemy_templates`, and `battles`.
+  `character_gears`, `character_drafts`, `enemy_templates`, and `battles`.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
@@ -307,6 +308,9 @@ both in the same change when committing.
   `equipped` flag; equipped weapons, armor, and shields feed derived stats and
   battles. `Gears::CombatProfile` parses the documented combat keys in gear
   `effects` (see `db/data/gear/README.md`).
+- `character_drafts` belongs to `users` and stores a JSONB `data` object (the
+  creation form snapshot, at most 100 KB) and the current wizard `step`. A user
+  may keep at most 20 drafts. Drafts are not validated as characters.
 - `enemy_templates` belongs to `users` and stores a stat block: Wild Card flag,
   JSONB `attribute_dice` and `skills` (dice such as `d12+2`), Pace, Parry,
   Toughness (including armor), armor, Size, Bennies, JSONB `weapons`,
@@ -408,6 +412,15 @@ Routes are defined in `backend/config/routes.rb`:
   - `PATCH /api/v1/parties/:party_id/memberships/:id/accept` — leader only.
   - `DELETE /api/v1/parties/:party_id/memberships/:id` — the leader (reject or
     remove) or the character's owner (leave or cancel a request).
+- Character drafts (authenticated, owner only): `GET`/`POST
+  /api/v1/character_drafts`, `GET`/`PATCH`/`DELETE /api/v1/character_drafts/:id`.
+  Bodies are `{ "character_draft": { "data": { ... }, "step": 2 } }`. The list
+  returns `id`, `name` (from `data.concept.name`), `step`, and `updated_at`
+  newest first; `show`, `create`, and `update` also return `data`. `422` for
+  non-object or oversized data, an invalid step, or more than 20 drafts; `403`
+  for another user's draft. The SPA autosaves the creation wizard (debounced),
+  resumes from `/characters/new?draft=:id`, lists drafts on the roster, and
+  deletes the draft after the character is saved.
 - Enemy templates (authenticated, owner only): `GET`/`POST
   /api/v1/enemy_templates`, `GET`/`PATCH`/`DELETE /api/v1/enemy_templates/:id`.
   `POST` defaults Wild Card Bennies to 2. Another user's template returns `403`.
@@ -472,7 +485,8 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   party members. `PartyPolicy` (leader edits; leader or accepted
   participant views; scope lists led/joined parties) and
   `PartyMembershipPolicy` (owner joins and leaves; leader accepts and removes)
-  guard parties. Multi-step party rules live in `Parties::Join` and
+  guard parties. `CharacterDraftPolicy` limits drafts to their owner.
+  Multi-step party rules live in `Parties::Join` and
   `Parties::TransferLeadership`. `EnemyTemplatePolicy` limits templates to their
   owner, and `BattlePolicy` lets party leaders and accepted participants run and
   view battles while only the creator or leader may delete them.

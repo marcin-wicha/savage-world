@@ -1,15 +1,18 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { CharacterAvatar } from '@/components/character-avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useSession } from '@/features/auth/use-session'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
 
-import { clearCharacterDraft, loadCharacterDraft } from './character-draft'
+import {
+  type CharacterDraftSummary,
+  type CharacterDraftsResponse,
+  characterDraftsQueryKey,
+} from './character-draft'
 
 const rankLabels: Record<string, string> = {
   novice: 'Novice',
@@ -44,15 +47,29 @@ export function CharactersRoute() {
     '/api/v1/characters',
   )
   const characters = data?.characters ?? []
-  const userId = useSession().data?.user?.id
-  const [discardedDraftFor, setDiscardedDraftFor] = useState<number | null>(null)
-  const draft = useMemo(
-    () =>
-      userId === undefined || discardedDraftFor === userId ? null : loadCharacterDraft(userId),
-    [discardedDraftFor, userId],
+  const [discardError, setDiscardError] = useState(false)
+  const draftsQuery = useRestQuery<CharacterDraftsResponse>(
+    characterDraftsQueryKey,
+    '/api/v1/character_drafts',
   )
+  const drafts = draftsQuery.data?.character_drafts ?? []
   const rosterLoaded = !isPending && !isError
-  const showEmptyState = rosterLoaded && characters.length === 0 && !draft
+  const showEmptyState =
+    rosterLoaded && !draftsQuery.isPending && characters.length === 0 && drafts.length === 0
+  const dateFormat = new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+  const discardMutation = useRestMutation<void, { id: number }>(
+    { path: ({ id }) => `/api/v1/character_drafts/${id}`, method: 'DELETE' },
+    {
+      onSuccess: () => {
+        setDiscardError(false)
+        void queryClient.invalidateQueries({ queryKey: characterDraftsQueryKey })
+      },
+      onError: () => setDiscardError(true),
+    },
+  )
   const deleteMutation = useRestMutation<void, DeleteCharacterVariables>(
     { path: ({ id }) => `/api/v1/characters/${id}`, method: 'DELETE' },
     {
@@ -74,12 +91,11 @@ export function CharactersRoute() {
     deleteMutation.mutate({ id: character.id })
   }
 
-  const discardDraft = () => {
-    if (userId === undefined) return
+  const discardDraft = (draft: CharacterDraftSummary) => {
     if (!window.confirm(t('Discard the unfinished character?'))) return
 
-    clearCharacterDraft(userId)
-    setDiscardedDraftFor(userId)
+    setDiscardError(false)
+    discardMutation.mutate({ id: draft.id })
   }
 
   return (
@@ -91,34 +107,58 @@ export function CharactersRoute() {
             {t('Manage the characters you have created.')}
           </p>
         </div>
-        {!showEmptyState && !draft ? (
+        {!showEmptyState ? (
           <Button asChild>
             <Link to="/characters/new">{t('Create a character')}</Link>
           </Button>
         ) : null}
       </div>
 
-      {draft ? (
-        <Card className="mt-6 max-w-2xl">
-          <CardHeader>
-            <CardTitle>{t('Unfinished character')}</CardTitle>
-            <CardDescription>
-              {draft.values.concept.name || t('Unnamed character')} ·{' '}
-              {new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-US', {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-              }).format(new Date(draft.saved_at))}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            <Button asChild>
-              <Link to="/characters/new">{t('Continue draft')}</Link>
-            </Button>
-            <Button type="button" variant="outline" onClick={discardDraft}>
-              {t('Discard draft')}
-            </Button>
-          </CardContent>
-        </Card>
+      {drafts.length > 0 ? (
+        <section aria-labelledby="character-drafts-heading" className="mt-6">
+          <h2 id="character-drafts-heading" className="text-foreground text-xl font-medium">
+            {t('Unfinished characters')}
+          </h2>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {drafts.map((draft) => (
+              <Card key={draft.id}>
+                <CardHeader>
+                  <CardTitle className="min-w-0 break-words">
+                    {draft.name || t('Unnamed character')}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('Last saved')} {dateFormat.format(new Date(draft.updated_at))}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-2">
+                  <Button asChild size="sm">
+                    <Link
+                      to={`/characters/new?draft=${draft.id}`}
+                      aria-label={`${t('Continue draft')}: ${draft.name || t('Unnamed character')}`}
+                    >
+                      {t('Continue draft')}
+                    </Link>
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => discardDraft(draft)}
+                    disabled={discardMutation.isPending}
+                    aria-label={`${t('Discard draft')}: ${draft.name || t('Unnamed character')}`}
+                  >
+                    {t('Discard draft')}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          {discardError ? (
+            <p className="text-danger mt-3 text-sm" role="alert">
+              {t('Could not discard the draft. Try again.')}
+            </p>
+          ) : null}
+        </section>
       ) : null}
 
       {isPending ? (

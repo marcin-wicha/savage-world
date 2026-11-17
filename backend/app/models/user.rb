@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :characters, dependent: :destroy
   has_many :led_parties, class_name: "Party", foreign_key: :leader_id, inverse_of: :leader, dependent: :destroy
   has_many :enemy_templates, dependent: :destroy
+  has_many :character_drafts, dependent: :destroy
   has_many :battles, dependent: :destroy
 
   scope :pending, -> { where(approved: false) }

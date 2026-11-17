@@ -1,13 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 
 import { api } from '@/lib/api-client'
 
 import { CharactersRoute } from './CharactersRoute'
-import { loadCharacterDraft, saveCharacterDraft } from './character-draft'
-import { characterFormDefaults } from './character-form'
+import type { CharacterDraftSummary } from './character-draft'
 
 vi.mock('@/lib/api-client', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api-client')>()
@@ -33,15 +32,10 @@ type TestCharacter = {
   origin_name: string | null
 }
 
-function renderRoute(characters: TestCharacter[] = [], sessionUserId?: number) {
+function renderRoute(characters: TestCharacter[] = [], drafts: CharacterDraftSummary[] = []) {
   apiGetMock.mockImplementation((path: string) =>
     Promise.resolve(
-      path === '/api/v1/session' && sessionUserId !== undefined
-        ? {
-            user: { id: sessionUserId, email_address: 'player@example.com', role: 'user' },
-            csrf_token: 'token',
-          }
-        : { characters },
+      path === '/api/v1/character_drafts' ? { character_drafts: drafts } : { characters },
     ),
   )
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -133,57 +127,66 @@ describe('CharactersRoute', () => {
     expect(screen.getAllByRole('link', { name: /create a character/i })).toHaveLength(1)
   })
 
-  describe('with an unfinished character draft', () => {
-    beforeEach(() => {
-      window.localStorage.clear()
-      saveCharacterDraft(
-        7,
-        { ...characterFormDefaults, concept: { name: 'Mira', description: '' } },
-        3,
-      )
-    })
+  describe('with unfinished character drafts', () => {
+    const drafts: CharacterDraftSummary[] = [
+      { id: 5, name: 'Mira', step: 3, updated_at: '2026-11-17T10:00:00Z' },
+      { id: 6, name: '', step: 0, updated_at: '2026-11-16T10:00:00Z' },
+    ]
 
-    afterEach(() => {
-      window.localStorage.clear()
-      vi.restoreAllMocks()
-    })
+    afterEach(() => vi.restoreAllMocks())
 
-    const renderSignedIn = (characters: TestCharacter[] = []) => renderRoute(characters, 7)
+    it('lists drafts with links to continue each one', async () => {
+      renderRoute([], drafts)
 
-    it('offers to continue the draft instead of a separate create link', async () => {
-      renderSignedIn()
-
-      expect(await screen.findByText('Unfinished character')).toBeInTheDocument()
-      expect(screen.getByText(/Mira/)).toBeInTheDocument()
-      expect(screen.getByRole('link', { name: 'Continue draft' })).toHaveAttribute(
+      expect(
+        await screen.findByRole('heading', { name: 'Unfinished characters' }),
+      ).toBeInTheDocument()
+      expect(screen.getByText('Mira')).toBeInTheDocument()
+      expect(screen.getByText('Unnamed character')).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'Continue draft: Mira' })).toHaveAttribute(
         'href',
-        '/characters/new',
+        '/characters/new?draft=5',
       )
-      expect(screen.queryByRole('link', { name: /create a character/i })).not.toBeInTheDocument()
       expect(screen.queryByText('No characters yet')).not.toBeInTheDocument()
+      expect(screen.getAllByRole('link', { name: /create a character/i })).toHaveLength(1)
     })
 
-    it('discards the draft after confirmation', async () => {
+    it('discards a draft after confirmation', async () => {
       const user = userEvent.setup()
       vi.spyOn(window, 'confirm').mockReturnValue(true)
-      renderSignedIn()
+      apiDeleteMock.mockResolvedValue(null)
+      renderRoute([], drafts)
 
-      await user.click(await screen.findByRole('button', { name: 'Discard draft' }))
+      await user.click(await screen.findByRole('button', { name: 'Discard draft: Mira' }))
 
-      expect(screen.queryByText('Unfinished character')).not.toBeInTheDocument()
-      expect(await screen.findByText('No characters yet')).toBeInTheDocument()
-      expect(loadCharacterDraft(7)).toBeNull()
+      await waitFor(() => {
+        expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/character_drafts/5')
+      })
+      expect(apiGetMock).toHaveBeenCalledWith(
+        '/api/v1/character_drafts',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      )
     })
 
     it('keeps the draft when discarding is cancelled', async () => {
       const user = userEvent.setup()
       vi.spyOn(window, 'confirm').mockReturnValue(false)
-      renderSignedIn()
+      renderRoute([], drafts)
 
-      await user.click(await screen.findByRole('button', { name: 'Discard draft' }))
+      await user.click(await screen.findByRole('button', { name: 'Discard draft: Mira' }))
 
-      expect(screen.getByText('Unfinished character')).toBeInTheDocument()
-      expect(loadCharacterDraft(7)).not.toBeNull()
+      expect(apiDeleteMock).not.toHaveBeenCalled()
+    })
+
+    it('reports a failed discard', async () => {
+      const user = userEvent.setup()
+      vi.spyOn(window, 'confirm').mockReturnValue(true)
+      apiDeleteMock.mockRejectedValue(new Error('boom'))
+      renderRoute([], drafts)
+
+      await user.click(await screen.findByRole('button', { name: 'Discard draft: Mira' }))
+
+      expect(await screen.findByText('Could not discard the draft. Try again.')).toBeInTheDocument()
     })
   })
 })
