@@ -121,6 +121,9 @@ Current gaps, intentionally left for later feature work:
 - There is no password-reset flow or mailer usage.
 - Domain Pundit policies currently cover character upsert and parties.
 - Frontend feature UI and MSW handlers are still minimal.
+- Unfinished character creation is autosaved as a per-user draft in browser
+  `localStorage` (`features/characters/character-draft.ts`); drafts are not
+  stored on the server and do not include an unsaved avatar file.
 
 ## Agent operating rules
 

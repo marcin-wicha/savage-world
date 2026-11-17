@@ -275,6 +275,14 @@ export function EdgesStep() {
 
       <HindrancePointsBalance />
 
+      {availableForEdges < edgeHindrancePointCost && reservedHindrancePoints > 0 ? (
+        <p className="text-muted-foreground max-w-xl text-sm" role="note">
+          {t(
+            'You need 2 free hindrance points for an edge. Go back to the Attributes or Skills step and lower a die to free points spent there.',
+          )}
+        </p>
+      ) : null}
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <FilterButton

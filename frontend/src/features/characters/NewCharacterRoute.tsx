@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-flow'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useSession } from '@/features/auth/use-session'
 import { ApiError, api } from '@/lib/api-client'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
@@ -18,6 +20,12 @@ import { EdgesStep } from './EdgesStep'
 import { OriginStep } from './OriginStep'
 
 import { HindrancesStep } from './HindrancesStep'
+import {
+  clearCharacterDraft,
+  hasDraftContent,
+  loadCharacterDraft,
+  saveCharacterDraft,
+} from './character-draft'
 import { GearStep } from './GearStep'
 import { SkillsStep } from './SkillsStep'
 import {
@@ -122,7 +130,7 @@ const stepDefinitions: StepDefinition[] = [
     title: 'Hindrances',
     heading: 'Take hindrances',
     description:
-      'Hindrances are flaws, bad habits, or troubles that make your character more interesting to play, such as greed, stubbornness, or poor eyesight. Each one earns points you can spend later on stronger attributes, more skills, or edges. A Minor hindrance is worth 1 point and a Major one 2, up to 4 points in total.',
+      'Hindrances are flaws, bad habits, or troubles that make your character more interesting to play, such as greed, stubbornness, or poor eyesight. Each one earns points you spend on the next steps: Attributes, Skills, and Edges. A Minor hindrance is worth 1 point and a Major one 2, up to 4 points in total. An edge costs 2 points, so keep some unspent on the Attributes and Skills steps if you want edges.',
   },
   {
     id: 'attributes',
@@ -162,7 +170,15 @@ const stepDefinitions: StepDefinition[] = [
 ]
 
 export function NewCharacterRoute() {
-  const { t } = useLanguage()
+  const { id } = useParams<{ id: string }>()
+  const userId = useSession().data?.user?.id
+  const draftUserId = id ? undefined : userId
+
+  return <CharacterEditor key={draftUserId ?? 'none'} draftUserId={draftUserId} />
+}
+
+function CharacterEditor({ draftUserId }: { draftUserId: number | undefined }) {
+  const { t, language } = useLanguage()
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
@@ -179,9 +195,17 @@ export function NewCharacterRoute() {
     `/api/v1/characters/${id ?? ''}`,
     { enabled: isEditing },
   )
+  const [initialDraft] = useState(() =>
+    draftUserId === undefined ? null : loadCharacterDraft(draftUserId),
+  )
+  const [step, setStep] = useState(() =>
+    Math.min(initialDraft?.step ?? 0, stepDefinitions.length - 1),
+  )
+  const [draftRestoredAt, setDraftRestoredAt] = useState(initialDraft?.saved_at ?? null)
+  const characterSaved = useRef(false)
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(characterFormSchema),
-    defaultValues: characterFormDefaults,
+    defaultValues: initialDraft?.values ?? characterFormDefaults,
     mode: 'onTouched',
   })
   useEffect(() => {
@@ -224,6 +248,21 @@ export function NewCharacterRoute() {
   const spentHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_spent' }) ?? 0
   const hindrancePointsBalanced = earnedHindrancePoints === spentHindrancePoints
+  const draftActive = draftUserId !== undefined
+  useEffect(() => {
+    if (draftUserId === undefined || characterSaved.current) return
+    const values = form.getValues()
+    if (step === 0 && draftRestoredAt === null && !hasDraftContent(values)) return
+
+    saveCharacterDraft(draftUserId, values, step)
+  }, [draftRestoredAt, draftUserId, form, formValues, step])
+
+  const startOver = () => {
+    if (draftUserId !== undefined) clearCharacterDraft(draftUserId)
+    form.reset(characterFormDefaults)
+    setStep(0)
+    setDraftRestoredAt(null)
+  }
   const saveMutation = useRestMutation<CharacterSaveResponse, CharacterSaveRequest>(
     {
       path: isEditing ? `/api/v1/characters/${id}` : '/api/v1/characters',
@@ -232,6 +271,10 @@ export function NewCharacterRoute() {
     {
       onSuccess: async (response) => {
         const characterId = response.character.id
+        if (draftUserId !== undefined) {
+          characterSaved.current = true
+          clearCharacterDraft(draftUserId)
+        }
         const avatarFailure = await syncAvatar(characterId)
         void queryClient.invalidateQueries({ queryKey: ['characters'] })
         void queryClient.invalidateQueries({ queryKey: ['parties'] })
@@ -359,11 +402,31 @@ export function NewCharacterRoute() {
         {t(isEditing ? 'Edit character' : 'Create a character')}
       </h1>
 
+      {draftActive ? (
+        <div className="border-border mt-4 flex max-w-2xl flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
+          <p className="text-muted-foreground text-sm" role="status">
+            {draftRestoredAt
+              ? `${t('Draft restored from')} ${new Intl.DateTimeFormat(
+                  language === 'pl' ? 'pl-PL' : 'en-US',
+                  { dateStyle: 'medium', timeStyle: 'short' },
+                ).format(new Date(draftRestoredAt))}.`
+              : t('Your progress is saved as a draft on this device.')}
+          </p>
+          {draftRestoredAt ? (
+            <Button type="button" size="sm" variant="outline" onClick={startOver}>
+              {t('Start over')}
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
+
       <Card className="mt-6 overflow-visible">
         <CardContent>
           <FormProvider {...form}>
             <MultiStepFlow
               steps={steps}
+              currentStep={step}
+              onStepChange={setStep}
               footerClassName="sticky bottom-0 z-10 bg-card/95 py-4 backdrop-blur"
               completeLabel={
                 saveMutation.isPending

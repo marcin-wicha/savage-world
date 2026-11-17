@@ -390,6 +390,9 @@ describe('EdgesStep', () => {
     })
     expect(screen.getByText('0 / 4')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Alertness' })).toBeDisabled()
+    expect(
+      screen.getByText(/go back to the attributes or skills step and lower a die/i),
+    ).toBeInTheDocument()
     expect(screen.queryByText('Loading edges…')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Alertness' }))

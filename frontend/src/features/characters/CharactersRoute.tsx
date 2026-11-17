@@ -1,12 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { CharacterAvatar } from '@/components/character-avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useSession } from '@/features/auth/use-session'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
+
+import { clearCharacterDraft, loadCharacterDraft } from './character-draft'
 
 const rankLabels: Record<string, string> = {
   novice: 'Novice',
@@ -41,6 +44,15 @@ export function CharactersRoute() {
     '/api/v1/characters',
   )
   const characters = data?.characters ?? []
+  const userId = useSession().data?.user?.id
+  const [discardedDraftFor, setDiscardedDraftFor] = useState<number | null>(null)
+  const draft = useMemo(
+    () =>
+      userId === undefined || discardedDraftFor === userId ? null : loadCharacterDraft(userId),
+    [discardedDraftFor, userId],
+  )
+  const rosterLoaded = !isPending && !isError
+  const showEmptyState = rosterLoaded && characters.length === 0 && !draft
   const deleteMutation = useRestMutation<void, DeleteCharacterVariables>(
     { path: ({ id }) => `/api/v1/characters/${id}`, method: 'DELETE' },
     {
@@ -62,6 +74,14 @@ export function CharactersRoute() {
     deleteMutation.mutate({ id: character.id })
   }
 
+  const discardDraft = () => {
+    if (userId === undefined) return
+    if (!window.confirm(t('Discard the unfinished character?'))) return
+
+    clearCharacterDraft(userId)
+    setDiscardedDraftFor(userId)
+  }
+
   return (
     <section>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -71,10 +91,35 @@ export function CharactersRoute() {
             {t('Manage the characters you have created.')}
           </p>
         </div>
-        <Button asChild>
-          <Link to="/characters/new">{t('Create a character')}</Link>
-        </Button>
+        {!showEmptyState && !draft ? (
+          <Button asChild>
+            <Link to="/characters/new">{t('Create a character')}</Link>
+          </Button>
+        ) : null}
       </div>
+
+      {draft ? (
+        <Card className="mt-6 max-w-2xl">
+          <CardHeader>
+            <CardTitle>{t('Unfinished character')}</CardTitle>
+            <CardDescription>
+              {draft.values.concept.name || t('Unnamed character')} ·{' '}
+              {new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-US', {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              }).format(new Date(draft.saved_at))}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link to="/characters/new">{t('Continue draft')}</Link>
+            </Button>
+            <Button type="button" variant="outline" onClick={discardDraft}>
+              {t('Discard draft')}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {isPending ? (
         <p className="text-muted-foreground mt-6 text-sm">{t('Loading characters…')}</p>
@@ -86,7 +131,7 @@ export function CharactersRoute() {
         </p>
       ) : null}
 
-      {!isPending && !isError && characters.length === 0 ? (
+      {showEmptyState ? (
         <Card className="mt-6 max-w-2xl">
           <CardHeader>
             <CardTitle>{t('No characters yet')}</CardTitle>
@@ -108,7 +153,7 @@ export function CharactersRoute() {
         </p>
       ) : null}
 
-      {!isPending && !isError && characters.length > 0 ? (
+      {rosterLoaded && characters.length > 0 ? (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {characters.map((character) => (
             <Card key={character.id}>

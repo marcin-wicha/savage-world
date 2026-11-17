@@ -6,6 +6,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { api } from '@/lib/api-client'
 
 import { CharactersRoute } from './CharactersRoute'
+import { loadCharacterDraft, saveCharacterDraft } from './character-draft'
+import { characterFormDefaults } from './character-form'
 
 vi.mock('@/lib/api-client', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api-client')>()
@@ -31,8 +33,17 @@ type TestCharacter = {
   origin_name: string | null
 }
 
-function renderRoute(characters: TestCharacter[] = []) {
-  apiGetMock.mockResolvedValue({ characters })
+function renderRoute(characters: TestCharacter[] = [], sessionUserId?: number) {
+  apiGetMock.mockImplementation((path: string) =>
+    Promise.resolve(
+      path === '/api/v1/session' && sessionUserId !== undefined
+        ? {
+            user: { id: sessionUserId, email_address: 'player@example.com', role: 'user' },
+            csrf_token: 'token',
+          }
+        : { characters },
+    ),
+  )
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
   render(
@@ -112,6 +123,67 @@ describe('CharactersRoute', () => {
     renderRoute()
 
     expect(await screen.findByText('No characters yet')).toBeInTheDocument()
-    expect(screen.getAllByRole('link', { name: /create a character/i })).toHaveLength(2)
+    expect(screen.getAllByRole('link', { name: /create a character/i })).toHaveLength(1)
+  })
+
+  it('shows a single create link when the roster has characters', async () => {
+    renderRoute([{ id: 1, name: 'Katarina Voss', rank: 'novice', origin_name: null }])
+
+    expect(await screen.findByText('Katarina Voss')).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /create a character/i })).toHaveLength(1)
+  })
+
+  describe('with an unfinished character draft', () => {
+    beforeEach(() => {
+      window.localStorage.clear()
+      saveCharacterDraft(
+        7,
+        { ...characterFormDefaults, concept: { name: 'Mira', description: '' } },
+        3,
+      )
+    })
+
+    afterEach(() => {
+      window.localStorage.clear()
+      vi.restoreAllMocks()
+    })
+
+    const renderSignedIn = (characters: TestCharacter[] = []) => renderRoute(characters, 7)
+
+    it('offers to continue the draft instead of a separate create link', async () => {
+      renderSignedIn()
+
+      expect(await screen.findByText('Unfinished character')).toBeInTheDocument()
+      expect(screen.getByText(/Mira/)).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'Continue draft' })).toHaveAttribute(
+        'href',
+        '/characters/new',
+      )
+      expect(screen.queryByRole('link', { name: /create a character/i })).not.toBeInTheDocument()
+      expect(screen.queryByText('No characters yet')).not.toBeInTheDocument()
+    })
+
+    it('discards the draft after confirmation', async () => {
+      const user = userEvent.setup()
+      vi.spyOn(window, 'confirm').mockReturnValue(true)
+      renderSignedIn()
+
+      await user.click(await screen.findByRole('button', { name: 'Discard draft' }))
+
+      expect(screen.queryByText('Unfinished character')).not.toBeInTheDocument()
+      expect(await screen.findByText('No characters yet')).toBeInTheDocument()
+      expect(loadCharacterDraft(7)).toBeNull()
+    })
+
+    it('keeps the draft when discarding is cancelled', async () => {
+      const user = userEvent.setup()
+      vi.spyOn(window, 'confirm').mockReturnValue(false)
+      renderSignedIn()
+
+      await user.click(await screen.findByRole('button', { name: 'Discard draft' }))
+
+      expect(screen.getByText('Unfinished character')).toBeInTheDocument()
+      expect(loadCharacterDraft(7)).not.toBeNull()
+    })
   })
 })

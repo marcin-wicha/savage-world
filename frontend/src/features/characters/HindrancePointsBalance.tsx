@@ -6,6 +6,24 @@ import type { CharacterFormValues } from './character-form'
 
 const maxHindrancePoints = 4
 
+const pointUses = [
+  {
+    step: 'Attributes',
+    cost: '1 point raises an attribute one die type',
+    field: 'attribute_hindrance_points_spent',
+  },
+  {
+    step: 'Skills',
+    cost: '1 point buys an extra skill point',
+    field: 'skill_hindrance_points_spent',
+  },
+  {
+    step: 'Edges',
+    cost: '2 points buy one edge',
+    field: 'edge_hindrance_points_spent',
+  },
+] as const
+
 type HindrancePointsBalanceProps = {
   earnedPoints?: number
 }
@@ -18,6 +36,10 @@ export function HindrancePointsBalance({
   const earnedPointsFromForm =
     useWatch({ control: form.control, name: 'hindrance_points_earned' }) ?? 0
   const spentPoints = useWatch({ control: form.control, name: 'hindrance_points_spent' }) ?? 0
+  const spentByStep = useWatch({
+    control: form.control,
+    name: pointUses.map((use) => use.field),
+  })
   const earnedPoints = Math.min(earnedPointsOverride ?? earnedPointsFromForm, maxHindrancePoints)
   const availablePoints = Math.max(earnedPoints - spentPoints, 0)
   const pointsSummary = `${availablePoints} / ${maxHindrancePoints}`
@@ -34,7 +56,9 @@ export function HindrancePointsBalance({
         <div className="grid gap-1">
           <p className="text-foreground text-sm font-medium">{t('Hindrance points')}</p>
           <p className="text-muted-foreground text-xs leading-5">
-            {t('Remaining from selected Hindrances for later creation steps.')}
+            {t(
+              'Earned from your Hindrances and shared by the Attributes, Skills, and Edges steps. Points spent on one step are no longer available for the others.',
+            )}
           </p>
         </div>
         <p className="text-foreground shrink-0 text-lg font-semibold" data-slot="hindrance-points">
@@ -55,6 +79,19 @@ export function HindrancePointsBalance({
           style={{ width: `${pointsProgress}%` }}
         />
       </div>
+      <ul aria-label={t('Ways to spend hindrance points')} className="grid gap-1.5 text-xs">
+        {pointUses.map((use, index) => (
+          <li key={use.step} className="flex items-baseline justify-between gap-3">
+            <span>
+              <span className="text-foreground font-medium">{t(use.step)}</span>
+              <span className="text-muted-foreground"> · {t(use.cost)}</span>
+            </span>
+            <span className="text-muted-foreground shrink-0 tabular-nums">
+              {t('spent')}: {spentByStep[index] ?? 0}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

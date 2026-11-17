@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, within } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
@@ -7,6 +7,8 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { api } from '@/lib/api-client'
 
 import { NewCharacterRoute } from './NewCharacterRoute'
+import { loadCharacterDraft, saveCharacterDraft } from './character-draft'
+import { characterFormDefaults } from './character-form'
 
 vi.mock('@/lib/api-client', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api-client')>()
@@ -358,5 +360,120 @@ describe('NewCharacterRoute', () => {
 
     expect(await screen.findByRole('heading', { name: /characters page/i })).toBeInTheDocument()
     expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/characters/9/avatar')
+  })
+
+  describe('drafts', () => {
+    beforeEach(() => {
+      window.localStorage.clear()
+      apiGetMock.mockImplementation((path: string) =>
+        Promise.resolve(
+          path === '/api/v1/session'
+            ? {
+                user: { id: 7, email_address: 'player@example.com', role: 'user' },
+                csrf_token: 'token',
+              }
+            : undefined,
+        ),
+      )
+    })
+
+    afterEach(() => {
+      apiGetMock.mockReset()
+      window.localStorage.clear()
+    })
+
+    it('autosaves progress and resumes on the saved step', async () => {
+      const user = userEvent.setup()
+
+      renderRoute()
+      expect(
+        await screen.findByText('Your progress is saved as a draft on this device.'),
+      ).toBeInTheDocument()
+
+      await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
+      await user.click(screen.getByRole('button', { name: /next/i }))
+      expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
+
+      await waitFor(() => {
+        expect(loadCharacterDraft(7)).toMatchObject({
+          step: 1,
+          values: { concept: { name: 'Katarina Voss' } },
+        })
+      })
+
+      cleanup()
+      renderRoute()
+
+      expect(await screen.findByRole('heading', { name: /choose an origin/i })).toBeInTheDocument()
+      expect(screen.getByText(/draft restored from/i)).toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: /back/i }))
+      expect(screen.getByLabelText(/character name/i)).toHaveValue('Katarina Voss')
+    })
+
+    it('starts over from a blank character and clears the draft', async () => {
+      const user = userEvent.setup()
+      saveCharacterDraft(
+        7,
+        { ...characterFormDefaults, concept: { name: 'Mira', description: '' } },
+        0,
+      )
+
+      renderRoute()
+
+      await user.click(await screen.findByRole('button', { name: 'Start over' }))
+
+      expect(screen.getByLabelText(/character name/i)).toHaveValue('')
+      expect(loadCharacterDraft(7)).toBeNull()
+    })
+
+    it('removes the draft once the character is saved', async () => {
+      const user = userEvent.setup()
+
+      renderRoute()
+      expect(
+        await screen.findByText('Your progress is saved as a draft on this device.'),
+      ).toBeInTheDocument()
+      await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
+      await completeFlow(user)
+
+      expect(await screen.findByRole('heading', { name: /characters page/i })).toBeInTheDocument()
+      expect(loadCharacterDraft(7)).toBeNull()
+    })
+
+    it('does not use drafts when editing an existing character', async () => {
+      saveCharacterDraft(
+        7,
+        { ...characterFormDefaults, concept: { name: 'Mira', description: '' } },
+        2,
+      )
+      apiGetMock.mockImplementation((path: string) =>
+        Promise.resolve(
+          path === '/api/v1/session'
+            ? { user: { id: 7, email_address: 'p@example.com', role: 'user' }, csrf_token: 't' }
+            : {
+                character: {
+                  id: 9,
+                  name: 'Katarina Voss',
+                  avatar_url: null,
+                  rank: 'novice',
+                  origin_id: 1,
+                  origin_name: 'Dunestriders',
+                  edge_ids: [],
+                  hindrance_ids: [],
+                  skill_ids: [],
+                  attributes: characterFormDefaults.attributes,
+                  skill_dice: {},
+                  effective_traits: { attributes: {}, skills: {} },
+                },
+              },
+        ),
+      )
+
+      renderRoute('/characters/9/edit')
+
+      expect(await screen.findByLabelText(/character name/i)).toHaveValue('Katarina Voss')
+      expect(screen.queryByText(/draft/i)).not.toBeInTheDocument()
+      expect(loadCharacterDraft(7)?.values.concept.name).toBe('Mira')
+    })
   })
 })

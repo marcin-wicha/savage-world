@@ -114,8 +114,8 @@ const translations: Record<string, string> = {
     'Zdecyduj, kim jest Twoja postać. Nadaj jej imię i opisz ją jednym zdaniem: czym się zajmuje, jaka jest lub co nią kieruje. Ten krok nie wpływa na zasady, ale ułatwi Ci wybory w kolejnych krokach.',
   'Pick the people and homeland your character comes from. Your origin sets the culture they grew up in and the story behind them.':
     'Wybierz lud i krainę, z których pochodzi Twoja postać. Pochodzenie określa kulturę, w której dorastała, i jej historię.',
-  'Hindrances are flaws, bad habits, or troubles that make your character more interesting to play, such as greed, stubbornness, or poor eyesight. Each one earns points you can spend later on stronger attributes, more skills, or edges. A Minor hindrance is worth 1 point and a Major one 2, up to 4 points in total.':
-    'Ułomności to wady, złe nawyki lub kłopoty, dzięki którym postać jest ciekawsza w grze, np. chciwość, upór albo słaby wzrok. Każda daje punkty, które później wydasz na mocniejsze atrybuty, więcej umiejętności lub przewagi. Lekka ułomność jest warta 1 punkt, a poważna 2, łącznie maksymalnie 4 punkty.',
+  'Hindrances are flaws, bad habits, or troubles that make your character more interesting to play, such as greed, stubbornness, or poor eyesight. Each one earns points you spend on the next steps: Attributes, Skills, and Edges. A Minor hindrance is worth 1 point and a Major one 2, up to 4 points in total. An edge costs 2 points, so keep some unspent on the Attributes and Skills steps if you want edges.':
+    'Ułomności to wady, złe nawyki lub kłopoty, dzięki którym postać jest ciekawsza w grze, np. chciwość, upór albo słaby wzrok. Każda daje punkty, które wydasz w kolejnych etapach: Atrybuty, Umiejętności i Przewagi. Lekka ułomność jest warta 1 punkt, a poważna 2, łącznie maksymalnie 4 punkty. Przewaga kosztuje 2 punkty, więc jeśli chcesz przewag, zostaw część punktów niewydanych w etapach Atrybuty i Umiejętności.',
   "Attributes are your character's natural talents: Agility (speed and coordination), Smarts (knowledge and quick thinking), Spirit (willpower and nerve), Strength (physical power), and Vigor (health and endurance). Each is rated with a die from d4 (weak) to d12 (exceptional); a bigger die means better rolls. Every attribute starts at d4. You have 5 points, and each point raises one attribute by one die size. Unspent hindrance points can buy more.":
     'Atrybuty to wrodzone zdolności postaci: Zręczność (szybkość i koordynacja), Spryt (wiedza i bystrość), Duch (siła woli i odwaga), Siła (moc fizyczna) i Wigor (zdrowie i wytrzymałość). Każdy jest oceniany kością od d4 (słabo) do d12 (wyjątkowo); większa kość to lepsze rzuty. Każdy atrybut zaczyna od d4. Masz 5 punktów, a każdy podnosi jeden atrybut o jedną kość. Niewydane punkty za ułomności pozwalają kupić więcej.',
   'Skills are what your character has learned, such as fighting, shooting, sneaking, or persuading. Like attributes, they use dice from d4 to d12. Core skills everyone knows already start at d4; other skills cost a point to learn and stay untrained until you pick them. You have 12 points to spend, and unspent hindrance points can buy more.':
@@ -219,8 +219,23 @@ const translations: Record<string, string> = {
   'Attribute points available': 'Dostępne punkty atrybutów',
   'attribute points available': 'dostępnych punktów atrybutów',
   'Hindrance points': 'Punkty za ułomności',
-  'Remaining from selected Hindrances for later creation steps.':
-    'Pozostałe punkty z wybranych ułomności do wykorzystania w kolejnych etapach.',
+  'Earned from your Hindrances and shared by the Attributes, Skills, and Edges steps. Points spent on one step are no longer available for the others.':
+    'Zdobyte za ułomności i wspólne dla etapów Atrybuty, Umiejętności i Przewagi. Punkty wydane w jednym etapie nie są już dostępne w pozostałych.',
+  'Ways to spend hindrance points': 'Sposoby wydania punktów za ułomności',
+  '1 point raises an attribute one die type': '1 punkt podnosi atrybut o jedną kość',
+  '1 point buys an extra skill point': '1 punkt daje dodatkowy punkt umiejętności',
+  '2 points buy one edge': '2 punkty kupują jedną przewagę',
+  'You need 2 free hindrance points for an edge. Go back to the Attributes or Skills step and lower a die to free points spent there.':
+    'Przewaga wymaga 2 wolnych punktów za ułomności. Wróć do etapu Atrybuty lub Umiejętności i obniż kość, aby odzyskać wydane tam punkty.',
+  'Draft restored from': 'Przywrócono szkic z',
+  'Your progress is saved as a draft on this device.':
+    'Twoje postępy są zapisywane jako szkic na tym urządzeniu.',
+  'Start over': 'Zacznij od nowa',
+  'Unfinished character': 'Niedokończona postać',
+  'Unnamed character': 'Postać bez imienia',
+  'Continue draft': 'Kontynuuj szkic',
+  'Discard draft': 'Odrzuć szkic',
+  'Discard the unfinished character?': 'Odrzucić niedokończoną postać?',
   'Hindrance points available': 'Dostępne punkty za ułomności',
   'hindrance points available': 'dostępnych punktów za ułomności',
   'Visit the gear shop': 'Odwiedź sklep z wyposażeniem',
