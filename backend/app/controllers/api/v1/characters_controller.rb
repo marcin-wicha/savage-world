@@ -2,7 +2,7 @@ module Api
   module V1
     class CharactersController < ApplicationController
       def index
-        characters = Current.user.characters.includes(:origin, :edges, :hindrances, character_skills: :skill, character_gears: :gear).order(updated_at: :desc, id: :desc)
+        characters = Current.user.characters.includes(:origin, :edges, character_hindrances: :hindrance, character_skills: :skill, character_gears: :gear).order(updated_at: :desc, id: :desc)
         render json: {
           characters: characters.map do |character|
             character_payload(character)
@@ -67,6 +67,7 @@ module Api
       def character_params
         params.require(:character).permit(
           :name,
+          :description,
           :rank,
           :origin_id,
           :hindrance_points_earned,
@@ -87,6 +88,7 @@ module Api
         {
           id: character.id,
           name: character.name,
+          description: character.description,
           origin_name: character.origin && ReferenceData::Translations.for(
             character.origin,
             :name,
@@ -97,10 +99,22 @@ module Api
           edge_ids: character.edge_ids,
           edges: character.edges.map { |edge| { id: edge.id, name: edge.name } },
           hindrance_ids: character.hindrance_ids,
-          hindrances: character.hindrances.map { |hindrance| { id: hindrance.id, name: hindrance.name } },
+          hindrances: character.character_hindrances.map do |selection|
+            { id: selection.hindrance_id, name: selection.hindrance.name, severity: selection.severity }
+          end,
+          hindrance_severities: character.character_hindrances.to_h do |selection|
+            [ selection.hindrance_id, selection.severity ]
+          end,
+          hindrance_points_earned: character.hindrance_points_earned,
           skill_ids: character.skill_ids,
           skills: character.character_skills.map do |selection|
-            { id: selection.skill_id, name: selection.skill.name, attribute: selection.skill.linked_attribute, die: selection.die }
+            {
+              id: selection.skill_id,
+              name: selection.skill.name,
+              attribute: selection.skill.linked_attribute,
+              core: selection.skill.core,
+              die: selection.die
+            }
           end,
           attributes: character.attribute_dice,
           skill_dice: character.character_skills.each_with_object({}) do |selection, dice|

@@ -206,6 +206,7 @@ describe('NewCharacterRoute', () => {
     expect(apiPostMock).toHaveBeenCalledWith('/api/v1/characters', {
       character: {
         name: 'Katarina Voss',
+        description: '',
         rank: 'novice',
         origin_id: 1,
         edge_ids: [],

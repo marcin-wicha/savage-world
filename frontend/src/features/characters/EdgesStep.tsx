@@ -13,6 +13,7 @@ import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { missingEdgeRequirements, type EdgeRequirementCharacter } from './edge-requirements'
 import { parseEdgeEffects } from './edge-effects'
 import type { CharacterFormValues } from './character-form'
+import { edgeHindrancePointCost } from './point-buy'
 import { useEdgeCatalog } from './reference-catalogs'
 
 const rankOptions: FilterOption[] = [
@@ -43,7 +44,6 @@ function ranksUpTo(rank: string): string[] {
 }
 
 const dieValues: Record<string, number> = { d4: 4, d6: 6, d8: 8, d10: 10, d12: 12 }
-const edgeHindrancePointCost = 2
 
 export function EdgesStep() {
   const { language, t } = useLanguage()

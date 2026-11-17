@@ -8,6 +8,19 @@ RSpec.describe Character, type: :model do
   it { is_expected.to belong_to(:user) }
   it { is_expected.to belong_to(:origin).optional }
   it { is_expected.to validate_presence_of(:name) }
+  it { is_expected.to validate_length_of(:description).is_at_most(500) }
+
+  it "strips the description" do
+    expect(build(:character, description: "  A hunter.  ").description).to eq("A hunter.")
+  end
+
+  it "sums hindrance points from the stored severities" do
+    character = create(:character)
+    create(:character_hindrance, character: character, severity: :major)
+    create(:character_hindrance, character: character, severity: :minor)
+
+    expect(character.reload.hindrance_points_earned).to eq(3)
+  end
   it { is_expected.to have_many(:character_edges).dependent(:destroy) }
   it { is_expected.to have_many(:edges).through(:character_edges) }
   it { is_expected.to have_many(:character_hindrances).dependent(:destroy) }

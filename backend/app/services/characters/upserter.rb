@@ -19,6 +19,7 @@ module Characters
     def call
       prepare_selections
       prepare_origin
+      prepare_hindrance_severities
       prepare_hindrance_points
       return false if errors.any?
 
@@ -27,11 +28,12 @@ module Characters
       return false if errors.any?
 
       Character.transaction do
-        character.assign_attributes(@attributes.slice(:name, :rank))
+        character.assign_attributes(@attributes.slice(:name, :description, :rank))
         character.attribute_dice = @attributes[:attributes] if @attributes.key?(:attributes)
         character.origin = @origin if @origin_provided
         character.save!
         apply_selections
+        apply_hindrance_severities
         apply_skill_dice
         apply_gear
       end
@@ -163,7 +165,7 @@ module Characters
         end
         return
       end
-      return if errors.key?(:hindrance_ids)
+      return if errors.key?(:hindrance_ids) || errors.key?(:hindrance_severities)
 
       spent = normalize_points(@attributes[:hindrance_points_spent], :hindrance_points_spent)
       reported_earned = normalize_points(@attributes[:hindrance_points_earned], :hindrance_points_earned)
@@ -181,23 +183,41 @@ module Characters
       errors[:hindrance_points_spent] = [ "must spend all earned hindrance points before saving" ] if spent != earned
     end
 
-    def hindrance_points_earned
-      severities = @attributes[:hindrance_severities] || {}
+    def prepare_hindrance_severities
+      return unless @attributes.key?(:hindrance_ids) || @attributes.key?(:hindrance_severities)
+      return if errors.key?(:hindrance_ids)
 
-      @selections.fetch(:hindrance_ids, []).sum do |id|
-        hindrance = Hindrance.find(id)
+      requested = @attributes[:hindrance_severities] || {}
+      unless requested.is_a?(Hash)
+        errors[:hindrance_severities] = [ "must be an object keyed by hindrance id" ]
+        return
+      end
+
+      requested = requested.transform_keys(&:to_s)
+      stored = stored_hindrance_severities
+      ids = @selections.fetch(:hindrance_ids) { stored.keys }
+      @hindrance_severities = Hindrance.where(id: ids).to_h do |hindrance|
         severity = hindrance.severity
-        if severity == "minor_or_major"
-          selected = severities[id.to_s] || severities[id] || "minor"
-          unless %w[minor major].include?(selected)
-            errors[:hindrance_severities] = [ "must specify minor or major for #{id}" ]
-            selected = "minor"
+        if hindrance.minor_or_major?
+          severity = requested.fetch(hindrance.id.to_s) { stored.fetch(hindrance.id, "minor") }
+          unless CharacterHindrance.severities.key?(severity)
+            errors[:hindrance_severities] = [ "must specify minor or major for #{hindrance.id}" ]
           end
-          severity = selected
         end
 
-        severity == "major" ? 2 : 1
+        [ hindrance.id, severity ]
       end
+    end
+
+    def stored_hindrance_severities
+      return {} if character.new_record?
+
+      character.character_hindrances.to_h { |selection| [ selection.hindrance_id, selection.severity ] }
+    end
+
+    def hindrance_points_earned
+      severities = @hindrance_severities || stored_hindrance_severities
+      severities.values.sum { |severity| severity == "major" ? 2 : 1 }
     end
 
     def normalize_points(value, key)
@@ -219,6 +239,14 @@ module Characters
     def apply_selections
       @selections.each do |key, ids|
         character.public_send(:"#{key}=", ids)
+      end
+    end
+
+    def apply_hindrance_severities
+      return unless @hindrance_severities
+
+      character.character_hindrances.reset.each do |selection|
+        selection.update!(severity: @hindrance_severities.fetch(selection.hindrance_id))
       end
     end
 

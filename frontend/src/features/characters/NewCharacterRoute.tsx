@@ -27,6 +27,7 @@ import {
   characterFormSchema,
   characterStepFields,
 } from './character-form'
+import { hindrancePointsSpentFor } from './point-buy'
 
 type StepDefinition = {
   id: CharacterStepId
@@ -38,6 +39,7 @@ type StepDefinition = {
 type CharacterSaveRequest = {
   character: {
     name: string
+    description: string
     rank: CharacterFormValues['rank']
     origin_id: number | null
     edge_ids: number[]
@@ -63,12 +65,16 @@ type CharacterResponse = {
   character: {
     id: number
     name: string
+    description?: string
     rank: CharacterFormValues['rank']
     origin_id: number | null
     origin_name: string | null
     edge_ids: number[]
     hindrance_ids: number[]
+    hindrance_severities?: Record<string, 'minor' | 'major'>
+    hindrance_points_earned?: number
     skill_ids: number[]
+    skills?: { id: number; core: boolean; die: CharacterFormValues['skill_dice'][string] }[]
     attributes: CharacterFormValues['attributes']
     skill_dice: Record<string, CharacterFormValues['skill_dice'][string]>
     gear?: { gear_id: number; name: string; quantity: number; equipped: boolean }[]
@@ -180,9 +186,15 @@ export function NewCharacterRoute() {
     const character = characterQuery.data?.character
     if (!character) return
 
+    const hindrancePointsSpent = hindrancePointsSpentFor({
+      attributes: character.attributes,
+      skills: character.skills ?? [],
+      edgeCount: character.edge_ids.length,
+    })
+
     form.reset({
       ...characterFormDefaults,
-      concept: { name: character.name, description: '' },
+      concept: { name: character.name, description: character.description ?? '' },
       rank: character.rank,
       origin: character.origin_id === null ? '' : String(character.origin_id),
       origin_name: character.origin_name ?? '',
@@ -194,8 +206,16 @@ export function NewCharacterRoute() {
         Object.entries(character.skill_dice).map(([skillId, die]) => [String(skillId), die]),
       ),
       hindrance_severities: Object.fromEntries(
-        character.hindrance_ids.map((hindranceId) => [String(hindranceId), 'minor']),
+        character.hindrance_ids.map((hindranceId) => [
+          String(hindranceId),
+          character.hindrance_severities?.[hindranceId] ?? 'minor',
+        ]),
       ),
+      hindrance_points_earned: character.hindrance_points_earned ?? 0,
+      attribute_hindrance_points_spent: hindrancePointsSpent.attribute,
+      skill_hindrance_points_spent: hindrancePointsSpent.skill,
+      edge_hindrance_points_spent: hindrancePointsSpent.edge,
+      hindrance_points_spent: hindrancePointsSpent.total,
       gear: Object.fromEntries(
         (character.gear ?? []).map((item) => [String(item.gear_id), item.quantity]),
       ),
@@ -287,6 +307,7 @@ export function NewCharacterRoute() {
       saveMutation.mutate({
         character: {
           name: values.concept.name,
+          description: values.concept.description,
           rank: values.rank,
           origin_id: Number(values.origin),
           edge_ids: ids(values.edges),

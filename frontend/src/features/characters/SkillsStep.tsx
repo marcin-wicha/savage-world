@@ -10,16 +10,9 @@ import { useLanguage } from '@/lib/i18n-context'
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { SkillPointsBalance } from './SkillPointsBalance'
 import type { CharacterFormValues } from './character-form'
+import { defaultDieFor, defaultSkillPoints, dieSteps, skillPointCost } from './point-buy'
 import { useSkillCatalog } from './reference-catalogs'
 
-const defaultSkillPoints = 12
-const dieSteps: Record<SkillDieType, number> = {
-  d4: 0,
-  d6: 1,
-  d8: 2,
-  d10: 3,
-  d12: 4,
-}
 const attributeLabels: Record<string, string> = {
   agility: 'Agility',
   smarts: 'Smarts',
@@ -35,14 +28,6 @@ function attributeLabel(attribute: string) {
     attributeLabels[normalizedAttribute] ??
     normalizedAttribute.charAt(0).toUpperCase() + normalizedAttribute.slice(1)
   )
-}
-
-function defaultDieFor(skill: { core: boolean }): SkillDieType {
-  return skill.core ? 'd6' : 'd4'
-}
-
-function skillPointCost(skill: { core: boolean }, die: SkillDieType) {
-  return dieSteps[die] + (skill.core ? 0 : 1)
 }
 
 export function SkillsStep() {

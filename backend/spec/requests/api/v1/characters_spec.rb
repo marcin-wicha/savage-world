@@ -101,6 +101,31 @@ RSpec.describe "Characters", type: :request do
       )
     end
 
+    it "returns the description, hindrance severities, earned points, and core skills" do
+      flexible_hindrance = create(:hindrance, severity: :minor_or_major)
+      core_skill = create(:skill, core: true)
+      put_character(
+        character_id,
+        name: "Katarina Voss",
+        description: "A relentless monster hunter.",
+        hindrance_ids: [ flexible_hindrance.id ],
+        hindrance_severities: { flexible_hindrance.id.to_s => "major" },
+        skill_ids: [ core_skill.id ],
+        skill_dice: { core_skill.id.to_s => "d6" }
+      )
+      expect(response).to have_http_status(:created)
+
+      get "/api/v1/characters/#{character_id}", headers: json_headers
+
+      expect(json["character"]).to include(
+        "description" => "A relentless monster hunter.",
+        "hindrances" => [ { "id" => flexible_hindrance.id, "name" => flexible_hindrance.name, "severity" => "major" } ],
+        "hindrance_severities" => { flexible_hindrance.id.to_s => "major" },
+        "hindrance_points_earned" => 2,
+        "skills" => [ hash_including("id" => core_skill.id, "core" => true, "die" => "d6") ]
+      )
+    end
+
     it "does not expose another user's character" do
       character = create(:character)
 

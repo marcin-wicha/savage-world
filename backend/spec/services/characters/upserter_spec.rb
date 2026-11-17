@@ -170,6 +170,115 @@ RSpec.describe Characters::Upserter do
     expect(upserter.errors).to be_empty
   end
 
+  describe "hindrance severities" do
+    let(:flexible_hindrance) { create(:hindrance, severity: :minor_or_major) }
+    let(:major_hindrance) { create(:hindrance, severity: :major) }
+
+    def severities_for(character)
+      character.reload.character_hindrances.to_h { |selection| [ selection.hindrance_id, selection.severity ] }
+    end
+
+    it "persists the chosen severity and the reference severity of fixed hindrances" do
+      character = user.characters.new
+
+      upserter = described_class.new(
+        character: character,
+        attributes: {
+          name: "Nathan Drake",
+          hindrance_ids: [ flexible_hindrance.id, major_hindrance.id ],
+          hindrance_severities: { flexible_hindrance.id.to_s => "major", major_hindrance.id.to_s => "minor" },
+          hindrance_points_earned: 4,
+          hindrance_points_spent: 4
+        }
+      )
+
+      expect(upserter.call).to be(true)
+      expect(severities_for(character)).to eq(flexible_hindrance.id => "major", major_hindrance.id => "major")
+    end
+
+    it "keeps stored severities when an update omits them" do
+      character = create(:character, user: user)
+      create(:character_hindrance, character: character, hindrance: flexible_hindrance, severity: :major)
+
+      upserter = described_class.new(
+        character: character,
+        attributes: { hindrance_ids: [ flexible_hindrance.id, major_hindrance.id ] }
+      )
+
+      expect(upserter.call).to be(true)
+      expect(severities_for(character)).to eq(flexible_hindrance.id => "major", major_hindrance.id => "major")
+    end
+
+    it "changes a severity without replacing the selected hindrances" do
+      character = create(:character, user: user)
+      create(:character_hindrance, character: character, hindrance: flexible_hindrance, severity: :minor)
+
+      upserter = described_class.new(
+        character: character,
+        attributes: { hindrance_severities: { flexible_hindrance.id.to_s => "major" } }
+      )
+
+      expect(upserter.call).to be(true)
+      expect(severities_for(character)).to eq(flexible_hindrance.id => "major")
+    end
+
+    it "checks hindrance points against stored hindrances when an update omits them" do
+      character = create(:character, user: user)
+      create(:character_hindrance, character: character, hindrance: flexible_hindrance, severity: :major)
+
+      valid = described_class.new(
+        character: character,
+        attributes: { hindrance_points_earned: 2, hindrance_points_spent: 2 }
+      )
+      invalid = described_class.new(
+        character: character,
+        attributes: { hindrance_points_earned: 1, hindrance_points_spent: 1 }
+      )
+
+      expect(valid.call).to be(true)
+      expect(invalid.call).to be(false)
+      expect(invalid.errors[:hindrance_points_earned]).to eq([ "does not match selected hindrances" ])
+    end
+
+    it "rejects an unknown severity without changing the character" do
+      character = create(:character, user: user)
+      create(:character_hindrance, character: character, hindrance: flexible_hindrance, severity: :minor)
+
+      upserter = described_class.new(
+        character: character,
+        attributes: { hindrance_severities: { flexible_hindrance.id.to_s => "extreme" } }
+      )
+
+      expect(upserter.call).to be(false)
+      expect(upserter.errors[:hindrance_severities]).to eq(
+        [ "must specify minor or major for #{flexible_hindrance.id}" ]
+      )
+      expect(severities_for(character)).to eq(flexible_hindrance.id => "minor")
+    end
+
+    it "rejects severities that are not an object" do
+      upserter = described_class.new(
+        character: user.characters.new,
+        attributes: { name: "Nathan Drake", hindrance_severities: [ "major" ] }
+      )
+
+      expect(upserter.call).to be(false)
+      expect(upserter.errors[:hindrance_severities]).to eq([ "must be an object keyed by hindrance id" ])
+    end
+  end
+
+  it "persists the concept description" do
+    character = user.characters.new
+
+    upserter = described_class.new(
+      character: character,
+      attributes: { name: "Nathan Drake", description: "A treasure hunter." }
+    )
+
+    expect(upserter.call).to be(true)
+    expect(character.reload.description).to eq("A treasure hunter.")
+  end
+
   it "returns model validation errors" do
     character = user.characters.new
 

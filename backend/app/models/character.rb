@@ -20,9 +20,15 @@ class Character < ApplicationRecord
   has_many :parties, through: :party_memberships
 
   normalizes :name, with: ->(name) { name.strip }
+  normalizes :description, with: ->(description) { description.strip }
 
   validates :name, presence: true
+  validates :description, length: { maximum: 500 }
   validate :attributes_are_valid
+
+  def hindrance_points_earned
+    character_hindrances.sum(&:points)
+  end
 
   private
 

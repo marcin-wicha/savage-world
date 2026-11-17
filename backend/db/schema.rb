@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_16_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -60,9 +60,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_170000) do
     t.bigint "hindrance_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "severity", default: 0, null: false
     t.index ["character_id", "hindrance_id"], name: "index_character_hindrances_on_character_id_and_hindrance_id", unique: true
     t.index ["character_id"], name: "index_character_hindrances_on_character_id"
     t.index ["hindrance_id"], name: "index_character_hindrances_on_hindrance_id"
+    t.check_constraint "severity = ANY (ARRAY[0, 1])", name: "character_hindrances_severity_range"
   end
 
   create_table "character_skills", force: :cascade do |t|
@@ -84,6 +86,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_170000) do
     t.datetime "updated_at", null: false
     t.bigint "origin_id"
     t.jsonb "attribute_dice", default: {"vigor" => "d4", "smarts" => "d4", "spirit" => "d4", "agility" => "d4", "strength" => "d4"}, null: false
+    t.text "description", default: "", null: false
     t.index ["origin_id"], name: "index_characters_on_origin_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
     t.check_constraint "rank >= 0 AND rank <= 4", name: "characters_rank_range"

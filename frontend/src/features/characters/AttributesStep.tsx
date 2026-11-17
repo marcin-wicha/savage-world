@@ -8,15 +8,7 @@ import { useLanguage } from '@/lib/i18n-context'
 import { HindrancePointsBalance } from './HindrancePointsBalance'
 import { AttributePointsBalance } from './AttributePointsBalance'
 import type { CharacterFormValues } from './character-form'
-
-const defaultAttributePoints = 5
-const dieSteps: Record<SkillDieType, number> = {
-  d4: 0,
-  d6: 1,
-  d8: 2,
-  d10: 3,
-  d12: 4,
-}
+import { defaultAttributePoints, dieSteps } from './point-buy'
 
 const attributeDefinitions = [
   {

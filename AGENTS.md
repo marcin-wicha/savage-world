@@ -289,10 +289,12 @@ both in the same change when committing.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
-- `characters` belongs to `users` and stores a name, rank, and JSONB
-  `attribute_dice`. Its selected edges, hindrances, and skills are normalized
-  through `character_edges`, `character_hindrances`, and `character_skills`, each
-  with a unique character/reference pair; `character_skills` also stores each
+- `characters` belongs to `users` and stores a name, concept description (up
+  to 500 characters), rank, and JSONB `attribute_dice`. Its selected edges,
+  hindrances, and skills are normalized through `character_edges`,
+  `character_hindrances`, and `character_skills`, each with a unique
+  character/reference pair; `character_hindrances` also stores each selection's
+  effective `minor`/`major` severity, and `character_skills` stores each
   selected skill's base die.
 - `parties` stores a name, optional description, `leader_id` (users), and a
   unique `invite_code` (`has_secure_token`). `party_memberships` joins parties
@@ -354,16 +356,20 @@ Routes are defined in `backend/config/routes.rb`:
   characters with their origin name and selected reference IDs.
 - `POST /api/v1/characters` — authenticated; creates the current user's
   character. JSON body:
-  `{ "character": { "name": "...", "rank": "novice", "origin_id": 1, "attributes": { "agility": "d6", "smarts": "d4", "spirit": "d4", "strength": "d4", "vigor": "d4" }, "edge_ids": [1], "hindrance_ids": [2], "skill_ids": [3], "skill_dice": { "3": "d6" }, "hindrance_severities": { "2": "minor" }, "hindrance_points_earned": 1, "hindrance_points_spent": 1 } }`.
-  The response includes base attributes/skill dice and calculated
-  `effective_traits` with effect attribution. Returns `201` on success, `401`
+  `{ "character": { "name": "...", "description": "...", "rank": "novice", "origin_id": 1, "attributes": { "agility": "d6", "smarts": "d4", "spirit": "d4", "strength": "d4", "vigor": "d4" }, "edge_ids": [1], "hindrance_ids": [2], "skill_ids": [3], "skill_dice": { "3": "d6" }, "hindrance_severities": { "2": "minor" }, "hindrance_points_earned": 1, "hindrance_points_spent": 1 } }`.
+  The response includes the description, base attributes/skill dice (skills
+  carry their `core` flag), each hindrance's stored severity
+  (`hindrance_severities`), server-calculated `hindrance_points_earned`, and
+  calculated `effective_traits` with effect attribution. Returns `201` on success, `401`
   unauthenticated, and `422` for validation, reference, or unspent hindrance
   points.
 - `PUT /api/v1/characters/:id` — authenticated; creates or updates the current
   user's character. It accepts the same character fields. Returns `201` on
   create, `200` on update, `401` unauthenticated, `403` for another user's
   character, and `422` for validation or reference errors. Omitted selection
-  arrays are left unchanged; provided arrays replace the selection.
+  arrays are left unchanged; provided arrays replace the selection. Hindrance
+  severities are persisted: fixed hindrances use their reference severity,
+  minor-or-major ones use the provided value, else the stored one, else minor.
   `gear` (`{ "<gear_id>": quantity }`) and `equipped_gear_ids` follow the same
   rule. Character payloads include `gear` (with each item's combat profile) and
   server-calculated `derived` Pace, Parry, and Toughness.
