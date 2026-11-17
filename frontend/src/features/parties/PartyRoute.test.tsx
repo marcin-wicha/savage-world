@@ -34,7 +34,7 @@ function member(overrides: Partial<PartyMember> & { name: string }): PartyMember
     status: 'accepted',
     owned_by_me: false,
     owner_id: 10,
-    character: { id: 1, name, rank: 'novice', origin_name: null },
+    character: { id: 1, name, avatar_url: null, rank: 'novice', origin_name: null },
     ...rest,
   }
 }
@@ -127,6 +127,32 @@ describe('PartyRoute', () => {
     await user.click(screen.getByRole('button', { name: 'Leave Vex' }))
     expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/parties/5/memberships/3')
     expect(await screen.findByText('Parties index')).toBeInTheDocument()
+  })
+
+  it('shows member names with their avatars', async () => {
+    renderParty({
+      members: [
+        member({
+          membership_id: 1,
+          name: 'Katarina',
+          character: {
+            id: 1,
+            name: 'Katarina',
+            avatar_url: '/api/v1/characters/1/avatar/abc',
+            rank: 'novice',
+            origin_name: null,
+          },
+        }),
+        member({ membership_id: 3, name: 'Vex Morrow' }),
+      ],
+    })
+
+    expect(await screen.findByRole('img', { name: 'Katarina' })).toHaveAttribute(
+      'src',
+      '/api/v1/characters/1/avatar/abc',
+    )
+    expect(screen.getByText('Vex Morrow')).toBeInTheDocument()
+    expect(screen.getByText('VM')).toBeInTheDocument()
   })
 
   it('shows an error when the party cannot be loaded', async () => {

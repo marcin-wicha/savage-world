@@ -12,6 +12,9 @@ Rails.application.routes.draw do
       get "characters/:id", to: "characters#show", as: :character_show
       put "characters/:id", to: "characters#upsert", as: :character
       delete "characters/:id", to: "characters#destroy", as: :character_destroy
+      post "characters/:character_id/avatar", to: "character_avatars#create", as: :character_avatar
+      delete "characters/:character_id/avatar", to: "character_avatars#destroy"
+      get "characters/:character_id/avatar/:filename", to: "character_avatars#show", format: false
 
       resources :parties, only: %i[index show create update destroy] do
         post :invite_code, on: :member, action: :regenerate_invite_code

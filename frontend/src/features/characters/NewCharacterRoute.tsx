@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-flow'
 import { Card, CardContent } from '@/components/ui/card'
-import { ApiError } from '@/lib/api-client'
+import { ApiError, api } from '@/lib/api-client'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
 
@@ -63,6 +63,7 @@ type CharacterResponse = {
   character: {
     id: number
     name: string
+    avatar_url?: string | null
     rank: CharacterFormValues['rank']
     origin_id: number | null
     origin_name: string | null
@@ -166,6 +167,13 @@ export function NewCharacterRoute() {
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
   const isEditing = Boolean(id)
+  const location = useLocation()
+  const [avatarError, setAvatarError] = useState<string | null>(() => {
+    const state: unknown = location.state
+    return state && typeof state === 'object' && 'avatarError' in state
+      ? String(state.avatarError)
+      : null
+  })
   const characterQuery = useRestQuery<CharacterResponse>(
     ['character', id],
     `/api/v1/characters/${id ?? ''}`,
@@ -183,6 +191,7 @@ export function NewCharacterRoute() {
     form.reset({
       ...characterFormDefaults,
       concept: { name: character.name, description: '' },
+      avatar_url: character.avatar_url ?? '',
       rank: character.rank,
       origin: character.origin_id === null ? '' : String(character.origin_id),
       origin_name: character.origin_name ?? '',
@@ -221,12 +230,49 @@ export function NewCharacterRoute() {
       method: isEditing ? 'PUT' : 'POST',
     },
     {
-      onSuccess: () => {
+      onSuccess: async (response) => {
+        const characterId = response.character.id
+        const avatarFailure = await syncAvatar(characterId)
         void queryClient.invalidateQueries({ queryKey: ['characters'] })
-        navigate('/characters')
+        void queryClient.invalidateQueries({ queryKey: ['parties'] })
+        if (avatarFailure === null) {
+          navigate('/characters')
+        } else if (!isEditing) {
+          navigate(`/characters/${characterId}/edit`, {
+            replace: true,
+            state: { avatarError: avatarFailure },
+          })
+        }
       },
     },
   )
+
+  async function syncAvatar(characterId: number) {
+    const file = form.getValues('avatar_file')
+    const removed =
+      !file && !form.getValues('avatar_url') && Boolean(characterQuery.data?.character.avatar_url)
+
+    setAvatarError(null)
+    try {
+      if (file) {
+        const body = new FormData()
+        body.append('file', file)
+        const { avatar_url } = await api.post<{ avatar_url: string }>(
+          `/api/v1/characters/${characterId}/avatar`,
+          body,
+        )
+        form.setValue('avatar_file', null)
+        form.setValue('avatar_url', avatar_url)
+      } else if (removed) {
+        await api.delete<void>(`/api/v1/characters/${characterId}/avatar`)
+      }
+      return null
+    } catch (error) {
+      const message = error instanceof Error ? error.message : ''
+      setAvatarError(message)
+      return message
+    }
+  }
 
   if (isEditing && characterQuery.isPending) {
     return <p className="text-muted-foreground text-sm">{t('Loading character…')}</p>
@@ -348,6 +394,12 @@ export function NewCharacterRoute() {
             {saveMutation.error ? (
               <p className="text-danger mt-4 text-sm" role="alert">
                 {t('Could not save character:')} {t(saveErrorMessage(saveMutation.error) ?? '')}
+              </p>
+            ) : null}
+            {avatarError !== null ? (
+              <p className="text-danger mt-4 text-sm" role="alert">
+                {t('The character was saved, but the avatar could not be uploaded:')}{' '}
+                {t(avatarError)}
               </p>
             ) : null}
           </FormProvider>

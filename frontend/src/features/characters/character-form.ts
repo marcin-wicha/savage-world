@@ -18,6 +18,18 @@ const edgeEffectSchema = z.discriminatedUnion('kind', [
   }),
 ])
 
+export const AVATAR_MAX_BYTES = 5 * 1024 * 1024
+export const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+
+const avatarFileSchema = z
+  .custom<File | null>((value) => value === null || value instanceof File)
+  .refine((file) => file === null || AVATAR_TYPES.includes(file.type), {
+    message: 'Choose a PNG, JPEG, GIF, or WebP image.',
+  })
+  .refine((file) => file === null || (file.size > 0 && file.size <= AVATAR_MAX_BYTES), {
+    message: 'The image must be 5 MB or smaller.',
+  })
+
 export const characterFormSchema = z.object({
   concept: z.object({
     name: z
@@ -27,6 +39,8 @@ export const characterFormSchema = z.object({
       .max(60, 'Use 60 characters or fewer.'),
     description: z.string().trim().max(500, 'Use 500 characters or fewer.'),
   }),
+  avatar_file: avatarFileSchema,
+  avatar_url: z.string(),
   rank: z.enum(['novice', 'seasoned', 'veteran', 'heroic', 'legendary']),
   origin: z.string().min(1, 'Choose an origin.'),
   origin_name: z.string(),
@@ -69,6 +83,8 @@ export const characterFormDefaults: CharacterFormValues = {
     name: '',
     description: '',
   },
+  avatar_file: null,
+  avatar_url: '',
   rank: 'novice',
   origin: '',
   origin_name: '',
@@ -108,7 +124,7 @@ export type CharacterStepId =
   'concept' | 'origin' | 'hindrances' | 'attributes' | 'skills' | 'edges' | 'gear' | 'summary'
 
 export const characterStepFields: Record<CharacterStepId, FieldPath<CharacterFormValues>[]> = {
-  concept: ['concept.name', 'concept.description'],
+  concept: ['concept.name', 'concept.description', 'avatar_file'],
   origin: ['origin'],
   hindrances: ['hindrances'],
   attributes: ['attributes'],

@@ -289,8 +289,9 @@ both in the same change when committing.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
-- `characters` belongs to `users` and stores a name, rank, and JSONB
-  `attribute_dice`. Its selected edges, hindrances, and skills are normalized
+- `characters` belongs to `users` and stores a name, rank, JSONB
+  `attribute_dice`, and an optional `avatar_filename` (a random hex name under
+  `storage/avatars/`, managed by `Characters::AvatarUpload`). Its selected edges, hindrances, and skills are normalized
   through `character_edges`, `character_hindrances`, and `character_skills`, each
   with a unique character/reference pair; `character_skills` also stores each
   selected skill's base die.
@@ -367,10 +368,24 @@ Routes are defined in `backend/config/routes.rb`:
   `gear` (`{ "<gear_id>": quantity }`) and `equipped_gear_ids` follow the same
   rule. Character payloads include `gear` (with each item's combat profile) and
   server-calculated `derived` Pace, Parry, and Toughness.
+- Character avatars (authenticated; `avatar_url` appears in character and
+  party member payloads, or `null`):
+  - `POST /api/v1/characters/:id/avatar` — owner only; multipart `file`
+    (PNG, JPEG, GIF, or WebP up to 5 MB, content checked against its type).
+    Replaces any previous avatar and returns `{ "avatar_url": "..." }`; `422`
+    for invalid files, `403` for another user's character.
+  - `DELETE /api/v1/characters/:id/avatar` — owner only; returns `204`.
+  - `GET /api/v1/characters/:id/avatar/:filename` — served to the owner, the
+    leader of a party the character belongs to or requested, and owners of
+    accepted characters in a party where the character is accepted.
+  The SPA picks the avatar on the Concept step and uploads it after the
+  character is saved. Deleting a character removes its avatar file.
 - Parties (all authenticated; payloads never expose other users' emails and
   use `led_by_me`/`owned_by_me` flags instead):
   - `GET /api/v1/parties` — parties the user leads or has a character in
-    (including pending requests, reported as `my_status`).
+    (including pending requests, reported as `my_status`). Leaders and
+    accepted participants also receive `member_characters` (accepted
+    characters' id, name, and `avatar_url`); pending requesters get `[]`.
   - `POST /api/v1/parties` — `{ "party": { "name": "...", "description": "..." } }`;
     the current user becomes leader. Returns `201`.
   - `GET /api/v1/parties/:id` — leader or accepted participant. The leader also
@@ -450,7 +465,8 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   wildcard origin with credentials.
 - Pundit is wired through `pundit_user = Current.user`. Add a policy for every
   domain authorization decision. `CharacterPolicy` currently guards character
-  upsert by ownership. `PartyPolicy` (leader edits; leader or accepted
+  upsert and avatar uploads by ownership; `view_avatar?` also admits shared
+  party members. `PartyPolicy` (leader edits; leader or accepted
   participant views; scope lists led/joined parties) and
   `PartyMembershipPolicy` (owner joins and leaves; leader accepts and removes)
   guard parties. Multi-step party rules live in `Parties::Join` and

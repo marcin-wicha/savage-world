@@ -127,6 +127,15 @@ const translations: Record<string, string> = {
   'Look over everything you chose. If something looks wrong, go back to that step and change it. All hindrance points must be spent before you can save the character.':
     'Przejrzyj wszystkie wybory. Jeśli coś się nie zgadza, wróć do danego kroku i to zmień. Przed zapisaniem postaci musisz wydać wszystkie punkty za ułomności.',
   'Character name': 'Imię postaci',
+  Avatar: 'Awatar',
+  'Avatar preview': 'Podgląd awatara',
+  'Remove avatar': 'Usuń awatar',
+  'Optional portrait. PNG, JPEG, GIF, or WebP; maximum 5 MB.':
+    'Opcjonalny portret. PNG, JPEG, GIF lub WebP; maksymalnie 5 MB.',
+  'Choose a PNG, JPEG, GIF, or WebP image.': 'Wybierz obraz PNG, JPEG, GIF lub WebP.',
+  'The image must be 5 MB or smaller.': 'Obraz może mieć maksymalnie 5 MB.',
+  'The character was saved, but the avatar could not be uploaded:':
+    'Postać została zapisana, ale nie udało się przesłać awatara:',
   'What should we call this legend?': 'Jak nazwiemy tę legendę?',
   'A wandering monster hunter chasing a debt across the frontier.':
     'Wędrowny łowca potworów ścigający dłużnika na pograniczu.',

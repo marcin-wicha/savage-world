@@ -5,12 +5,15 @@ module PartyPayloads
 
   def party_summary_payload(party)
     my_statuses = party.party_memberships.select { |membership| membership.character.user_id == Current.user.id }.map(&:status)
+    led_by_me = party.leader?(Current.user)
+    accepted = party.party_memberships.select(&:accepted?).sort_by(&:id)
     {
       id: party.id,
       name: party.name,
       description: party.description,
-      led_by_me: party.leader?(Current.user),
-      member_count: party.party_memberships.count(&:accepted?),
+      led_by_me: led_by_me,
+      member_count: accepted.size,
+      member_characters: led_by_me || my_statuses.include?("accepted") ? accepted.map { |membership| character_summary(membership.character) } : [],
       my_status: my_statuses.include?("accepted") ? "accepted" : my_statuses.first
     }
   end
@@ -34,13 +37,15 @@ module PartyPayloads
       status: membership.status,
       owned_by_me: character.user_id == Current.user.id,
       owner_id: character.user_id,
-      character: {
-        id: character.id,
-        name: character.name,
+      character: character_summary(character).merge(
         rank: character.rank,
         origin_name: character.origin && ReferenceData::Translations.for(character.origin, :name, locale: requested_locale)
-      }
+      )
     }
+  end
+
+  def character_summary(character)
+    { id: character.id, name: character.name, avatar_url: Characters::AvatarUpload.url(character) }
   end
 
   def party_memberships_preload

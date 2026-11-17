@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { CharacterAvatar } from '@/components/character-avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -82,15 +83,31 @@ export function PartiesRoute() {
                         <CardDescription>{party.description}</CardDescription>
                       ) : null}
                     </CardHeader>
-                    <CardContent className="flex items-center justify-between gap-2 text-sm">
-                      <span className="text-muted-foreground">
-                        {t('Members')}: {party.member_count}
-                      </span>
-                      {party.led_by_me || party.my_status === 'accepted' ? (
-                        <Button asChild size="sm" variant="outline">
-                          <Link to={`/parties/${party.id}`}>{t('Open')}</Link>
-                        </Button>
+                    <CardContent className="grid gap-3 text-sm">
+                      {party.member_characters.length > 0 ? (
+                        <ul aria-label={`${t('Members')}: ${party.name}`} className="grid gap-2">
+                          {party.member_characters.map((character) => (
+                            <li key={character.id} className="flex items-center gap-2">
+                              <CharacterAvatar
+                                name={character.name}
+                                src={character.avatar_url}
+                                size="sm"
+                              />
+                              <span className="text-foreground truncate">{character.name}</span>
+                            </li>
+                          ))}
+                        </ul>
                       ) : null}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-muted-foreground">
+                          {t('Members')}: {party.member_count}
+                        </span>
+                        {party.led_by_me || party.my_status === 'accepted' ? (
+                          <Button asChild size="sm" variant="outline">
+                            <Link to={`/parties/${party.id}`}>{t('Open')}</Link>
+                          </Button>
+                        ) : null}
+                      </div>
                     </CardContent>
                   </Card>
                 </li>

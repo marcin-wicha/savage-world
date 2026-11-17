@@ -26,6 +26,7 @@ const apiDeleteMock = vi.mocked(api.delete)
 type TestCharacter = {
   id: number
   name: string
+  avatar_url?: string | null
   rank: string
   origin_name: string | null
 }
@@ -72,6 +73,25 @@ describe('CharactersRoute', () => {
       '/api/v1/characters',
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     )
+  })
+
+  it('shows each character avatar', async () => {
+    renderRoute([
+      {
+        id: 1,
+        name: 'Katarina Voss',
+        avatar_url: '/api/v1/characters/1/avatar/abc',
+        rank: 'novice',
+        origin_name: null,
+      },
+      { id: 2, name: 'Rook Ashford', avatar_url: null, rank: 'novice', origin_name: null },
+    ])
+
+    expect(await screen.findByRole('img', { name: 'Katarina Voss' })).toHaveAttribute(
+      'src',
+      '/api/v1/characters/1/avatar/abc',
+    )
+    expect(screen.getByText('RA')).toBeInTheDocument()
   })
 
   it('deletes a character after confirmation', async () => {

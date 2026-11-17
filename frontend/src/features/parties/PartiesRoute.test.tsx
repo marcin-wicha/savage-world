@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { api } from '@/lib/api-client'
@@ -34,6 +34,10 @@ describe('PartiesRoute', () => {
           description: 'Treasure hunters',
           led_by_me: true,
           member_count: 2,
+          member_characters: [
+            { id: 4, name: 'Katarina Voss', avatar_url: '/api/v1/characters/4/avatar/abc' },
+            { id: 5, name: 'Rook Ashford', avatar_url: null },
+          ],
           my_status: null,
         },
         {
@@ -42,6 +46,7 @@ describe('PartiesRoute', () => {
           description: null,
           led_by_me: false,
           member_count: 3,
+          member_characters: [],
           my_status: 'pending',
         },
       ],
@@ -54,6 +59,14 @@ describe('PartiesRoute', () => {
     expect(screen.getByText('Awaiting approval')).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'Open' })).toHaveLength(1)
     expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute('href', '/parties/1')
+
+    const roster = screen.getByRole('list', { name: 'Members: The Crew' })
+    expect(within(roster).getByText('Katarina Voss')).toBeInTheDocument()
+    expect(within(roster).getByText('Rook Ashford')).toBeInTheDocument()
+    expect(within(roster).getByRole('img', { name: 'Katarina Voss' })).toHaveAttribute(
+      'src',
+      '/api/v1/characters/4/avatar/abc',
+    )
   })
 
   it('shows the empty and error states', async () => {

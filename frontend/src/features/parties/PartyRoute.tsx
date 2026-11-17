@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
+import { CharacterAvatar } from '@/components/character-avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -374,17 +375,22 @@ function MemberRow({ member, children }: { member: PartyMember; children: ReactN
 
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 py-3">
-      <div>
-        <p className="text-foreground font-medium">
-          {member.character.name}
-          {member.owned_by_me ? (
-            <span className="text-muted-foreground ml-2 text-xs">({t('yours')})</span>
-          ) : null}
-        </p>
-        <p className="text-muted-foreground text-sm">
-          {t(rankLabels[member.character.rank] ?? member.character.rank)} ·{' '}
-          {member.character.origin_name ? t(member.character.origin_name) : t('No origin selected')}
-        </p>
+      <div className="flex min-w-0 items-center gap-3">
+        <CharacterAvatar name={member.character.name} src={member.character.avatar_url} />
+        <div className="min-w-0">
+          <p className="text-foreground font-medium">
+            {member.character.name}
+            {member.owned_by_me ? (
+              <span className="text-muted-foreground ml-2 text-xs">({t('yours')})</span>
+            ) : null}
+          </p>
+          <p className="text-muted-foreground text-sm">
+            {t(rankLabels[member.character.rank] ?? member.character.rank)} ·{' '}
+            {member.character.origin_name
+              ? t(member.character.origin_name)
+              : t('No origin selected')}
+          </p>
+        </div>
       </div>
       <div className="flex gap-2">{children}</div>
     </li>

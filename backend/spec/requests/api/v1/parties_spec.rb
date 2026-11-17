@@ -31,12 +31,29 @@ RSpec.describe "Parties", type: :request do
       )
     end
 
-    it "shows pending requests with their status" do
+    it "includes accepted member names and avatars" do
+      member_character.update!(avatar_filename: "a" * 32)
+      sign_in_as(leader)
+
+      get "/api/v1/parties", headers: json_headers
+
+      expect(json.dig("parties", 0, "member_characters")).to eq([
+        {
+          "id" => member_character.id,
+          "name" => "Katarina",
+          "avatar_url" => "/api/v1/characters/#{member_character.id}/avatar/#{'a' * 32}"
+        }
+      ])
+    end
+
+    it "shows pending requests with their status but not the roster" do
       sign_in_as(requester)
 
       get "/api/v1/parties", headers: json_headers
 
-      expect(json["parties"]).to contain_exactly(hash_including("id" => party.id, "my_status" => "pending"))
+      expect(json["parties"]).to contain_exactly(
+        hash_including("id" => party.id, "my_status" => "pending", "member_characters" => [])
+      )
     end
 
     it "requires authentication" do
@@ -100,7 +117,10 @@ RSpec.describe "Parties", type: :request do
           "membership_id" => membership.id,
           "status" => "accepted",
           "owned_by_me" => true,
-          "character" => { "id" => member_character.id, "name" => "Katarina", "rank" => "seasoned", "origin_name" => "Dunestriders" }
+          "character" => {
+            "id" => member_character.id, "name" => "Katarina", "avatar_url" => nil,
+            "rank" => "seasoned", "origin_name" => "Dunestriders"
+          }
         )
       )
       expect(response.body).not_to include(participant.email_address)

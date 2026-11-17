@@ -26,6 +26,7 @@ module Api
         character = Character.find(character_id)
         authorize character, :destroy?
         character.destroy!
+        Characters::AvatarUpload.delete_file(character.avatar_filename)
         head :no_content
       end
 
@@ -87,6 +88,7 @@ module Api
         {
           id: character.id,
           name: character.name,
+          avatar_url: Characters::AvatarUpload.url(character),
           origin_name: character.origin && ReferenceData::Translations.for(
             character.origin,
             :name,

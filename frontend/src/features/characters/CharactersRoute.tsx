@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { CharacterAvatar } from '@/components/character-avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useRestMutation, useRestQuery } from '@/lib/queries'
@@ -18,6 +19,7 @@ const rankLabels: Record<string, string> = {
 type Character = {
   id: number
   name: string
+  avatar_url: string | null
   rank: string
   origin_name: string | null
 }
@@ -110,8 +112,9 @@ export function CharactersRoute() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {characters.map((character) => (
             <Card key={character.id}>
-              <CardHeader>
-                <CardTitle>{character.name}</CardTitle>
+              <CardHeader className="flex flex-row items-center gap-4">
+                <CharacterAvatar name={character.name} src={character.avatar_url} />
+                <CardTitle className="min-w-0 break-words">{character.name}</CardTitle>
               </CardHeader>
               <CardContent>
                 <dl className="grid grid-cols-2 gap-3 text-sm">

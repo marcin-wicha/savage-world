@@ -1,11 +1,18 @@
 export type MembershipStatus = 'pending' | 'accepted'
 
+export type PartyCharacter = {
+  id: number
+  name: string
+  avatar_url: string | null
+}
+
 export type PartySummary = {
   id: number
   name: string
   description: string | null
   led_by_me: boolean
   member_count: number
+  member_characters: PartyCharacter[]
   my_status: MembershipStatus | null
 }
 
@@ -14,9 +21,7 @@ export type PartyMember = {
   status: MembershipStatus
   owned_by_me: boolean
   owner_id: number
-  character: {
-    id: number
-    name: string
+  character: PartyCharacter & {
     rank: string
     origin_name: string | null
   }
