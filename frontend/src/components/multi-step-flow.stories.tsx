@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
 import { MultiStepFlow, type MultiStepFlowStep } from './multi-step-flow'
+import { Button } from './ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
@@ -106,6 +107,36 @@ export const ResumedProgress: Story = {
         <CardTitle>Continue a saved character</CardTitle>
         <CardDescription>
           Every step is already filled in, so any step can be opened directly.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <MultiStepFlow {...args} />
+      </CardContent>
+    </Card>
+  ),
+}
+
+export const UnsavedChanges: Story = {
+  args: {
+    defaultStep: 1,
+    completedThrough: 2,
+    allowStepNavigation: true,
+    nextVariant: 'outline',
+    footerActions: (
+      <>
+        <Button type="button" variant="ghost">
+          Discard changes
+        </Button>
+        <Button type="button">Save changes</Button>
+      </>
+    ),
+  },
+  render: (args) => (
+    <Card className="w-full max-w-2xl">
+      <CardHeader>
+        <CardTitle>Edit a saved character</CardTitle>
+        <CardDescription>
+          With unsaved changes, saving becomes the main action on every step.
         </CardDescription>
       </CardHeader>
       <CardContent>

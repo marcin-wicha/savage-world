@@ -29,6 +29,8 @@ type MultiStepFlowProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   headerClassName?: string
   contentClassName?: string
   footerClassName?: string
+  footerActions?: React.ReactNode
+  nextVariant?: 'default' | 'outline'
 }
 
 function clampStep(step: number, total: number) {
@@ -53,6 +55,8 @@ function MultiStepFlow({
   headerClassName,
   contentClassName,
   footerClassName,
+  footerActions,
+  nextVariant = 'default',
   className,
   ...props
 }: MultiStepFlowProps) {
@@ -197,18 +201,22 @@ function MultiStepFlow({
         >
           {t(backLabel)}
         </Button>
-        <Button
-          onClick={() => {
-            if (isLast) {
-              onComplete?.()
-            } else {
-              void advance()
-            }
-          }}
-          disabled={!nextAllowed || isAdvancing}
-        >
-          {isLast ? t(completeLabel) : t(nextLabel)}
-        </Button>
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          {footerActions}
+          <Button
+            variant={isLast ? 'default' : nextVariant}
+            onClick={() => {
+              if (isLast) {
+                onComplete?.()
+              } else {
+                void advance()
+              }
+            }}
+            disabled={!nextAllowed || isAdvancing}
+          >
+            {isLast ? t(completeLabel) : t(nextLabel)}
+          </Button>
+        </div>
       </div>
     </div>
   )

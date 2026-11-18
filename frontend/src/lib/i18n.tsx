@@ -239,6 +239,9 @@ const translations: Record<string, string> = {
   'Last saved': 'Ostatni zapis',
   'Could not discard the draft. Try again.': 'Nie udało się odrzucić szkicu. Spróbuj ponownie.',
   'Start over': 'Zacznij od nowa',
+  'Discard changes': 'Odrzuć zmiany',
+  'Saving needs a name, an origin, and every hindrance point spent.':
+    'Zapis wymaga imienia, pochodzenia i wydania wszystkich punktów za ułomności.',
   'Unfinished characters': 'Niedokończone postacie',
   'Unnamed character': 'Postać bez imienia',
   'Continue draft': 'Kontynuuj szkic',

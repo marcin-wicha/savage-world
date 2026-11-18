@@ -220,20 +220,33 @@ function CharacterEditor({ character }: { character: CharacterResponse['characte
     onCreated: (createdId) =>
       navigate(`/characters/${createdId}/edit`, { replace: true, state: keepEditorState }),
   })
+  const [savedValues] = useState(() =>
+    character ? characterToFormValues(character) : characterFormDefaults,
+  )
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(characterFormSchema),
-    defaultValues: character ? characterToFormValues(character) : characterFormDefaults,
+    defaultValues: savedValues,
     mode: 'onTouched',
   })
   const formValues = useWatch({ control: form.control })
   const validation = characterFormSchema.safeParse(formValues)
   const vigor = useWatch({ control: form.control, name: 'attributes.vigor' })
-  const derived = useDerivedPreview(toCharacterSaveFields(form.getValues()), character?.derived)
+  const currentFieldsKey = JSON.stringify(toCharacterSaveFields(form.getValues()))
+  const derived = useDerivedPreview(JSON.parse(currentFieldsKey), character?.derived)
+  const [initialFieldsKey] = useState(currentFieldsKey)
+  const avatarFile = useWatch({ control: form.control, name: 'avatar_file' })
+  const avatarUrl = useWatch({ control: form.control, name: 'avatar_url' })
+  const hasUnsavedChanges =
+    isEditing &&
+    (currentFieldsKey !== initialFieldsKey ||
+      avatarFile !== null ||
+      avatarUrl !== (character.avatar_url ?? ''))
   const earnedHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_earned' }) ?? 0
   const spentHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_spent' }) ?? 0
   const hindrancePointsBalanced = earnedHindrancePoints === spentHindrancePoints
+  const canSave = validation.success && hindrancePointsBalanced
   const { characterId: draftId, schedule: scheduleDraftSave } = draft
   const skipRestoredSave = useRef(character?.status === 'draft')
   useEffect(() => {
@@ -255,6 +268,16 @@ function CharacterEditor({ character }: { character: CharacterResponse['characte
     setFurthestCompleted(-1)
     setDraftRestoredAt(null)
     navigate('/characters/new', { replace: true, state: keepEditorState })
+  }
+
+  const discardChanges = () => {
+    const confirmed = window.confirm(
+      language === 'pl' ? 'Odrzucić niezapisane zmiany?' : 'Discard your unsaved changes?',
+    )
+    if (!confirmed) return
+
+    form.reset(savedValues)
+    setSaveError(null)
   }
 
   async function persist(values: CharacterFormValues) {
@@ -447,6 +470,36 @@ function CharacterEditor({ character }: { character: CharacterResponse['characte
                 )
               }}
               onComplete={handleComplete}
+              nextVariant={hasUnsavedChanges ? 'outline' : 'default'}
+              footerActions={
+                hasUnsavedChanges ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={saving}
+                      onClick={discardChanges}
+                    >
+                      {t('Discard changes')}
+                    </Button>
+                    {step < stepDefinitions.length - 1 && !canSave ? (
+                      <p id="save-changes-hint" className="text-muted-foreground text-xs">
+                        {t('Saving needs a name, an origin, and every hindrance point spent.')}
+                      </p>
+                    ) : null}
+                    {step < stepDefinitions.length - 1 ? (
+                      <Button
+                        type="button"
+                        disabled={saving || !canSave}
+                        aria-describedby={canSave ? undefined : 'save-changes-hint'}
+                        onClick={handleComplete}
+                      >
+                        {saving ? t('Saving…') : t('Save changes')}
+                      </Button>
+                    ) : null}
+                  </>
+                ) : null
+              }
             />
             {saveError ? (
               <p className="text-danger mt-4 text-sm" role="alert">

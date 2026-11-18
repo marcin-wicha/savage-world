@@ -567,6 +567,105 @@ describe('NewCharacterRoute', () => {
     expect(finalizeCalls()).toHaveLength(0)
   })
 
+  describe('editing a finished character', () => {
+    const finished = () =>
+      storedCharacter({
+        name: 'Katarina Voss',
+        status: 'alive',
+        origin_id: 1,
+        origin_name: 'Dunestriders',
+      })
+
+    afterEach(() => vi.restoreAllMocks())
+
+    it('keeps Next as the only call to action until something changes', async () => {
+      mockApi({ stored: finished() })
+
+      renderRoute('/characters/9/edit')
+
+      expect(await screen.findByLabelText(/character name/i)).toHaveValue('Katarina Voss')
+      expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Discard changes' })).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /next/i })).toHaveAttribute(
+        'data-variant',
+        'default',
+      )
+    })
+
+    it('saves changes from any step once the form is dirty', async () => {
+      const user = userEvent.setup()
+      mockApi({ stored: finished() })
+
+      renderRoute('/characters/9/edit')
+
+      const name = await screen.findByLabelText(/character name/i)
+      await user.clear(name)
+      await user.type(name, 'Katarina the Bold')
+
+      const save = screen.getByRole('button', { name: 'Save changes' })
+      expect(save).toHaveAttribute('data-variant', 'default')
+      expect(screen.getByRole('button', { name: /next/i })).toHaveAttribute(
+        'data-variant',
+        'outline',
+      )
+      await user.click(save)
+
+      expect(await screen.findByRole('heading', { name: /characters page/i })).toBeInTheDocument()
+      expect(apiPutMock).toHaveBeenCalledWith('/api/v1/characters/9', {
+        character: expect.objectContaining({ name: 'Katarina the Bold', origin_id: 1 }),
+      })
+      expect(finalizeCalls()).toHaveLength(0)
+    })
+
+    it('discards changes after confirmation', async () => {
+      const user = userEvent.setup()
+      const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValue(true)
+      mockApi({ stored: finished() })
+
+      renderRoute('/characters/9/edit')
+
+      const name = await screen.findByLabelText(/character name/i)
+      await user.type(name, ' the Bold')
+      await user.click(screen.getByRole('button', { name: 'Discard changes' }))
+
+      expect(confirm).toHaveBeenCalledTimes(1)
+      expect(name).toHaveValue('Katarina Voss the Bold')
+
+      await user.click(screen.getByRole('button', { name: 'Discard changes' }))
+
+      expect(screen.getByLabelText(/character name/i)).toHaveValue('Katarina Voss')
+      expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Discard changes' })).not.toBeInTheDocument()
+      expect(apiPutMock).not.toHaveBeenCalled()
+    })
+
+    it('explains why changes cannot be saved yet', async () => {
+      const user = userEvent.setup()
+      mockApi({ stored: finished() })
+
+      renderRoute('/characters/9/edit')
+
+      await user.clear(await screen.findByLabelText(/character name/i))
+
+      const save = screen.getByRole('button', { name: 'Save changes' })
+      expect(save).toBeDisabled()
+      expect(save).toHaveAccessibleDescription(
+        'Saving needs a name, an origin, and every hindrance point spent.',
+      )
+      expect(screen.getByRole('button', { name: 'Discard changes' })).toBeEnabled()
+    })
+
+    it('does not offer save or discard while creating a character', async () => {
+      const user = userEvent.setup()
+
+      renderRoute()
+      await user.type(screen.getByLabelText(/character name/i), 'Mira')
+
+      expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Discard changes' })).not.toBeInTheDocument()
+    })
+  })
+
   describe('step navigation', () => {
     it('lets a new character jump to any step without marking skipped steps complete', async () => {
       const user = userEvent.setup()

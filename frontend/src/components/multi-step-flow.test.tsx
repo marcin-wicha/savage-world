@@ -65,6 +65,28 @@ describe('MultiStepFlow', () => {
     expect(screen.getByRole('button', { name: /completed.*attributes/i })).toBeInTheDocument()
   })
 
+  it('renders footer actions beside Next and can make Next secondary', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MultiStepFlow
+        steps={steps}
+        nextVariant="outline"
+        footerActions={<button type="button">Save changes</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /next/i })).toHaveAttribute('data-variant', 'outline')
+
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(screen.getByRole('button', { name: /next/i }))
+    expect(screen.getByRole('button', { name: 'Complete' })).toHaveAttribute(
+      'data-variant',
+      'default',
+    )
+  })
+
   it('returns to the progress heading when changing steps', async () => {
     const user = userEvent.setup()
     const scrollIntoView = vi.fn()
