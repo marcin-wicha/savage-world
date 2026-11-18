@@ -122,7 +122,7 @@ function TraitCardStack({
       data-open={open}
       style={{ width: open ? rowWidth : width, height: open ? gridHeight : height }}
       className={cn(
-        'relative transition-[width,height] duration-700 ease-out [perspective:1200px] motion-reduce:transition-none',
+        'relative isolate transition-[width,height] duration-700 ease-out [perspective:1200px] motion-reduce:transition-none',
         className,
       )}
       {...props}

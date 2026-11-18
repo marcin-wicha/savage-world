@@ -4,6 +4,12 @@ import userEvent from '@testing-library/user-event'
 import { TraitCard } from './trait-card'
 
 describe('TraitCard', () => {
+  it('keeps its layered title and badges inside its own stacking context', () => {
+    const { container } = render(<TraitCard title="Dunestriders" eyebrow="Origin" />)
+
+    expect(container.querySelector('[data-slot="trait-card"]')).toHaveClass('isolate')
+  })
+
   it('renders the header, eyebrow, and description', () => {
     render(<TraitCard title="Berserk" eyebrow="Edge" description="Strike with reckless fury." />)
 

@@ -12,6 +12,12 @@ const traits: TraitCardStackTrait[] = [
 ]
 
 describe('TraitCardStack', () => {
+  it('keeps its carousel controls inside its own stacking context', () => {
+    const { container } = render(<TraitCardStack category="Combat" traits={traits} />)
+
+    expect(container.querySelector('[data-slot="trait-card-stack"]')).toHaveClass('isolate')
+  })
+
   it('shows a tooltip for disabled traits on hover without selecting them', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
