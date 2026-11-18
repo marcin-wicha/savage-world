@@ -171,7 +171,7 @@ RSpec.describe Characters::Upserter do
   end
 
   it "returns model validation errors" do
-    character = user.characters.new
+    character = user.characters.new(status: :alive)
 
     upserter = described_class.new(character: character, attributes: { name: "" })
 

@@ -6,12 +6,16 @@ module Characters
       skill_ids: Skill
     }.freeze
 
+    LIFECYCLE_STATUSES = %w[alive dead].freeze
+
     attr_reader :character, :errors
 
-    def initialize(character:, attributes:, require_hindrance_balance: false)
+    # finalize: true applies the changes and then enforces the full creation
+    # rules, turning a draft into a living character in the same transaction.
+    def initialize(character:, attributes:, finalize: false)
       @character = character
       @attributes = attributes
-      @require_hindrance_balance = require_hindrance_balance
+      @finalize = finalize
       @errors = {}
       @created = character.new_record?
     end
@@ -19,7 +23,9 @@ module Characters
     def call
       prepare_selections
       prepare_origin
+      prepare_hindrance_severities
       prepare_hindrance_points
+      prepare_status
       return false if errors.any?
 
       prepare_skill_dice
@@ -27,16 +33,19 @@ module Characters
       return false if errors.any?
 
       Character.transaction do
-        character.assign_attributes(@attributes.slice(:name, :rank))
+        character.assign_attributes(@attributes.slice(:name, :rank, :concept, :creation_step))
+        character.status = @status if @status
         character.attribute_dice = @attributes[:attributes] if @attributes.key?(:attributes)
         character.origin = @origin if @origin_provided
         character.save!
         apply_selections
+        apply_hindrance_severities
         apply_skill_dice
         apply_gear
+        finalize! if @finalize
       end
 
-      true
+      errors.empty?
     rescue ActiveRecord::RecordInvalid => error
       @errors = error.record.errors.to_hash
       false
@@ -47,6 +56,57 @@ module Characters
     end
 
     private
+
+    def finalize!
+      character.reload
+      messages = {}
+      messages[:name] = [ "can't be blank" ] if character.name.blank?
+      messages[:origin_id] = [ "must be chosen" ] if character.origin_id.nil?
+      messages.merge!(CreationPoints.new(character).errors)
+
+      if messages.any?
+        @errors = messages
+        raise ActiveRecord::Rollback
+      end
+
+      character.update!(status: :alive, creation_step: 0)
+    end
+
+    def prepare_status
+      return unless @attributes.key?(:status)
+
+      status = @attributes[:status].to_s
+      if character.new_record? || character.draft?
+        errors[:status] = [ "can only change after the character is finalized" ]
+      elsif !LIFECYCLE_STATUSES.include?(status)
+        errors[:status] = [ "must be alive or dead" ]
+      else
+        @status = status
+      end
+    end
+
+    def prepare_hindrance_severities
+      return unless @attributes.key?(:hindrance_severities)
+
+      severities = @attributes[:hindrance_severities]
+      unless severities.is_a?(Hash) && severities.values.all? { |value| CharacterHindrance::SEVERITIES.include?(value) }
+        errors[:hindrance_severities] = [ "must map hindrance ids to minor or major" ]
+        return
+      end
+
+      @hindrance_severities = severities.transform_keys(&:to_s)
+    end
+
+    def apply_hindrance_severities
+      return unless @hindrance_severities || @selections.key?(:hindrance_ids)
+
+      character.character_hindrances.includes(:hindrance).each do |selection|
+        next selection.update!(severity: nil) unless selection.hindrance.severity == "minor_or_major"
+
+        chosen = @hindrance_severities&.fetch(selection.hindrance_id.to_s, nil)
+        selection.update!(severity: chosen || selection.severity || "minor")
+      end
+    end
 
     def prepare_selections
       @selections = {}
@@ -157,12 +217,7 @@ module Characters
 
     def prepare_hindrance_points
       has_point_fields = @attributes.key?(:hindrance_points_spent) && @attributes.key?(:hindrance_points_earned)
-      unless has_point_fields
-        if @require_hindrance_balance
-          errors[:hindrance_points] = [ "must include earned and spent hindrance points" ]
-        end
-        return
-      end
+      return if !has_point_fields || @finalize
       return if errors.key?(:hindrance_ids)
 
       spent = normalize_points(@attributes[:hindrance_points_spent], :hindrance_points_spent)

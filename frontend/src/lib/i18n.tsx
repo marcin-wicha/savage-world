@@ -234,9 +234,8 @@ const translations: Record<string, string> = {
   'Draft saved.': 'Szkic zapisany.',
   'Could not save the draft. Keep this page open and try again shortly.':
     'Nie udało się zapisać szkicu. Nie zamykaj tej strony i spróbuj ponownie za chwilę.',
-  'Loading draft…': 'Wczytywanie szkicu…',
-  'Could not load this draft. It may have been finished or discarded.':
-    'Nie udało się wczytać szkicu. Mógł zostać ukończony lub odrzucony.',
+  'Back to characters': 'Wróć do postaci',
+  Dead: 'Martwa',
   'Last saved': 'Ostatni zapis',
   'Could not discard the draft. Try again.': 'Nie udało się odrzucić szkicu. Spróbuj ponownie.',
   'Start over': 'Zacznij od nowa',

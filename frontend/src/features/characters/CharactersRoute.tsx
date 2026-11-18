@@ -8,11 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useRestMutation, useRestQuery } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
 
-import {
-  type CharacterDraftSummary,
-  type CharacterDraftsResponse,
-  characterDraftsQueryKey,
-} from './character-draft'
+import type { CharacterStatus } from './character-draft'
 
 const rankLabels: Record<string, string> = {
   novice: 'Novice',
@@ -24,7 +20,9 @@ const rankLabels: Record<string, string> = {
 
 type Character = {
   id: number
-  name: string
+  name: string | null
+  status: CharacterStatus
+  updated_at: string
   avatar_url: string | null
   rank: string
   origin_name: string | null
@@ -46,26 +44,22 @@ export function CharactersRoute() {
     ['characters'],
     '/api/v1/characters',
   )
-  const characters = data?.characters ?? []
+  const allCharacters = data?.characters ?? []
+  const characters = allCharacters.filter((character) => character.status !== 'draft')
+  const drafts = allCharacters.filter((character) => character.status === 'draft')
   const [discardError, setDiscardError] = useState(false)
-  const draftsQuery = useRestQuery<CharacterDraftsResponse>(
-    characterDraftsQueryKey,
-    '/api/v1/character_drafts',
-  )
-  const drafts = draftsQuery.data?.character_drafts ?? []
   const rosterLoaded = !isPending && !isError
-  const showEmptyState =
-    rosterLoaded && !draftsQuery.isPending && characters.length === 0 && drafts.length === 0
+  const showEmptyState = rosterLoaded && characters.length === 0 && drafts.length === 0
   const dateFormat = new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-US', {
     dateStyle: 'medium',
     timeStyle: 'short',
   })
   const discardMutation = useRestMutation<void, { id: number }>(
-    { path: ({ id }) => `/api/v1/character_drafts/${id}`, method: 'DELETE' },
+    { path: ({ id }) => `/api/v1/characters/${id}`, method: 'DELETE' },
     {
       onSuccess: () => {
         setDiscardError(false)
-        void queryClient.invalidateQueries({ queryKey: characterDraftsQueryKey })
+        void queryClient.invalidateQueries({ queryKey: ['characters'] })
       },
       onError: () => setDiscardError(true),
     },
@@ -83,7 +77,9 @@ export function CharactersRoute() {
 
   const deleteCharacter = (character: Character) => {
     if (
-      !window.confirm(language === 'pl' ? `Usunąć ${character.name}?` : `Delete ${character.name}?`)
+      !window.confirm(
+        language === 'pl' ? `Usunąć ${character.name ?? ''}?` : `Delete ${character.name ?? ''}?`,
+      )
     )
       return
 
@@ -91,7 +87,7 @@ export function CharactersRoute() {
     deleteMutation.mutate({ id: character.id })
   }
 
-  const discardDraft = (draft: CharacterDraftSummary) => {
+  const discardDraft = (draft: Character) => {
     if (!window.confirm(t('Discard the unfinished character?'))) return
 
     setDiscardError(false)
@@ -133,7 +129,7 @@ export function CharactersRoute() {
                 <CardContent className="flex flex-wrap gap-2">
                   <Button asChild size="sm">
                     <Link
-                      to={`/characters/new?draft=${draft.id}`}
+                      to={`/characters/${draft.id}/edit`}
                       aria-label={`${t('Continue draft')}: ${draft.name || t('Unnamed character')}`}
                     >
                       {t('Continue draft')}
@@ -198,8 +194,15 @@ export function CharactersRoute() {
           {characters.map((character) => (
             <Card key={character.id}>
               <CardHeader className="flex flex-row items-center gap-4">
-                <CharacterAvatar name={character.name} src={character.avatar_url} />
-                <CardTitle className="min-w-0 break-words">{character.name}</CardTitle>
+                <CharacterAvatar name={character.name ?? ''} src={character.avatar_url} />
+                <div className="grid min-w-0 gap-1">
+                  <CardTitle className="min-w-0 break-words">{character.name}</CardTitle>
+                  {character.status === 'dead' ? (
+                    <p className="text-muted-foreground text-xs tracking-[0.18em] uppercase">
+                      {t('Dead')}
+                    </p>
+                  ) : null}
+                </div>
               </CardHeader>
               <CardContent>
                 <dl className="grid grid-cols-2 gap-3 text-sm">

@@ -10,6 +10,11 @@ module Parties
     end
 
     def call
+      if (message = PartyMembership.join_error_for(@character))
+        @errors = { character_id: [ message ] }
+        return false
+      end
+
       if @party.party_memberships.exists?(character_id: @character.id)
         @errors = { character_id: [ "is already in this party or awaiting approval" ] }
         return false

@@ -8,6 +8,9 @@ RSpec.describe Character, type: :model do
   it { is_expected.to belong_to(:user) }
   it { is_expected.to belong_to(:origin).optional }
   it { is_expected.to validate_presence_of(:name) }
+  it { is_expected.to validate_length_of(:name).is_at_most(60) }
+  it { is_expected.to validate_length_of(:concept).is_at_most(500) }
+  it { is_expected.to define_enum_for(:status).with_values(draft: 0, alive: 1, dead: 2).validating }
   it { is_expected.to have_many(:character_edges).dependent(:destroy) }
   it { is_expected.to have_many(:edges).through(:character_edges) }
   it { is_expected.to have_many(:character_hindrances).dependent(:destroy) }

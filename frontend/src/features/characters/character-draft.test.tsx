@@ -5,9 +5,10 @@ import type { PropsWithChildren } from 'react'
 import { api } from '@/lib/api-client'
 
 import {
+  type CharacterResponse,
+  characterToFormValues,
   hasDraftContent,
-  restoreDraftValues,
-  toDraftData,
+  toCharacterSaveFields,
   useCharacterDraftAutosave,
 } from './character-draft'
 import { characterFormDefaults } from './character-form'
@@ -17,64 +18,111 @@ vi.mock('@/lib/api-client', async (importOriginal) => {
 
   return {
     ...actual,
-    api: { ...actual.api, post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+    api: { ...actual.api, post: vi.fn(), put: vi.fn(), delete: vi.fn() },
   }
 })
 
 const apiPostMock = vi.mocked(api.post)
-const apiPatchMock = vi.mocked(api.patch)
+const apiPutMock = vi.mocked(api.put)
 const apiDeleteMock = vi.mocked(api.delete)
 
-const draftResponse = (id: number) => ({
-  character_draft: { id, name: '', step: 0, updated_at: '2026-11-17T10:00:00Z', data: {} },
+const storedCharacter = (
+  overrides: Partial<CharacterResponse['character']> = {},
+): CharacterResponse['character'] => ({
+  id: 5,
+  name: null,
+  status: 'draft',
+  updated_at: '2026-11-18T10:00:00Z',
+  concept: null,
+  creation_step: 0,
+  rank: 'novice',
+  origin_id: null,
+  origin_name: null,
+  edge_ids: [],
+  hindrance_ids: [],
+  skill_ids: [],
+  attributes: characterFormDefaults.attributes,
+  skill_dice: {},
+  ...overrides,
 })
 
-const payload = (name: string, step = 0) => ({
-  data: toDraftData({ ...characterFormDefaults, concept: { name, description: '' } }),
-  step,
-})
+const fields = (name: string, step = 0) =>
+  toCharacterSaveFields({ ...characterFormDefaults, concept: { name, description: '' } }, step)
 
-function renderAutosave(initialDraftId: number | null = null) {
+function renderAutosave(initialCharacterId: number | null = null, enabled = true) {
   const onCreated = vi.fn()
   const queryClient = new QueryClient()
   const wrapper = ({ children }: PropsWithChildren) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
   const hook = renderHook(
-    () => useCharacterDraftAutosave({ initialDraftId, onCreated, delayMs: 0 }),
+    () => useCharacterDraftAutosave({ initialCharacterId, enabled, onCreated, delayMs: 0 }),
     { wrapper },
   )
 
   return { ...hook, onCreated }
 }
 
-describe('character draft values', () => {
-  it('restores valid fields and falls back to defaults for invalid ones', () => {
-    const values = restoreDraftValues({
-      rank: 'demigod',
-      skills: ['3'],
-      concept: { name: 'Mira', description: '' },
-      avatar_file: 'nope',
-    })
+describe('character draft mapping', () => {
+  it('builds the character payload, keeping only selected hindrance severities', () => {
+    const payload = toCharacterSaveFields(
+      {
+        ...characterFormDefaults,
+        concept: { name: 'Mira', description: 'Desert scout' },
+        origin: '3',
+        hindrances: ['7'],
+        hindrance_severities: { '7': 'major', '8': 'minor' },
+        gear: { '2': 1 },
+        equipped_gear: ['2', '9'],
+      },
+      4,
+    )
 
-    expect(values.rank).toBe('novice')
-    expect(values.skills).toEqual(['3'])
-    expect(values.concept.name).toBe('Mira')
-    expect(values.avatar_file).toBeNull()
-    expect(values.attributes).toEqual(characterFormDefaults.attributes)
-    expect(restoreDraftValues(['not', 'an', 'object'])).toEqual(characterFormDefaults)
+    expect(payload).toMatchObject({
+      name: 'Mira',
+      concept: 'Desert scout',
+      origin_id: 3,
+      hindrance_ids: [7],
+      hindrance_severities: { '7': 'major' },
+      equipped_gear_ids: [2],
+      creation_step: 4,
+    })
+    expect(toCharacterSaveFields(characterFormDefaults)).toMatchObject({ origin_id: null })
+    expect(toCharacterSaveFields(characterFormDefaults)).not.toHaveProperty('creation_step')
   })
 
-  it('leaves the avatar file out of the stored snapshot', () => {
-    const data = toDraftData({
-      ...characterFormDefaults,
-      avatar_file: new File(['x'], 'avatar.png', { type: 'image/png' }),
-    })
+  it('restores form values and point spending from a stored character', () => {
+    const values = characterToFormValues(
+      storedCharacter({
+        name: 'Mira',
+        concept: 'Desert scout',
+        origin_id: 3,
+        origin_name: 'Dunestriders',
+        hindrance_ids: [7],
+        hindrances: [{ id: 7, name: 'Greedy', slug: 'greedy' }],
+        hindrance_severities: { '7': 'major' },
+        skill_ids: [4],
+        skills: [{ id: 4, name: 'Fighting', slug: 'fighting' }],
+        skill_dice: { '4': 'd8' },
+        creation_points: { earned: 2, spent: { attributes: 1, skills: 0, edges: 0 } },
+      }),
+    )
 
-    expect(data).not.toHaveProperty('avatar_file')
+    expect(values).toMatchObject({
+      concept: { name: 'Mira', description: 'Desert scout' },
+      origin: '3',
+      hindrances: ['7'],
+      hindrance_slugs: { '7': 'greedy' },
+      hindrance_severities: { '7': 'major' },
+      skill_slugs: { '4': 'fighting' },
+      skill_dice: { '4': 'd8' },
+      hindrance_points_earned: 2,
+      attribute_hindrance_points_spent: 1,
+      hindrance_points_spent: 1,
+    })
   })
 
-  it('detects whether values differ from a blank character', () => {
+  it('treats a blank character as having no draft content', () => {
     expect(hasDraftContent(characterFormDefaults)).toBe(false)
     expect(
       hasDraftContent({ ...characterFormDefaults, concept: { name: 'M', description: '' } }),
@@ -84,75 +132,98 @@ describe('character draft values', () => {
 
 describe('useCharacterDraftAutosave', () => {
   beforeEach(() => {
-    apiPostMock.mockReset().mockResolvedValue(draftResponse(5))
-    apiPatchMock.mockReset().mockResolvedValue(draftResponse(5))
+    apiPostMock.mockReset().mockResolvedValue({ character: storedCharacter() })
+    apiPutMock.mockReset().mockResolvedValue({ character: storedCharacter() })
     apiDeleteMock.mockReset().mockResolvedValue(undefined)
   })
 
-  it('creates a draft on the first save and updates it afterwards', async () => {
+  it('creates a draft character on the first save and updates it afterwards', async () => {
     const { result, onCreated } = renderAutosave()
 
-    act(() => result.current.schedule(payload('Mira')))
+    act(() => result.current.schedule(fields('Mira')))
     await waitFor(() => expect(result.current.status).toBe('saved'))
 
-    expect(apiPostMock).toHaveBeenCalledWith('/api/v1/character_drafts', {
-      character_draft: payload('Mira'),
-    })
+    expect(apiPostMock).toHaveBeenCalledWith('/api/v1/characters', { character: fields('Mira') })
     expect(onCreated).toHaveBeenCalledWith(5)
-    expect(result.current.draftId).toBe(5)
+    expect(result.current.characterId).toBe(5)
 
-    act(() => result.current.schedule(payload('Mira Voss', 2)))
-    await waitFor(() => expect(apiPatchMock).toHaveBeenCalledTimes(1))
+    act(() => result.current.schedule(fields('Mira Voss', 2)))
+    await waitFor(() => expect(apiPutMock).toHaveBeenCalledTimes(1))
 
-    expect(apiPatchMock).toHaveBeenCalledWith('/api/v1/character_drafts/5', {
-      character_draft: payload('Mira Voss', 2),
+    expect(apiPutMock).toHaveBeenCalledWith('/api/v1/characters/5', {
+      character: fields('Mira Voss', 2),
     })
     expect(apiPostMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('updates an existing draft without creating another', async () => {
-    const { result, onCreated } = renderAutosave(9)
-
-    act(() => result.current.schedule(payload('Mira')))
-    await waitFor(() => expect(result.current.status).toBe('saved'))
-
-    expect(apiPatchMock).toHaveBeenCalledWith('/api/v1/character_drafts/9', expect.anything())
-    expect(apiPostMock).not.toHaveBeenCalled()
-    expect(onCreated).not.toHaveBeenCalled()
   })
 
   it('reports failed saves', async () => {
     apiPostMock.mockRejectedValue(new Error('offline'))
     const { result } = renderAutosave()
 
-    act(() => result.current.schedule(payload('Mira')))
+    act(() => result.current.schedule(fields('Mira')))
 
     await waitFor(() => expect(result.current.status).toBe('error'))
-    expect(result.current.draftId).toBeNull()
+    expect(result.current.characterId).toBeNull()
   })
 
-  it('discards the draft and starts a new one on the next change', async () => {
+  it('does nothing while disabled', async () => {
+    const { result } = renderAutosave(null, false)
+
+    act(() => result.current.schedule(fields('Mira')))
+
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(apiPostMock).not.toHaveBeenCalled()
+  })
+
+  it('flushes a pending change immediately and reports the character id', async () => {
+    const { result } = renderAutosave(9)
+    const longDelay = renderHook(
+      () =>
+        useCharacterDraftAutosave({
+          initialCharacterId: 9,
+          enabled: true,
+          onCreated: vi.fn(),
+          delayMs: 60_000,
+        }),
+      {
+        wrapper: ({ children }: PropsWithChildren) => (
+          <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
+        ),
+      },
+    )
+
+    act(() => longDelay.result.current.schedule(fields('Mira')))
+    let flushedId: number | null = null
+    await act(async () => {
+      flushedId = await longDelay.result.current.flush()
+    })
+
+    expect(flushedId).toBe(9)
+    expect(apiPutMock).toHaveBeenCalledWith('/api/v1/characters/9', { character: fields('Mira') })
+    expect(result.current.characterId).toBe(9)
+  })
+
+  it('discards the draft character and starts a new one on the next change', async () => {
     const { result } = renderAutosave(9)
 
     await act(() => result.current.discard())
 
-    expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/character_drafts/9')
-    expect(result.current.draftId).toBeNull()
+    expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/characters/9')
+    expect(result.current.characterId).toBeNull()
 
-    act(() => result.current.schedule(payload('Fresh')))
-    await waitFor(() => expect(result.current.draftId).toBe(5))
+    act(() => result.current.schedule(fields('Fresh')))
+    await waitFor(() => expect(result.current.characterId).toBe(5))
     expect(apiPostMock).toHaveBeenCalledTimes(1)
   })
 
-  it('stops saving once the character is finished', async () => {
+  it('stops saving once stopped', async () => {
     const { result } = renderAutosave(9)
 
-    await act(() => result.current.finish())
-    act(() => result.current.schedule(payload('Late change')))
+    await act(() => result.current.stop())
+    act(() => result.current.schedule(fields('Late change')))
 
     await new Promise((resolve) => setTimeout(resolve, 10))
-    expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/character_drafts/9')
-    expect(apiPatchMock).not.toHaveBeenCalled()
-    expect(apiPostMock).not.toHaveBeenCalled()
+    expect(apiPutMock).not.toHaveBeenCalled()
+    expect(apiDeleteMock).not.toHaveBeenCalled()
   })
 })

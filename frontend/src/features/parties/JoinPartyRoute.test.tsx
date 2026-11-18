@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { ApiError, api } from '@/lib/api-client'
@@ -21,8 +21,10 @@ function mockInvite(myMemberships: { character_id: number; status: string }[] = 
       path === '/api/v1/characters'
         ? {
             characters: [
-              { id: 1, name: 'Katarina' },
-              { id: 2, name: 'Vex' },
+              { id: 1, name: 'Katarina', status: 'alive' },
+              { id: 2, name: 'Vex', status: 'alive' },
+              { id: 3, name: null, status: 'draft' },
+              { id: 4, name: 'Fallen', status: 'dead' },
             ],
           }
         : {
@@ -59,6 +61,12 @@ describe('JoinPartyRoute', () => {
     expect(await screen.findByText('The Crew')).toBeInTheDocument()
     const select = await screen.findByLabelText('Character')
     expect(screen.queryByRole('option', { name: 'Vex' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Fallen' })).not.toBeInTheDocument()
+    expect(
+      within(select)
+        .getAllByRole('option')
+        .map((option) => option.textContent),
+    ).not.toContain('')
 
     await user.selectOptions(select, '1')
     await user.click(screen.getByRole('button', { name: 'Request to join' }))

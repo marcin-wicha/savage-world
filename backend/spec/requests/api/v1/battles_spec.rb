@@ -82,13 +82,22 @@ RSpec.describe "Battles", type: :request do
       expect(json.dig("details", "enemies")).to eq([ "cannot bring the battle above 30 combatants" ])
     end
 
+    it "leaves dead characters out of the fight" do
+      hero.update!(status: :dead)
+
+      create_battle(enemies: [ { enemy_template_id: template.id } ])
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "party")).to eq([ "has no accepted living characters" ])
+    end
+
     it "requires accepted characters" do
       empty_party = create(:party, leader: leader)
 
       create_battle({ enemies: [ { enemy_template_id: template.id } ] }, party_id: empty_party.id)
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(json.dig("details", "party")).to eq([ "has no accepted characters" ])
+      expect(json.dig("details", "party")).to eq([ "has no accepted living characters" ])
     end
 
     it "forbids someone else's enemy templates" do

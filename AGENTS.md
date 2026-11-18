@@ -121,10 +121,11 @@ Current gaps, intentionally left for later feature work:
 - There is no password-reset flow or mailer usage.
 - Domain Pundit policies currently cover character upsert and parties.
 - Frontend feature UI and MSW handlers are still minimal.
-- Unfinished character creation is autosaved as server-side character drafts
-  (`/api/v1/character_drafts`, `features/characters/character-draft.ts`).
-  Drafts store an opaque form snapshot and do not include an unsaved avatar
-  file; game rules are validated only when the character is saved.
+- Characters have a lifecycle `status` (`draft`, `alive`, `dead`). The creation
+  wizard autosaves an unfinished character as a `draft`
+  (`features/characters/character-draft.ts`) and
+  `POST /api/v1/characters/:id/finalize` validates it and makes it `alive`.
+  An avatar chosen during creation is still uploaded only after finalizing.
 
 ## Agent operating rules
 
@@ -289,28 +290,35 @@ both in the same change when committing.
 - Current tables are `users`, `sessions`, `characters`, `character_edges`,
   `character_hindrances`, `character_skills`, `origins`, `edges`, `hindrances`,
   `skills`, `gears`, `powers`, `parties`, `party_memberships`,
-  `character_gears`, `character_drafts`, `enemy_templates`, and `battles`.
+  `character_gears`, `enemy_templates`, and `battles`.
 - `users` stores a normalized, unique `email_address` and `password_digest`.
 - `sessions` belongs to `users` and stores optional `ip_address` and
   `user_agent`.
 - `characters` belongs to `users` and stores a name, rank, JSONB
-  `attribute_dice`, and an optional `avatar_filename` (a random hex name under
-  `storage/avatars/`, managed by `Characters::AvatarUpload`). Its selected edges, hindrances, and skills are normalized
+  `attribute_dice`, an optional `concept`, and an optional `avatar_filename` (a random hex name under
+  `storage/avatars/`, managed by `Characters::AvatarUpload`). `status` is
+  `draft` (0, the column default), `alive` (1), or `dead` (2); a check
+  constraint requires a non-blank name unless the character is a draft, and a
+  character never returns to `draft`. `creation_step` (0–20) is the wizard step
+  a draft resumes on. Use the `finished` scope (or an explicit status filter)
+  wherever drafts must be excluded; there is no default scope. Its selected edges, hindrances, and skills are normalized
   through `character_edges`, `character_hindrances`, and `character_skills`, each
   with a unique character/reference pair; `character_skills` also stores each
-  selected skill's base die.
+  selected skill's base die, and `character_hindrances` stores the chosen
+  `severity` (`minor`/`major`) for Minor-or-Major hindrances.
+- `Characters::CreationPoints` is the server-side point-buy: Hindrance points
+  earned (max 4) versus points spent on attributes beyond 5 free steps, skills
+  beyond 12 free points, and 2 per Edge. Finalizing requires them to balance.
 - `parties` stores a name, optional description, `leader_id` (users), and a
   unique `invite_code` (`has_secure_token`). `party_memberships` joins parties
   and characters with a `pending`/`accepted` status and a unique
-  party/character pair. A character may belong to many parties. Deleting a
+  party/character pair. Only `alive` characters may join a party, and only
+  `alive` accepted characters fight in battles. A character may belong to many parties. Deleting a
   party, its leader, or a character removes the related memberships.
 - `character_gears` joins characters and gear with a 1–99 `quantity` and an
   `equipped` flag; equipped weapons, armor, and shields feed derived stats and
   battles. `Gears::CombatProfile` parses the documented combat keys in gear
   `effects` (see `db/data/gear/README.md`).
-- `character_drafts` belongs to `users` and stores a JSONB `data` object (the
-  creation form snapshot, at most 100 KB) and the current wizard `step`. A user
-  may keep at most 20 drafts. Drafts are not validated as characters.
 - `enemy_templates` belongs to `users` and stores a stat block: Wild Card flag,
   JSONB `attribute_dice` and `skills` (dice such as `d12+2`), Pace, Parry,
   Toughness (including armor), armor, Size, Bennies, JSONB `weapons`,
@@ -358,17 +366,29 @@ Routes are defined in `backend/config/routes.rb`:
   credentials, and `429` when rate limited.
 - `DELETE /api/v1/session` — authenticated; destroys the session and returns
   `204`.
-- `GET /api/v1/characters` — authenticated; returns the current user's
-  characters with their origin name and selected reference IDs.
-- `POST /api/v1/characters` — authenticated; creates the current user's
-  character. JSON body:
+- `GET /api/v1/characters` — authenticated; returns all of the current user's
+  characters, drafts included, with `status`, origin name, and selected
+  reference IDs.
+- `POST /api/v1/characters` — authenticated; creates a `draft` character for
+  the current user. Drafts may omit the name and leave hindrance points
+  unbalanced. JSON body:
   `{ "character": { "name": "...", "rank": "novice", "origin_id": 1, "attributes": { "agility": "d6", "smarts": "d4", "spirit": "d4", "strength": "d4", "vigor": "d4" }, "edge_ids": [1], "hindrance_ids": [2], "skill_ids": [3], "skill_dice": { "3": "d6" }, "hindrance_severities": { "2": "minor" }, "hindrance_points_earned": 1, "hindrance_points_spent": 1 } }`.
   The response includes base attributes/skill dice and calculated
-  `effective_traits` with effect attribution. Returns `201` on success, `401`
-  unauthenticated, and `422` for validation, reference, or unspent hindrance
-  points.
-- `PUT /api/v1/characters/:id` — authenticated; creates or updates the current
-  user's character. It accepts the same character fields. Returns `201` on
+  `effective_traits` with effect attribution. Character payloads also include
+  `status`, `concept`, `creation_step`, `updated_at`, per-hindrance
+  `hindrance_severities`, slugs on `edges`/`hindrances`/`skills`, and
+  server-calculated `creation_points` (`earned` plus `spent` attributes, skills,
+  and edges). Returns `201` on success, `401` unauthenticated, and `422` for
+  validation or reference errors.
+- `POST /api/v1/characters/:id/finalize` — owner only; optionally applies a
+  `character` body like `PUT`, then requires a name, an origin, and balanced
+  `creation_points` before setting `status` to `alive`. Client-reported point
+  totals are ignored. Returns `200`, `422` (rolled back) for unmet rules or a
+  character that is not a draft, `403` for another user's character, and `404`.
+- `PUT /api/v1/characters/:id` — authenticated; creates (as a draft) or updates
+  the current user's character. It accepts the same character fields plus
+  `concept`, `creation_step`, and, for finished characters only, `status`
+  (`alive` or `dead`); a draft becomes `alive` only through finalize. Returns `201` on
   create, `200` on update, `401` unauthenticated, `403` for another user's
   character, and `422` for validation or reference errors. Omitted selection
   arrays are left unchanged; provided arrays replace the selection.
@@ -412,15 +432,11 @@ Routes are defined in `backend/config/routes.rb`:
   - `PATCH /api/v1/parties/:party_id/memberships/:id/accept` — leader only.
   - `DELETE /api/v1/parties/:party_id/memberships/:id` — the leader (reject or
     remove) or the character's owner (leave or cancel a request).
-- Character drafts (authenticated, owner only): `GET`/`POST
-  /api/v1/character_drafts`, `GET`/`PATCH`/`DELETE /api/v1/character_drafts/:id`.
-  Bodies are `{ "character_draft": { "data": { ... }, "step": 2 } }`. The list
-  returns `id`, `name` (from `data.concept.name`), `step`, and `updated_at`
-  newest first; `show`, `create`, and `update` also return `data`. `422` for
-  non-object or oversized data, an invalid step, or more than 20 drafts; `403`
-  for another user's draft. The SPA autosaves the creation wizard (debounced),
-  resumes from `/characters/new?draft=:id`, lists drafts on the roster, and
-  deletes the draft after the character is saved.
+- The SPA autosaves the creation wizard (debounced): the first change creates
+  a draft with `POST /api/v1/characters` and moves to `/characters/:id/edit`,
+  later changes use `PUT`, and saving calls finalize. The roster lists drafts
+  under "Unfinished characters"; discarding one deletes the character. Party
+  join pickers only offer `alive` characters.
 - Enemy templates (authenticated, owner only): `GET`/`POST
   /api/v1/enemy_templates`, `GET`/`PATCH`/`DELETE /api/v1/enemy_templates/:id`.
   `POST` defaults Wild Card Bennies to 2. Another user's template returns `403`.
@@ -485,7 +501,7 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   party members. `PartyPolicy` (leader edits; leader or accepted
   participant views; scope lists led/joined parties) and
   `PartyMembershipPolicy` (owner joins and leaves; leader accepts and removes)
-  guard parties. `CharacterDraftPolicy` limits drafts to their owner.
+  guard parties. `CharacterPolicy` also guards finalize by ownership.
   Multi-step party rules live in `Parties::Join` and
   `Parties::TransferLeadership`. `EnemyTemplatePolicy` limits templates to their
   owner, and `BattlePolicy` lets party leaders and accepted participants run and

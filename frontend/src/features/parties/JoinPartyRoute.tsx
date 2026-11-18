@@ -23,7 +23,7 @@ type InviteResponse = {
 }
 
 type CharactersResponse = {
-  characters: { id: number; name: string }[]
+  characters: { id: number; name: string | null; status: 'draft' | 'alive' | 'dead' }[]
 }
 
 type JoinResponse = { membership: { status: MembershipStatus } }
@@ -73,7 +73,7 @@ export function JoinPartyRoute() {
   const { party, my_memberships: myMemberships } = invite.data
   const joinedIds = new Set(myMemberships.map((membership) => membership.character_id))
   const available = (characters.data?.characters ?? []).filter(
-    (character) => !joinedIds.has(character.id),
+    (character) => character.status === 'alive' && !joinedIds.has(character.id),
   )
 
   return (

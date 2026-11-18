@@ -41,6 +41,21 @@ RSpec.describe "Party invites", type: :request do
   end
 
   describe "POST /api/v1/party_invites/:code/memberships" do
+    it "rejects unfinished drafts and dead characters" do
+      sign_in_as(user)
+      draft = create(:character, :draft, user: user)
+      fallen = create(:character, user: user, status: :dead)
+
+      join(party.invite_code, draft.id)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "character_id")).to eq([ "must be finished before joining a party" ])
+
+      join(party.invite_code, fallen.id)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "character_id")).to eq([ "cannot join a party while dead" ])
+      expect(party.party_memberships).to be_empty
+    end
+
     it "creates a pending join request" do
       sign_in_as(user)
 

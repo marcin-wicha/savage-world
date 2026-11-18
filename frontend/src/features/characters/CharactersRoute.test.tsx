@@ -6,7 +6,6 @@ import { MemoryRouter } from 'react-router-dom'
 import { api } from '@/lib/api-client'
 
 import { CharactersRoute } from './CharactersRoute'
-import type { CharacterDraftSummary } from './character-draft'
 
 vi.mock('@/lib/api-client', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api-client')>()
@@ -26,18 +25,22 @@ const apiDeleteMock = vi.mocked(api.delete)
 
 type TestCharacter = {
   id: number
-  name: string
+  name: string | null
+  status?: 'draft' | 'alive' | 'dead'
+  updated_at?: string
   avatar_url?: string | null
   rank: string
   origin_name: string | null
 }
 
-function renderRoute(characters: TestCharacter[] = [], drafts: CharacterDraftSummary[] = []) {
-  apiGetMock.mockImplementation((path: string) =>
-    Promise.resolve(
-      path === '/api/v1/character_drafts' ? { character_drafts: drafts } : { characters },
-    ),
-  )
+function renderRoute(characters: TestCharacter[] = []) {
+  apiGetMock.mockResolvedValue({
+    characters: characters.map((character) => ({
+      status: 'alive',
+      updated_at: '2026-11-17T10:00:00Z',
+      ...character,
+    })),
+  })
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
   render(
@@ -127,16 +130,23 @@ describe('CharactersRoute', () => {
     expect(screen.getAllByRole('link', { name: /create a character/i })).toHaveLength(1)
   })
 
+  it('marks dead characters', async () => {
+    renderRoute([{ id: 1, name: 'Fallen Hero', rank: 'novice', origin_name: null, status: 'dead' }])
+
+    expect(await screen.findByText('Fallen Hero')).toBeInTheDocument()
+    expect(screen.getByText('Dead')).toBeInTheDocument()
+  })
+
   describe('with unfinished character drafts', () => {
-    const drafts: CharacterDraftSummary[] = [
-      { id: 5, name: 'Mira', step: 3, updated_at: '2026-11-17T10:00:00Z' },
-      { id: 6, name: '', step: 0, updated_at: '2026-11-16T10:00:00Z' },
+    const drafts: TestCharacter[] = [
+      { id: 5, name: 'Mira', status: 'draft', rank: 'novice', origin_name: null },
+      { id: 6, name: null, status: 'draft', rank: 'novice', origin_name: null },
     ]
 
     afterEach(() => vi.restoreAllMocks())
 
-    it('lists drafts with links to continue each one', async () => {
-      renderRoute([], drafts)
+    it('lists drafts separately with links to continue each one', async () => {
+      renderRoute(drafts)
 
       expect(
         await screen.findByRole('heading', { name: 'Unfinished characters' }),
@@ -145,8 +155,9 @@ describe('CharactersRoute', () => {
       expect(screen.getByText('Unnamed character')).toBeInTheDocument()
       expect(screen.getByRole('link', { name: 'Continue draft: Mira' })).toHaveAttribute(
         'href',
-        '/characters/new?draft=5',
+        '/characters/5/edit',
       )
+      expect(screen.queryByRole('link', { name: 'Sheet' })).not.toBeInTheDocument()
       expect(screen.queryByText('No characters yet')).not.toBeInTheDocument()
       expect(screen.getAllByRole('link', { name: /create a character/i })).toHaveLength(1)
     })
@@ -155,23 +166,19 @@ describe('CharactersRoute', () => {
       const user = userEvent.setup()
       vi.spyOn(window, 'confirm').mockReturnValue(true)
       apiDeleteMock.mockResolvedValue(null)
-      renderRoute([], drafts)
+      renderRoute(drafts)
 
       await user.click(await screen.findByRole('button', { name: 'Discard draft: Mira' }))
 
       await waitFor(() => {
-        expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/character_drafts/5')
+        expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/characters/5')
       })
-      expect(apiGetMock).toHaveBeenCalledWith(
-        '/api/v1/character_drafts',
-        expect.objectContaining({ signal: expect.any(AbortSignal) }),
-      )
     })
 
     it('keeps the draft when discarding is cancelled', async () => {
       const user = userEvent.setup()
       vi.spyOn(window, 'confirm').mockReturnValue(false)
-      renderRoute([], drafts)
+      renderRoute(drafts)
 
       await user.click(await screen.findByRole('button', { name: 'Discard draft: Mira' }))
 
@@ -182,7 +189,7 @@ describe('CharactersRoute', () => {
       const user = userEvent.setup()
       vi.spyOn(window, 'confirm').mockReturnValue(true)
       apiDeleteMock.mockRejectedValue(new Error('boom'))
-      renderRoute([], drafts)
+      renderRoute(drafts)
 
       await user.click(await screen.findByRole('button', { name: 'Discard draft: Mira' }))
 

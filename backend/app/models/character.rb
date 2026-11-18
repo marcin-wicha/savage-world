@@ -1,5 +1,8 @@
 class Character < ApplicationRecord
   enum :rank, { novice: 0, seasoned: 1, veteran: 2, heroic: 3, legendary: 4 }, validate: true
+  enum :status, { draft: 0, alive: 1, dead: 2 }, validate: true
+
+  MAX_CREATION_STEP = 20
 
   belongs_to :user
   belongs_to :origin, optional: true
@@ -19,12 +22,23 @@ class Character < ApplicationRecord
   has_many :party_memberships, dependent: :destroy
   has_many :parties, through: :party_memberships
 
-  normalizes :name, with: ->(name) { name.strip }
+  normalizes :name, with: ->(name) { name.strip.presence }
+  normalizes :concept, with: ->(concept) { concept.strip.presence }
 
-  validates :name, presence: true
+  scope :finished, -> { where.not(status: :draft) }
+
+  validates :name, presence: true, unless: :draft?
+  validates :name, length: { maximum: 60 }
+  validates :concept, length: { maximum: 500 }
+  validates :creation_step, numericality: { only_integer: true, in: 0..MAX_CREATION_STEP }
+  validate :status_does_not_return_to_draft, on: :update
   validate :attributes_are_valid
 
   private
+
+  def status_does_not_return_to_draft
+    errors.add(:status, "cannot return to draft") if status_changed? && draft? && status_was != "draft"
+  end
 
   def attributes_are_valid
     expected = %w[agility smarts spirit strength vigor]

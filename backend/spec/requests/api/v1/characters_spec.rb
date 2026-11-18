@@ -90,7 +90,8 @@ RSpec.describe "Characters", type: :request do
           "origin_id" => origin.id,
           "origin_name" => origin.name,
           "edge_ids" => [ edge.id ],
-          "edges" => [ { "id" => edge.id, "name" => edge.name } ],
+          "edges" => [ { "id" => edge.id, "name" => edge.name, "slug" => edge.slug } ],
+          "status" => "alive",
           "hindrance_ids" => [],
           "skill_ids" => [],
           "attributes" => hash_including("agility" => "d4"),
@@ -134,16 +135,20 @@ RSpec.describe "Characters", type: :request do
       expect(json.dig("character", "name")).to eq("Nathan Drake")
     end
 
-    it "requires hindrance point totals when creating a character" do
+    it "creates an unfinished draft without requiring a name or balanced points" do
       post "/api/v1/characters",
-        params: { character: { name: "Nathan Drake", hindrance_ids: [ hindrance.id ] } }.to_json,
+        params: { character: { hindrance_ids: [ hindrance.id ], creation_step: 2, concept: "Treasure hunter" } }.to_json,
         headers: json_headers
 
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(json.dig("details", "hindrance_points")).to eq(
-        [ "must include earned and spent hindrance points" ]
+      expect(response).to have_http_status(:created)
+      expect(json["character"]).to include(
+        "status" => "draft",
+        "name" => nil,
+        "creation_step" => 2,
+        "concept" => "Treasure hunter",
+        "hindrance_ids" => [ hindrance.id ]
       )
-      expect(user.characters).to be_empty
+      expect(user.characters.sole).to be_draft
     end
 
     it "requires authentication" do
@@ -385,9 +390,18 @@ RSpec.describe "Characters", type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(json["error"]).to eq("Validation failed")
-      expect(json.dig("details", "name")).to be_present
       expect(json.dig("details", "rank")).to be_present
+      expect(json.dig("details", "name")).to be_nil
       expect(Character.count).to eq(0)
+    end
+
+    it "requires a name for a finished character" do
+      character = create(:character, user: user)
+
+      put_character(character.id, name: " ")
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "name")).to eq([ "can't be blank" ])
     end
 
     it "rejects malformed reference ids" do

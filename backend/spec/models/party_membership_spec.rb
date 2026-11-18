@@ -7,6 +7,19 @@ RSpec.describe PartyMembership do
   it { is_expected.to belong_to(:character) }
   it { is_expected.to define_enum_for(:status).with_values(pending: 0, accepted: 1).validating }
 
+  it "only lets finished, living characters join" do
+    expect(build(:party_membership, character: create(:character, :draft))).not_to be_valid
+    expect(build(:party_membership, character: create(:character, status: :dead))).not_to be_valid
+    expect(build(:party_membership, character: create(:character))).to be_valid
+  end
+
+  it "keeps a membership valid when its character later dies" do
+    membership = create(:party_membership)
+    membership.character.update!(status: :dead)
+
+    expect(membership.reload).to be_valid
+  end
+
   it "allows a character to join a party only once" do
     existing = create(:party_membership)
     duplicate = build(:party_membership, party: existing.party, character: existing.character)

@@ -20,7 +20,7 @@ module Battles
       seed = parse_seed
       enemies = parse_enemies
       characters = party_characters
-      errors[:party] = [ "has no accepted characters" ] if characters.empty?
+      errors[:party] = [ "has no accepted living characters" ] if characters.empty?
       return false if errors.any?
 
       definitions = characters.map { |character| CombatantBuilder.from_character(character) } + enemy_definitions(enemies)
@@ -117,6 +117,7 @@ module Battles
 
     def party_characters
       @party.party_memberships.accepted
+        .joins(:character).where(characters: { status: :alive })
         .includes(character: [ :edges, :hindrances, { character_skills: :skill }, { character_gears: :gear } ])
         .order(:id)
         .map(&:character)

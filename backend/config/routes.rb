@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       post "characters", to: "characters#create", as: :characters
       get "characters/:id", to: "characters#show", as: :character_show
       put "characters/:id", to: "characters#upsert", as: :character
+      post "characters/:id/finalize", to: "characters#finalize", as: :character_finalize
       delete "characters/:id", to: "characters#destroy", as: :character_destroy
       post "characters/:character_id/avatar", to: "character_avatars#create", as: :character_avatar
       delete "characters/:character_id/avatar", to: "character_avatars#destroy"
@@ -25,7 +26,6 @@ Rails.application.routes.draw do
       end
       resources :battles, only: %i[show destroy]
       resources :enemy_templates, only: %i[index show create update destroy]
-      resources :character_drafts, only: %i[index show create update destroy]
       get "party_invites/:code", to: "party_invites#show", as: :party_invite
       post "party_invites/:code/memberships", to: "party_invites#join", as: :party_invite_memberships
       get "artwork/:resource/:id/:filename", to: "artwork#show", format: false

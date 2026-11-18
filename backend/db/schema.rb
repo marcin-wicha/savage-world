@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,17 +31,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_200000) do
     t.check_constraint "jsonb_typeof(log) = 'array'::text", name: "battles_log_array"
     t.check_constraint "jsonb_typeof(roster) = 'array'::text", name: "battles_roster_array"
     t.check_constraint "runs >= 1 AND runs <= 200", name: "battles_runs_range"
-  end
-
-  create_table "character_drafts", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.jsonb "data", default: {}, null: false
-    t.integer "step", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id", "updated_at"], name: "index_character_drafts_on_user_id_and_updated_at"
-    t.check_constraint "jsonb_typeof(data) = 'object'::text", name: "character_drafts_data_object"
-    t.check_constraint "step >= 0", name: "character_drafts_step_non_negative"
   end
 
   create_table "character_edges", force: :cascade do |t|
@@ -71,9 +60,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_200000) do
     t.bigint "hindrance_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "severity"
     t.index ["character_id", "hindrance_id"], name: "index_character_hindrances_on_character_id_and_hindrance_id", unique: true
     t.index ["character_id"], name: "index_character_hindrances_on_character_id"
     t.index ["hindrance_id"], name: "index_character_hindrances_on_hindrance_id"
+    t.check_constraint "severity IS NULL OR (severity::text = ANY (ARRAY['minor'::character varying, 'major'::character varying]::text[]))", name: "character_hindrances_severity_values"
   end
 
   create_table "character_skills", force: :cascade do |t|
@@ -89,16 +80,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_200000) do
 
   create_table "characters", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "name", null: false
+    t.string "name"
     t.integer "rank", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "origin_id"
     t.jsonb "attribute_dice", default: {"vigor" => "d4", "smarts" => "d4", "spirit" => "d4", "agility" => "d4", "strength" => "d4"}, null: false
     t.string "avatar_filename"
+    t.integer "status", default: 0, null: false
+    t.integer "creation_step", default: 0, null: false
+    t.text "concept"
     t.index ["origin_id"], name: "index_characters_on_origin_id"
+    t.index ["user_id", "status"], name: "index_characters_on_user_id_and_status"
     t.index ["user_id"], name: "index_characters_on_user_id"
+    t.check_constraint "creation_step >= 0 AND creation_step <= 20", name: "characters_creation_step_range"
     t.check_constraint "rank >= 0 AND rank <= 4", name: "characters_rank_range"
+    t.check_constraint "status = 0 OR name IS NOT NULL AND btrim(name::text) <> ''::text", name: "characters_name_required_unless_draft"
+    t.check_constraint "status >= 0 AND status <= 2", name: "characters_status_range"
   end
 
   create_table "edges", force: :cascade do |t|
@@ -283,7 +281,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_200000) do
 
   add_foreign_key "battles", "parties", on_delete: :cascade
   add_foreign_key "battles", "users", on_delete: :cascade
-  add_foreign_key "character_drafts", "users", on_delete: :cascade
   add_foreign_key "character_edges", "characters"
   add_foreign_key "character_edges", "edges"
   add_foreign_key "character_gears", "characters", on_delete: :cascade

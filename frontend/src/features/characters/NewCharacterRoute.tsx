@@ -2,13 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { MultiStepFlow, type MultiStepFlowStep } from '@/components/multi-step-flow'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ApiError, api } from '@/lib/api-client'
-import { useRestMutation, useRestQuery } from '@/lib/queries'
+import { useRestQuery } from '@/lib/queries'
 import { useLanguage } from '@/lib/i18n-context'
 
 import { AttributesStep } from './AttributesStep'
@@ -20,12 +20,11 @@ import { OriginStep } from './OriginStep'
 
 import { HindrancesStep } from './HindrancesStep'
 import {
-  type CharacterDraftResponse,
+  type CharacterResponse,
   type DraftSaveStatus,
-  type RestoredCharacterDraft,
+  characterToFormValues,
   hasDraftContent,
-  restoreCharacterDraft,
-  toDraftData,
+  toCharacterSaveFields,
   useCharacterDraftAutosave,
 } from './character-draft'
 import { GearStep } from './GearStep'
@@ -44,53 +43,6 @@ type StepDefinition = {
   heading: string
   description: string
 }
-
-type CharacterSaveRequest = {
-  character: {
-    name: string
-    rank: CharacterFormValues['rank']
-    origin_id: number | null
-    edge_ids: number[]
-    hindrance_ids: number[]
-    skill_ids: number[]
-    attributes: CharacterFormValues['attributes']
-    skill_dice: Record<string, CharacterFormValues['skill_dice'][string]>
-    hindrance_severities: Record<string, 'minor' | 'major'>
-    hindrance_points_earned: number
-    hindrance_points_spent: number
-    gear: Record<string, number>
-    equipped_gear_ids: number[]
-  }
-}
-
-type CharacterSaveResponse = {
-  character: {
-    id: number
-  }
-}
-
-type CharacterResponse = {
-  character: {
-    id: number
-    name: string
-    avatar_url?: string | null
-    rank: CharacterFormValues['rank']
-    origin_id: number | null
-    origin_name: string | null
-    edge_ids: number[]
-    hindrance_ids: number[]
-    skill_ids: number[]
-    attributes: CharacterFormValues['attributes']
-    skill_dice: Record<string, CharacterFormValues['skill_dice'][string]>
-    gear?: { gear_id: number; name: string; quantity: number; equipped: boolean }[]
-    effective_traits: {
-      attributes: Record<string, { base_die: string; die: string; modifier: number }>
-      skills: Record<string, { base_die: string; die: string; modifier: number }>
-    }
-  }
-}
-
-const ids = (values: string[]) => values.map(Number)
 
 function saveErrorMessage(error: Error | null) {
   if (!(error instanceof ApiError)) return error?.message
@@ -171,16 +123,16 @@ const stepDefinitions: StepDefinition[] = [
   },
 ]
 
-type DraftNavigationState = { keepEditor: true }
+type EditorNavigationState = { keepEditor: true }
 
-const keepsEditor = (state: unknown): state is DraftNavigationState =>
+const keepEditorState: EditorNavigationState = { keepEditor: true }
+
+const keepsEditor = (state: unknown): state is EditorNavigationState =>
   Boolean(state && typeof state === 'object' && 'keepEditor' in state)
 
 export function NewCharacterRoute() {
   const { id } = useParams<{ id: string }>()
-  const [searchParams] = useSearchParams()
   const location = useLocation()
-  const draftParam = id ? null : searchParams.get('draft')
   const [editor, setEditor] = useState({ key: location.key, locationKey: location.key })
 
   if (location.key !== editor.locationKey) {
@@ -190,43 +142,41 @@ export function NewCharacterRoute() {
     })
   }
 
-  if (id) return <CharacterEditor key={`edit-${id}`} initialDraft={null} />
-
-  return <DraftLoader key={editor.key} draftParam={draftParam} />
+  return <CharacterLoader key={editor.key} routeId={id ?? null} />
 }
 
-function DraftLoader({ draftParam }: { draftParam: string | null }) {
+function CharacterLoader({ routeId }: { routeId: string | null }) {
   const { t } = useLanguage()
-  const [draftId] = useState(() => {
-    const parsed = Number(draftParam)
-    return draftParam !== null && Number.isInteger(parsed) && parsed > 0 ? parsed : null
+  const [characterId] = useState(() => {
+    const parsed = Number(routeId)
+    return routeId !== null && Number.isInteger(parsed) && parsed > 0 ? parsed : null
   })
-  const draftQuery = useRestQuery<CharacterDraftResponse>(
-    ['character-draft', draftId],
-    `/api/v1/character_drafts/${draftId ?? ''}`,
-    { enabled: draftId !== null, gcTime: 0, staleTime: 0 },
+  const characterQuery = useRestQuery<CharacterResponse>(
+    ['character', String(characterId)],
+    `/api/v1/characters/${characterId ?? ''}`,
+    { enabled: characterId !== null, gcTime: 0, staleTime: 0 },
   )
 
-  if (draftId === null) return <CharacterEditor initialDraft={null} />
+  if (characterId === null) return <CharacterEditor character={null} />
 
-  if (draftQuery.isPending) {
-    return <p className="text-muted-foreground text-sm">{t('Loading draft…')}</p>
+  if (characterQuery.isPending) {
+    return <p className="text-muted-foreground text-sm">{t('Loading character…')}</p>
   }
 
-  if (draftQuery.isError) {
+  if (characterQuery.isError) {
     return (
       <div className="grid gap-3">
         <p className="text-danger text-sm" role="alert">
-          {t('Could not load this draft. It may have been finished or discarded.')}
+          {t('Could not load character. Try again.')}
         </p>
         <Button asChild variant="outline" className="w-fit">
-          <Link to="/characters/new">{t('Create a character')}</Link>
+          <Link to="/characters">{t('Back to characters')}</Link>
         </Button>
       </div>
     )
   }
 
-  return <CharacterEditor initialDraft={restoreCharacterDraft(draftQuery.data.character_draft)} />
+  return <CharacterEditor character={characterQuery.data.character} />
 }
 
 const draftStatusMessages: Record<DraftSaveStatus, string> = {
@@ -236,74 +186,41 @@ const draftStatusMessages: Record<DraftSaveStatus, string> = {
   error: 'Could not save the draft. Keep this page open and try again shortly.',
 }
 
-function CharacterEditor({ initialDraft }: { initialDraft: RestoredCharacterDraft | null }) {
+function CharacterEditor({ character }: { character: CharacterResponse['character'] | null }) {
   const { t, language } = useLanguage()
   const navigate = useNavigate()
-  const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
-  const isEditing = Boolean(id)
   const location = useLocation()
+  const isEditing = character !== null && character.status !== 'draft'
+  const isDraftFlow = !isEditing
   const [avatarError, setAvatarError] = useState<string | null>(() => {
     const state: unknown = location.state
     return state && typeof state === 'object' && 'avatarError' in state
       ? String(state.avatarError)
       : null
   })
-  const characterQuery = useRestQuery<CharacterResponse>(
-    ['character', id],
-    `/api/v1/characters/${id ?? ''}`,
-    { enabled: isEditing },
-  )
   const [step, setStep] = useState(() =>
-    Math.min(initialDraft?.step ?? 0, stepDefinitions.length - 1),
+    character?.status === 'draft'
+      ? Math.min(character.creation_step, stepDefinitions.length - 1)
+      : 0,
   )
-  const [draftRestoredAt, setDraftRestoredAt] = useState(initialDraft?.updated_at ?? null)
-  const characterSaved = useRef(false)
+  const [draftRestoredAt, setDraftRestoredAt] = useState(
+    character?.status === 'draft' ? character.updated_at : null,
+  )
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<Error | null>(null)
+  const finished = useRef(false)
   const draft = useCharacterDraftAutosave({
-    initialDraftId: initialDraft?.id ?? null,
-    onCreated: (draftId) =>
-      navigate(`/characters/new?draft=${draftId}`, {
-        replace: true,
-        state: { keepEditor: true } satisfies DraftNavigationState,
-      }),
+    initialCharacterId: character?.status === 'draft' ? character.id : null,
+    enabled: isDraftFlow,
+    onCreated: (createdId) =>
+      navigate(`/characters/${createdId}/edit`, { replace: true, state: keepEditorState }),
   })
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(characterFormSchema),
-    defaultValues: initialDraft?.values ?? characterFormDefaults,
+    defaultValues: character ? characterToFormValues(character) : characterFormDefaults,
     mode: 'onTouched',
   })
-  useEffect(() => {
-    const character = characterQuery.data?.character
-    if (!character) return
-
-    form.reset({
-      ...characterFormDefaults,
-      concept: { name: character.name, description: '' },
-      avatar_url: character.avatar_url ?? '',
-      rank: character.rank,
-      origin: character.origin_id === null ? '' : String(character.origin_id),
-      origin_name: character.origin_name ?? '',
-      edges: character.edge_ids.map(String),
-      hindrances: character.hindrance_ids.map(String),
-      skills: character.skill_ids.map(String),
-      attributes: character.attributes,
-      skill_dice: Object.fromEntries(
-        Object.entries(character.skill_dice).map(([skillId, die]) => [String(skillId), die]),
-      ),
-      hindrance_severities: Object.fromEntries(
-        character.hindrance_ids.map((hindranceId) => [String(hindranceId), 'minor']),
-      ),
-      gear: Object.fromEntries(
-        (character.gear ?? []).map((item) => [String(item.gear_id), item.quantity]),
-      ),
-      gear_names: Object.fromEntries(
-        (character.gear ?? []).map((item) => [String(item.gear_id), item.name]),
-      ),
-      equipped_gear: (character.gear ?? [])
-        .filter((item) => item.equipped)
-        .map((item) => String(item.gear_id)),
-    })
-  }, [characterQuery.data, form])
   const formValues = useWatch({ control: form.control })
   const validation = characterFormSchema.safeParse(formValues)
   const vigor = useWatch({ control: form.control, name: 'attributes.vigor' })
@@ -312,10 +229,10 @@ function CharacterEditor({ initialDraft }: { initialDraft: RestoredCharacterDraf
   const spentHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_spent' }) ?? 0
   const hindrancePointsBalanced = earnedHindrancePoints === spentHindrancePoints
-  const { draftId, schedule: scheduleDraftSave } = draft
-  const skipRestoredSave = useRef(initialDraft !== null)
+  const { characterId: draftId, schedule: scheduleDraftSave } = draft
+  const skipRestoredSave = useRef(character?.status === 'draft')
   useEffect(() => {
-    if (isEditing || characterSaved.current) return
+    if (!isDraftFlow || finished.current) return
     if (skipRestoredSave.current) {
       skipRestoredSave.current = false
       return
@@ -323,50 +240,47 @@ function CharacterEditor({ initialDraft }: { initialDraft: RestoredCharacterDraf
     const values = form.getValues()
     if (draftId === null && step === 0 && !hasDraftContent(values)) return
 
-    scheduleDraftSave({ data: toDraftData(values), step })
-  }, [draftId, form, formValues, isEditing, scheduleDraftSave, step])
+    scheduleDraftSave(toCharacterSaveFields(values, step))
+  }, [draftId, form, formValues, isDraftFlow, scheduleDraftSave, step])
 
   const startOver = async () => {
     await draft.discard()
     form.reset(characterFormDefaults)
     setStep(0)
     setDraftRestoredAt(null)
-    navigate('/characters/new', {
-      replace: true,
-      state: { keepEditor: true } satisfies DraftNavigationState,
-    })
+    navigate('/characters/new', { replace: true, state: keepEditorState })
   }
-  const saveMutation = useRestMutation<CharacterSaveResponse, CharacterSaveRequest>(
-    {
-      path: isEditing ? `/api/v1/characters/${id}` : '/api/v1/characters',
-      method: isEditing ? 'PUT' : 'POST',
-    },
-    {
-      onSuccess: async (response) => {
-        const characterId = response.character.id
-        if (!isEditing) {
-          characterSaved.current = true
-          await draft.finish()
-        }
-        const avatarFailure = await syncAvatar(characterId)
-        void queryClient.invalidateQueries({ queryKey: ['characters'] })
-        void queryClient.invalidateQueries({ queryKey: ['parties'] })
-        if (avatarFailure === null) {
-          navigate('/characters')
-        } else if (!isEditing) {
-          navigate(`/characters/${characterId}/edit`, {
-            replace: true,
-            state: { avatarError: avatarFailure },
-          })
-        }
-      },
-    },
-  )
+
+  async function persist(values: CharacterFormValues) {
+    const fields = toCharacterSaveFields(values)
+
+    if (isEditing) {
+      const response = await api.put<CharacterResponse>(`/api/v1/characters/${character.id}`, {
+        character: {
+          ...fields,
+          hindrance_points_earned: values.hindrance_points_earned,
+          hindrance_points_spent: values.hindrance_points_spent,
+        },
+      })
+      return response.character.id
+    }
+
+    let id = await draft.flush()
+    if (id === null) {
+      id = (await api.post<CharacterResponse>('/api/v1/characters', { character: fields }))
+        .character.id
+    }
+    const response = await api.post<CharacterResponse>(`/api/v1/characters/${id}/finalize`, {
+      character: fields,
+    })
+    finished.current = true
+    await draft.stop()
+    return response.character.id
+  }
 
   async function syncAvatar(characterId: number) {
     const file = form.getValues('avatar_file')
-    const removed =
-      !file && !form.getValues('avatar_url') && Boolean(characterQuery.data?.character.avatar_url)
+    const removed = !file && !form.getValues('avatar_url') && Boolean(character?.avatar_url)
 
     setAvatarError(null)
     try {
@@ -388,18 +302,6 @@ function CharacterEditor({ initialDraft }: { initialDraft: RestoredCharacterDraf
       setAvatarError(message)
       return message
     }
-  }
-
-  if (isEditing && characterQuery.isPending) {
-    return <p className="text-muted-foreground text-sm">{t('Loading character…')}</p>
-  }
-
-  if (isEditing && characterQuery.isError) {
-    return (
-      <p className="text-danger text-sm" role="alert">
-        {t('Could not load character. Try again.')}
-      </p>
-    )
   }
 
   const steps: MultiStepFlowStep[] = stepDefinitions.map((step, index) => {
@@ -441,28 +343,33 @@ function CharacterEditor({ initialDraft }: { initialDraft: RestoredCharacterDraf
     form.trigger(characterStepFields[stepDefinitions[index].id])
 
   const handleComplete = () => {
-    if (saveMutation.isPending || !hindrancePointsBalanced) return
+    if (saving || !hindrancePointsBalanced) return
 
-    void form.handleSubmit((values) => {
+    void form.handleSubmit(async (values) => {
       if (values.hindrance_points_earned !== values.hindrance_points_spent) return
 
-      saveMutation.mutate({
-        character: {
-          name: values.concept.name,
-          rank: values.rank,
-          origin_id: Number(values.origin),
-          edge_ids: ids(values.edges),
-          hindrance_ids: ids(values.hindrances),
-          skill_ids: ids(values.skills),
-          attributes: values.attributes,
-          skill_dice: values.skill_dice,
-          hindrance_severities: values.hindrance_severities,
-          hindrance_points_earned: values.hindrance_points_earned,
-          hindrance_points_spent: values.hindrance_points_spent,
-          gear: values.gear,
-          equipped_gear_ids: ids(values.equipped_gear.filter((gearId) => gearId in values.gear)),
-        },
-      })
+      setSaving(true)
+      setSaveError(null)
+      try {
+        const savedId = await persist(values)
+        const avatarFailure = await syncAvatar(savedId)
+        void queryClient.invalidateQueries({ queryKey: ['parties'] })
+        await queryClient
+          .invalidateQueries({ queryKey: ['characters'], refetchType: 'all' })
+          .catch(() => undefined)
+        if (avatarFailure === null) {
+          navigate('/characters')
+        } else if (!isEditing) {
+          navigate(`/characters/${savedId}/edit`, {
+            replace: true,
+            state: { avatarError: avatarFailure },
+          })
+        }
+      } catch (error) {
+        setSaveError(error instanceof Error ? error : new Error(String(error)))
+      } finally {
+        setSaving(false)
+      }
     })()
   }
 
@@ -475,7 +382,7 @@ function CharacterEditor({ initialDraft }: { initialDraft: RestoredCharacterDraf
         {t(isEditing ? 'Edit character' : 'Create a character')}
       </h1>
 
-      {!isEditing ? (
+      {isDraftFlow ? (
         <div className="border-border mt-4 flex max-w-2xl flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
           <div className="grid gap-1 text-sm" role="status">
             {draftRestoredAt ? (
@@ -509,16 +416,12 @@ function CharacterEditor({ initialDraft }: { initialDraft: RestoredCharacterDraf
               onStepChange={setStep}
               footerClassName="sticky bottom-0 z-10 bg-card/95 py-4 backdrop-blur"
               completeLabel={
-                saveMutation.isPending
-                  ? t('Saving…')
-                  : isEditing
-                    ? t('Save changes')
-                    : t('Save character')
+                saving ? t('Saving…') : isEditing ? t('Save changes') : t('Save character')
               }
               onBack={() => navigate('/characters')}
               onBeforeNext={(_step, index) => validateStep(index)}
               canAdvance={(_step, index) => {
-                if (saveMutation.isPending) return false
+                if (saving) return false
                 if (index === stepDefinitions.length - 1) {
                   return hindrancePointsBalanced && validation.success
                 }
@@ -534,9 +437,9 @@ function CharacterEditor({ initialDraft }: { initialDraft: RestoredCharacterDraf
               }}
               onComplete={handleComplete}
             />
-            {saveMutation.error ? (
+            {saveError ? (
               <p className="text-danger mt-4 text-sm" role="alert">
-                {t('Could not save character:')} {t(saveErrorMessage(saveMutation.error) ?? '')}
+                {t('Could not save character:')} {t(saveErrorMessage(saveError) ?? '')}
               </p>
             ) : null}
             {avatarError !== null ? (
