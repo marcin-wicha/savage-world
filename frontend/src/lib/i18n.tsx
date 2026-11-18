@@ -893,8 +893,16 @@ const translations: Record<string, string> = {
   'Enemy victory': 'Zwycięstwo przeciwników',
   Draw: 'Remis',
   'Battle log': 'Przebieg bitwy',
-  'A full account of the first simulation, round by round.':
-    'Pełny zapis pierwszej symulacji, runda po rundzie.',
+  'Every simulated run, round by round. Filter by outcome and pick a run.':
+    'Każda symulacja runda po rundzie. Filtruj według wyniku i wybierz symulację.',
+  'Filter runs by outcome': 'Filtruj symulacje według wyniku',
+  All: 'Wszystkie',
+  Won: 'Wygrane',
+  Lost: 'Przegrane',
+  Run: 'Symulacja',
+  'Loading battle log…': 'Wczytywanie przebiegu bitwy…',
+  'Could not load this run. Try again.': 'Nie udało się wczytać tej symulacji. Spróbuj ponownie.',
+  'No runs match this outcome.': 'Żadna symulacja nie ma takiego wyniku.',
   'Taken out': 'Wyeliminowany',
   Killed: 'Zabity',
   Fled: 'Uciekł',

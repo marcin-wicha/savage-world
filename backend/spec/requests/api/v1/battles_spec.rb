@@ -35,6 +35,49 @@ RSpec.describe "Battles", type: :request do
       expect(Battle.last).to have_attributes(party: party, user: leader, seed: 42)
     end
 
+    it "returns every run's outcome and replays any run's full log" do
+      create_battle(enemies: [ { enemy_template_id: template.id, count: 3 } ], runs: 12, seed: 7)
+      battle = json["battle"]
+      results = battle["run_results"]
+
+      expect(results.pluck("index")).to eq((0...12).to_a)
+      expect(results.count { |run| run["winner"] == "party" }).to eq(battle.dig("summary", "wins", "party"))
+      expect(results.count { |run| run["winner"] == "draw" }).to eq(battle.dig("summary", "draws"))
+      expect(battle["summary"]).not_to have_key("run_results")
+
+      get "/api/v1/battles/#{battle['id']}/runs/0", headers: json_headers
+      expect(response).to have_http_status(:ok)
+      expect(json["run"]).to include("index" => 0, "winner" => results[0]["winner"], "rounds" => results[0]["rounds"])
+      expect(json.dig("run", "log")).to eq(battle["log"])
+
+      longest = results.max_by { |run| run["rounds"] }
+      get "/api/v1/battles/#{battle['id']}/runs/#{longest['index']}", headers: json_headers
+      expect(json.dig("run", "rounds")).to eq(longest["rounds"])
+      expect(json.dig("run", "log").pluck("round").max).to eq(longest["rounds"])
+      expect(json.dig("run", "log").last).to include("type" => "battle_end", "winner" => longest["winner"])
+    end
+
+    it "replays run results for battles recorded before they were stored" do
+      create_battle(enemies: [ { enemy_template_id: template.id, count: 2 } ], runs: 6, seed: 3)
+      expected = json.dig("battle", "run_results")
+      battle = Battle.find(json.dig("battle", "id"))
+      battle.update!(summary: battle.summary.except("run_results"))
+
+      get "/api/v1/battles/#{battle.id}", headers: json_headers
+
+      expect(json.dig("battle", "run_results")).to eq(expected)
+    end
+
+    it "returns not found for runs outside the battle" do
+      create_battle(enemies: [ { enemy_template_id: template.id } ], runs: 3)
+      id = json.dig("battle", "id")
+
+      [ 3, -1, "first" ].each do |index|
+        get "/api/v1/battles/#{id}/runs/#{index}", headers: json_headers
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     it "is reproducible with the same seed" do
       create_battle(enemies: [ { enemy_template_id: template.id, count: 2 } ], runs: 5, seed: 9)
       first = json.dig("battle", "summary")
@@ -161,6 +204,9 @@ RSpec.describe "Battles", type: :request do
       get "/api/v1/battles/#{battle.id}", headers: json_headers
       expect(response).to have_http_status(:forbidden)
 
+      get "/api/v1/battles/#{battle.id}/runs/0", headers: json_headers
+      expect(response).to have_http_status(:forbidden)
+
       create_battle(enemies: [ { enemy_template_id: create(:enemy_template, user: stranger).id } ])
       expect(response).to have_http_status(:forbidden)
     end
@@ -168,7 +214,9 @@ RSpec.describe "Battles", type: :request do
 
   it "requires authentication" do
     get "/api/v1/parties/#{party.id}/battles", headers: json_headers
+    expect(response).to have_http_status(:unauthorized)
 
+    get "/api/v1/battles/#{create(:battle, party: party).id}/runs/0", headers: json_headers
     expect(response).to have_http_status(:unauthorized)
   end
 end

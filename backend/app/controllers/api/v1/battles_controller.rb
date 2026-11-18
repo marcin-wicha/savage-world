@@ -14,6 +14,15 @@ module Api
         render json: { battle: detail_payload(battle) }
       end
 
+      def run
+        battle = Battle.includes(:party).find(params[:id])
+        authorize battle, :show?
+        index = Integer(params[:index].to_s, 10, exception: false)
+        raise ActiveRecord::RecordNotFound if index.nil?
+
+        render json: { run: Battles::Runs.new(battle).replay(index) }
+      end
+
       def create
         party = Party.find(params[:party_id])
         authorize Battle.new(party: party, user: Current.user)
@@ -51,13 +60,14 @@ module Api
           seed: battle.seed,
           settings: battle.settings,
           roster: battle.roster.map { |combatant| roster_entry(combatant) },
-          summary: battle.summary
+          summary: battle.summary.with_indifferent_access.except(:run_results)
         }
       end
 
       def detail_payload(battle)
         summary_payload(battle).merge(
           can_delete: policy(battle).destroy?,
+          run_results: Battles::Runs.new(battle).results,
           log: battle.log,
           final_state: battle.final_state
         )

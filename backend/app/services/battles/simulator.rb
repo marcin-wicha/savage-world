@@ -29,6 +29,7 @@ module Battles
         average_rounds: (rounds.sum.to_f / rounds.length).round(2),
         median_rounds: median(rounds),
         first_run: { winner: results.first.winner, rounds: results.first.rounds },
+        run_results: results.each_with_index.map { |result, index| Runs.result_for(result, index) },
         combatants: combatant_statistics(results)
       }
     end

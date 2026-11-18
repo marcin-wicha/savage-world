@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
@@ -49,6 +49,118 @@ describe('BattleRoute', () => {
     expect(screen.getByText('Valeria attacks Goblin 1 with Long Sword: hit.')).toBeInTheDocument()
     expect(screen.getByText('Goblin 1 is out of the fight.')).toBeInTheDocument()
     expect(screen.getByText('The party wins.')).toBeInTheDocument()
+  })
+
+  describe('browsing runs', () => {
+    const battle = {
+      ...battleFixture,
+      run_results: [
+        { index: 0, winner: 'party' as const, rounds: 1 },
+        { index: 1, winner: 'enemies' as const, rounds: 4 },
+        { index: 2, winner: 'draw' as const, rounds: 20 },
+        { index: 3, winner: 'party' as const, rounds: 3 },
+      ],
+    }
+    const lostRunLog = [
+      { type: 'battle_start', round: 0 },
+      ...[1, 2, 3, 4].map((round) => ({ type: 'round_start', round })),
+      { type: 'battle_end', round: 4, winner: 'enemies' },
+    ]
+
+    function mockRuns() {
+      apiGetMock.mockImplementation((path: string) => {
+        if (path === '/api/v1/battles/5') return Promise.resolve({ battle })
+        if (path === '/api/v1/battles/5/runs/1') {
+          return Promise.resolve({
+            run: { index: 1, winner: 'enemies', rounds: 4, log: lostRunLog },
+          })
+        }
+        return Promise.reject(new Error(`Unexpected GET ${path}`))
+      })
+    }
+
+    it('shows the first run from the battle and counts outcomes for the filters', async () => {
+      mockRuns()
+
+      renderRoute()
+
+      const filters = await screen.findByRole('group', { name: 'Filter runs by outcome' })
+      expect(
+        within(filters)
+          .getAllByRole('button')
+          .map((button) => button.textContent),
+      ).toEqual(['All (4)', 'Won (2)', 'Lost (1)', 'Draw (1)'])
+      expect(screen.getByLabelText('Run')).toHaveValue('0')
+      expect(screen.getByText('Run 1: Won · 1 round')).toBeInTheDocument()
+      expect(screen.getByText('The party wins.')).toBeInTheDocument()
+      expect(apiGetMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('loads the full log of any chosen run', async () => {
+      const user = userEvent.setup()
+      mockRuns()
+
+      renderRoute()
+
+      await user.selectOptions(await screen.findByLabelText('Run'), '1')
+
+      expect(await screen.findByRole('heading', { name: 'Round 4' })).toBeInTheDocument()
+      expect(screen.getByText('Run 2: Lost · 4 rounds')).toBeInTheDocument()
+      expect(apiGetMock).toHaveBeenCalledWith('/api/v1/battles/5/runs/1', expect.any(Object))
+    })
+
+    it('filters runs by outcome', async () => {
+      const user = userEvent.setup()
+      mockRuns()
+
+      renderRoute()
+
+      await user.click(await screen.findByRole('button', { name: 'Lost (1)' }))
+
+      expect(screen.getByRole('button', { name: 'Lost (1)' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+      expect(
+        within(screen.getByLabelText('Run'))
+          .getAllByRole('option')
+          .map((option) => option.textContent),
+      ).toEqual(['Run 2 · Lost · 4 rounds'])
+      expect(await screen.findByRole('heading', { name: 'Round 4' })).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: 'Won (2)' }))
+      expect(
+        within(screen.getByLabelText('Run'))
+          .getAllByRole('option')
+          .map((option) => option.getAttribute('value')),
+      ).toEqual(['0', '3'])
+    })
+
+    it('explains when a run cannot be loaded', async () => {
+      const user = userEvent.setup()
+      mockRuns()
+
+      renderRoute()
+
+      await user.click(await screen.findByRole('button', { name: 'Draw (1)' }))
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Could not load this run. Try again.',
+      )
+    })
+
+    it('falls back to the first run for battles without run results', async () => {
+      apiGetMock.mockResolvedValue({ battle: battleFixture })
+
+      renderRoute()
+
+      expect(
+        within(await screen.findByLabelText('Run'))
+          .getAllByRole('option')
+          .map((option) => option.textContent),
+      ).toEqual(['Run 1 · Won · 2 rounds'])
+      expect(screen.getByRole('button', { name: 'Lost (0)' })).toBeDisabled()
+    })
   })
 
   it('translates the log into Polish', async () => {

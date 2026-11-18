@@ -24,7 +24,9 @@ Rails.application.routes.draw do
         end
         resources :battles, only: %i[index create]
       end
-      resources :battles, only: %i[show destroy]
+      resources :battles, only: %i[show destroy] do
+        get "runs/:index", on: :member, action: :run, as: :run
+      end
       resources :enemy_templates, only: %i[index show create update destroy]
       get "party_invites/:code", to: "party_invites#show", as: :party_invite
       post "party_invites/:code/memberships", to: "party_invites#join", as: :party_invite_memberships

@@ -72,8 +72,13 @@ export type BattleListItem = {
   summary: BattleSummary
 }
 
+export type RunResult = { index: number; winner: Side | 'draw'; rounds: number }
+
+export type RunResponse = { run: RunResult & { log: BattleEvent[] } }
+
 export type BattleDetail = BattleListItem & {
   can_delete: boolean
+  run_results?: RunResult[]
   log: BattleEvent[]
   final_state: Record<string, unknown>[]
 }

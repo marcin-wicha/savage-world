@@ -454,7 +454,12 @@ Routes are defined in `backend/config/routes.rb`:
     Runs the simulation synchronously and returns `201` with the summary and
     first-run log. `422` for invalid input, no accepted characters, or more than
     30 combatants; `403` for non-members or another user's custom templates.
-  - `GET /api/v1/battles/:id` — full result including the log and `can_delete`.
+  - `GET /api/v1/battles/:id` — full result including the first run's log,
+    `run_results` (`index`, `winner`, `rounds` for every run), and `can_delete`.
+    List payloads omit `run_results`.
+  - `GET /api/v1/battles/:id/runs/:index` — replays run `index` (0-based) from
+    the stored seed, roster, and settings and returns its full `log`; `404`
+    outside `0...runs`.
   - `DELETE /api/v1/battles/:id` — the battle's creator or the party leader.
 - `POST /api/v1/issue_reports` — authenticated; JSON body:
   `{ "issue_report": { "title": "...", "description": "...", "page_url": "/characters/new", "language": "en", "viewport": "1280x720", "user_agent": "..." } }`.

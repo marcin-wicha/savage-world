@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +21,8 @@ import {
   type BattleResponse,
   type CombatantStatistics,
   type RosterEntry,
+  type RunResponse,
+  type RunResult,
   type Side,
 } from './battle-types'
 
@@ -28,6 +31,19 @@ const winnerLabels: Record<string, string> = {
   enemies: 'Enemy victory',
   draw: 'Draw',
 }
+
+type RunOutcome = 'won' | 'lost' | 'draw'
+type RunFilter = 'all' | RunOutcome
+
+const runOutcome = (winner: RunResult['winner']): RunOutcome =>
+  winner === 'party' ? 'won' : winner === 'enemies' ? 'lost' : 'draw'
+
+const runFilters: { value: RunFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'won', label: 'Won' },
+  { value: 'lost', label: 'Lost' },
+  { value: 'draw', label: 'Draw' },
+]
 
 const illuminationLabels: Record<string, string> = {
   bright: 'Bright light',
@@ -172,11 +188,11 @@ function BattleView({ battle }: { battle: BattleDetail }) {
         <CardHeader>
           <CardTitle>{t('Battle log')}</CardTitle>
           <CardDescription>
-            {t('A full account of the first simulation, round by round.')}
+            {t('Every simulated run, round by round. Filter by outcome and pick a run.')}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <BattleLog events={battle.log} names={names} />
+          <BattleRuns battle={battle} names={names} />
         </CardContent>
       </Card>
     </section>
@@ -247,6 +263,94 @@ function RosterRow({
         </p>
       ) : null}
     </li>
+  )
+}
+
+function BattleRuns({ battle, names }: { battle: BattleDetail; names: Record<string, string> }) {
+  const { t } = useLanguage()
+  const [filter, setFilter] = useState<RunFilter>('all')
+  const [selected, setSelected] = useState(0)
+  const results = battle.run_results ?? [
+    { index: 0, winner: battle.summary.first_run.winner, rounds: battle.summary.first_run.rounds },
+  ]
+  const counts: Record<RunFilter, number> = { all: results.length, won: 0, lost: 0, draw: 0 }
+  results.forEach((result) => {
+    counts[runOutcome(result.winner)] += 1
+  })
+  const filtered =
+    filter === 'all' ? results : results.filter((result) => runOutcome(result.winner) === filter)
+  const current = filtered.find((result) => result.index === selected) ?? filtered[0]
+  const runQuery = useRestQuery<RunResponse>(
+    [...battleQueryKey(battle.id), 'runs', current?.index ?? null],
+    `/api/v1/battles/${battle.id}/runs/${current?.index ?? 0}`,
+    { enabled: current !== undefined && current.index !== 0, staleTime: Infinity },
+  )
+  const outcomeLabel = (result: RunResult) =>
+    t(runFilters.find((option) => option.value === runOutcome(result.winner))?.label ?? 'Draw')
+  const roundsLabel = (rounds: number) => `${rounds} ${t(rounds === 1 ? 'round' : 'rounds')}`
+
+  return (
+    <div className="grid gap-6">
+      <div className="flex flex-wrap items-end gap-4">
+        <div role="group" aria-label={t('Filter runs by outcome')} className="flex flex-wrap gap-2">
+          {runFilters.map((option) => (
+            <Button
+              key={option.value}
+              type="button"
+              size="sm"
+              variant="outline"
+              aria-pressed={filter === option.value}
+              disabled={option.value !== 'all' && counts[option.value] === 0}
+              onClick={() => setFilter(option.value)}
+              className={cn(filter === option.value && 'bg-accent text-accent-foreground')}
+            >
+              {t(option.label)} ({counts[option.value]})
+            </Button>
+          ))}
+        </div>
+        {current ? (
+          <div className="grid min-w-56 gap-1.5">
+            <label htmlFor="battle-run" className="text-foreground text-sm font-medium">
+              {t('Run')}
+            </label>
+            <select
+              id="battle-run"
+              value={current.index}
+              onChange={(event) => setSelected(Number(event.target.value))}
+              className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3"
+            >
+              {filtered.map((result) => (
+                <option key={result.index} value={result.index}>
+                  {t('Run')} {result.index + 1} · {outcomeLabel(result)} ·{' '}
+                  {roundsLabel(result.rounds)}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
+      </div>
+
+      {current ? (
+        <div className="grid gap-4">
+          <p className="text-foreground text-sm font-medium" aria-live="polite">
+            {t('Run')} {current.index + 1}: {outcomeLabel(current)} · {roundsLabel(current.rounds)}
+          </p>
+          {current.index === 0 ? (
+            <BattleLog events={battle.log} names={names} />
+          ) : runQuery.isPending ? (
+            <p className="text-muted-foreground text-sm">{t('Loading battle log…')}</p>
+          ) : runQuery.isError || !runQuery.data ? (
+            <p className="text-danger text-sm" role="alert">
+              {t('Could not load this run. Try again.')}
+            </p>
+          ) : (
+            <BattleLog events={runQuery.data.run.log} names={names} />
+          )}
+        </div>
+      ) : (
+        <p className="text-muted-foreground text-sm">{t('No runs match this outcome.')}</p>
+      )}
+    </div>
   )
 }
 

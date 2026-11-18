@@ -19,6 +19,21 @@ RSpec.describe Battles::Simulator do
     expect(summary[:combatants].first).to include(:incapacitated_rate, :death_rate, :average_wounds, :average_bennies_spent)
     expect(result[:log].first[:type]).to eq("battle_start")
     expect(result[:final_state].length).to eq(3)
+    expect(summary[:run_results].length).to eq(25)
+    expect(summary[:run_results].first).to eq(index: 0, winner: summary[:first_run][:winner], rounds: summary[:first_run][:rounds])
+  end
+
+  it "can replay any run's log from a stored battle" do
+    result = described_class.new(definitions: definitions, settings: {}, seed: 100, runs: 6).call
+    battle = build(:battle, seed: 100, runs: 6, roster: JSON.parse(definitions.to_json),
+      settings: JSON.parse(Battles::Settings.new({}).to_h.to_json), summary: JSON.parse(result[:summary].to_json))
+    runs = Battles::Runs.new(battle)
+
+    expect(JSON.parse(runs.replay(0)[:log].to_json)).to eq(JSON.parse(result[:log].to_json))
+    result[:summary][:run_results].each do |expected|
+      expect(runs.replay(expected[:index]).slice(:index, :winner, :rounds)).to eq(expected)
+    end
+    expect { runs.replay(6) }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
   it "is reproducible for the same seed" do

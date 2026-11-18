@@ -12,12 +12,17 @@ only displays results; all rules live in `backend/app/services/battles/`.
 2. `Battles::Create` snapshots every combatant into a plain definition hash
    (`Battles::CombatantBuilder`), validates limits, and runs `Battles::Simulator`.
 3. The simulator runs `Battles::Engine` once per seed (`seed`, `seed + 1`, …),
-   records the full event log for the first run only, and aggregates win rates,
-   rounds, and per-combatant incapacitation/death/flee rates.
+   records the full event log for the first run only, keeps every run's outcome
+   and round count in `summary.run_results`, and aggregates win rates, rounds,
+   and per-combatant incapacitation/death/flee rates.
 4. The `battles` row stores the seed, settings, roster snapshot, summary, first
    run log, and final state, so later edits to characters or templates never
    change a recorded battle. The same seed and roster always reproduce the same
-   result.
+   result, so `GET /api/v1/battles/:id/runs/:index` (`Battles::Runs`) replays
+   any run's full log on demand instead of storing every log. Battles recorded
+   before `run_results` existed get their run results by replay as well.
+5. The battle page lists every run with All / Won / Lost / Draw filters (from
+   the party's point of view) and shows the selected run's log.
 
 Limits: 1–200 runs (default 50), at most 30 combatants, 1–20 copies per enemy
 template, 1–30 rounds (default 20). Simulations run synchronously; 200 runs of a
