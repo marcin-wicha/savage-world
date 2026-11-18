@@ -46,6 +46,7 @@ backend/db/data/edges/private/
 backend/db/data/hindrances/private/
 backend/db/data/skills/private/
 backend/db/data/gear/private/
+backend/db/data/bestiary/private/
 backend/db/data/powers/private/
 backend/config/locales/private/
 

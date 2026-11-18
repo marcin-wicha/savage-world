@@ -32,6 +32,12 @@ services:
         bind:
           create_host_path: false
       - type: bind
+        source: /var/www/savage-worlds-private-data/bestiary
+        target: /rails/db/data/bestiary/private
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
         source: /var/www/savage-worlds-private-data/powers
         target: /rails/db/data/powers/private
         read_only: true

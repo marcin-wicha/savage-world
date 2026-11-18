@@ -15,3 +15,5 @@ Hindrance.where(slug: %w[arcane-sensitivity material-components corruption]).des
 unless User.exists?(email_address: "admin")
   User.create!(email_address: "admin", password: "admin", password_confirmation: "admin", role: :admin, approved: true)
 end
+
+EnemyTemplates::Importer.new(user: User.find_by!(email_address: "admin")).call

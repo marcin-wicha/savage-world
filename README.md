@@ -78,7 +78,7 @@ Nginx, and Caddy on OCI. Caddy terminates HTTPS for `mw-swade.duckdns.org`.
 ### Private reference catalogs
 
 The licensed YAML catalogs and SWADE description overlays under
-`backend/db/data/{edges,hindrances,skills,gear,powers}/private/`, as well as
+`backend/db/data/{edges,hindrances,skills,gear,powers,bestiary}/private/`, as well as
 Polish Fantasy Companion translations under `backend/config/locales/private/`,
 are gitignored.
 A Git checkout and `db:prepare` alone cannot populate them. Before the first
@@ -92,7 +92,7 @@ permissions to the deployment user and ensure the container's `rails` user
 `.env`, the public-assets bucket, or the Docker image. Back up this directory
 separately from the database.
 
-The deploy checks that all five catalog directories and the locale directory
+The deploy checks that all six catalog directories and the locale directory
 contain YAML before updating the stack. `docker-compose.private.yml` mounts them
 read-only into Rails; after
 `docker compose up`, deployment runs `db:seed` to refresh reference data and
