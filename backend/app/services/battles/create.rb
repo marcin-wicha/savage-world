@@ -96,9 +96,9 @@ module Battles
         return []
       end
 
-      if templates.values.any? { |template| template.user_id != @user.id }
+      if templates.values.any? { |template| !EnemyTemplatePolicy.new(@user, template).show? }
         @forbidden = true
-        errors[:enemies] = [ "may only use your own enemy templates" ]
+        errors[:enemies] = [ "may only use your own enemy templates or shared bestiary entries" ]
         return []
       end
 

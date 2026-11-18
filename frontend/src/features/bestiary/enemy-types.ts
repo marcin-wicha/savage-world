@@ -43,6 +43,7 @@ export type EnemyWeapon = {
 
 export type EnemyTemplate = {
   id: number
+  read_only: boolean
   name: string
   description: string | null
   wild_card: boolean

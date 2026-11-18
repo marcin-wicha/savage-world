@@ -23,6 +23,7 @@ const apiDeleteMock = vi.mocked(api.delete)
 
 const orc: EnemyTemplate = {
   id: 7,
+  read_only: false,
   name: 'Orc Chieftain',
   description: 'Leads the warband.',
   wild_card: true,
@@ -62,6 +63,15 @@ describe('BestiaryRoute', () => {
     expect(screen.getByText(/Great Axe Str\+d10 AP 3/)).toBeInTheDocument()
     expect(screen.getByText('11 (3)', { exact: false })).toBeInTheDocument()
     expect(screen.getByText(/Sweep · Hardy/)).toBeInTheDocument()
+  })
+
+  it('shows seeded entries without edit or delete controls', async () => {
+    apiGetMock.mockResolvedValueOnce({ enemy_templates: [{ ...orc, read_only: true }] })
+    renderRoute()
+
+    expect(await screen.findByText('Orc Chieftain')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit Orc Chieftain' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Delete Orc Chieftain' })).not.toBeInTheDocument()
   })
 
   it('shows the empty and error states', async () => {

@@ -100,6 +100,15 @@ RSpec.describe "Battles", type: :request do
       expect(json.dig("details", "party")).to eq([ "has no accepted living characters" ])
     end
 
+    it "lets the party use shared bestiary entries" do
+      shared = create(:enemy_template, source_key: "goblin", name: "Bestiary Goblin")
+
+      create_battle(enemies: [ { enemy_template_id: shared.id } ], runs: 1)
+
+      expect(response).to have_http_status(:created)
+      expect(json.dig("battle", "roster").pluck("name")).to include("Bestiary Goblin")
+    end
+
     it "forbids someone else's enemy templates" do
       foreign = create(:enemy_template)
 

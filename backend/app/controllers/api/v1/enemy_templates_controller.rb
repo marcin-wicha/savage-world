@@ -60,6 +60,7 @@ module Api
       def payload(template)
         {
           id: template.id,
+          read_only: template.source_key.present?,
           name: template.name,
           description: template.description,
           wild_card: template.wild_card,

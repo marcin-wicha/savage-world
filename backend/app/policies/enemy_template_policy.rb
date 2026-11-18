@@ -8,11 +8,14 @@ class EnemyTemplatePolicy < ApplicationPolicy
   end
 
   def show?
-    owner?
+    user.present? && (owner? || record.source_key.present?)
   end
 
-  alias update? show?
-  alias destroy? show?
+  def update?
+    owner? && record.source_key.nil?
+  end
+
+  alias destroy? update?
 
   private
 
@@ -24,7 +27,7 @@ class EnemyTemplatePolicy < ApplicationPolicy
     def resolve
       return scope.none if user.nil?
 
-      scope.where(user_id: user.id)
+      scope.where(user_id: user.id).or(scope.where.not(source_key: nil))
     end
   end
 end

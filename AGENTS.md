@@ -87,7 +87,7 @@ The monorepo and the API/RSpec migration are complete. The current baseline is:
   approve join requests; participants can only leave.
 - Character gear persistence (`character_gears`) and server-side derived
   statistics (`Characters::DerivedStats`: Pace, Parry, Toughness with armor).
-- An owner-scoped bestiary of enemy stat blocks at `/api/v1/enemy_templates`.
+- A bestiary of private, owner-scoped enemy stat blocks and shared, read-only seeded entries at `/api/v1/enemy_templates`.
 - A fully automated SWADE battle simulator under `/api/v1/parties/:id/battles`
   and `/api/v1/battles/:id`; see `docs/battle-simulator.md` for rules coverage.
 - RSpec + FactoryBot + Shoulda Matchers; Minitest has been removed.
@@ -437,16 +437,18 @@ Routes are defined in `backend/config/routes.rb`:
   later changes use `PUT`, and saving calls finalize. The roster lists drafts
   under "Unfinished characters"; discarding one deletes the character. Party
   join pickers only offer `alive` characters.
-- Enemy templates (authenticated, owner only): `GET`/`POST
+- Enemy templates (authenticated): `GET`/`POST
   /api/v1/enemy_templates`, `GET`/`PATCH`/`DELETE /api/v1/enemy_templates/:id`.
-  `POST` defaults Wild Card Bennies to 2. Another user's template returns `403`.
+  `POST` defaults Wild Card Bennies to 2. A user sees their own templates and
+  shared seeded entries (`read_only: true`); seeded entries cannot be edited or
+  deleted through the API. Another user's custom template returns `403`.
 - Battles (authenticated; leader or accepted participant of the party):
   - `GET /api/v1/parties/:party_id/battles` — up to 50 recent battles without logs.
   - `POST /api/v1/parties/:party_id/battles` —
     `{ "battle": { "enemies": [{ "enemy_template_id": 1, "count": 3 }], "runs": 50, "seed": 42, "settings": { "starting_distance": 12, "illumination": "bright", "cover": "none", "max_rounds": 20, "morale": false } } }`.
     Runs the simulation synchronously and returns `201` with the summary and
     first-run log. `422` for invalid input, no accepted characters, or more than
-    30 combatants; `403` for non-members or another user's templates.
+    30 combatants; `403` for non-members or another user's custom templates.
   - `GET /api/v1/battles/:id` — full result including the log and `can_delete`.
   - `DELETE /api/v1/battles/:id` — the battle's creator or the party leader.
 - `POST /api/v1/issue_reports` — authenticated; JSON body:
@@ -503,8 +505,9 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   `PartyMembershipPolicy` (owner joins and leaves; leader accepts and removes)
   guard parties. `CharacterPolicy` also guards finalize by ownership.
   Multi-step party rules live in `Parties::Join` and
-  `Parties::TransferLeadership`. `EnemyTemplatePolicy` limits templates to their
-  owner, and `BattlePolicy` lets party leaders and accepted participants run and
+  `Parties::TransferLeadership`. `EnemyTemplatePolicy` allows reading shared
+  seeded entries, but limits custom templates to their owner and forbids edits
+  to seeded entries. `BattlePolicy` lets party leaders and accepted participants run and
   view battles while only the creator or leader may delete them.
 
 ### GraphQL
