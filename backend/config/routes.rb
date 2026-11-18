@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
       get "characters", to: "characters#index", as: :characters_index
       post "characters", to: "characters#create", as: :characters
+      post "characters/derived_preview", to: "characters#derived_preview", as: :characters_derived_preview
       get "characters/:id", to: "characters#show", as: :character_show
       put "characters/:id", to: "characters#upsert", as: :character
       post "characters/:id/finalize", to: "characters#finalize", as: :character_finalize

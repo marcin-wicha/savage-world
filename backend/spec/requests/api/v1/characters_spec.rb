@@ -489,6 +489,62 @@ RSpec.describe "Characters", type: :request do
       expect(json.dig("character", "derived", "pace", "value")).to eq(6)
     end
 
+    it "previews derived statistics for unsaved choices without saving anything" do
+      fighting = create(:skill, name: "Fighting", slug: "fighting")
+      shield = create(:gear, name: "Medium Shield", category: "shield", effects: { "parry" => 2, "cover" => 2 })
+      block = create(:edge, name: "Block", slug: "block")
+
+      expect do
+        post "/api/v1/characters/derived_preview",
+          params: {
+            character: {
+              attributes: { agility: "d4", smarts: "d4", spirit: "d4", strength: "d4", vigor: "d8" },
+              skill_ids: [ fighting.id ],
+              skill_dice: { fighting.id.to_s => "d12" },
+              edge_ids: [ block.id ],
+              gear: { shield.id.to_s => 1 },
+              equipped_gear_ids: [ shield.id ]
+            }
+          }.to_json,
+          headers: json_headers
+      end.not_to change { [ Character.count, CharacterSkill.count, CharacterEdge.count, CharacterGear.count ] }
+
+      expect(response).to have_http_status(:ok)
+      parry = json.dig("derived", "parry")
+      expect(parry["value"]).to eq(11)
+      expect(parry["contributions"]).to eq([
+        { "label" => "Base Parry", "value" => 2 },
+        { "label" => "Half Fighting (d12)", "value" => 6 },
+        { "label" => "Medium Shield", "value" => 2 },
+        { "label" => "Block", "value" => 1 }
+      ])
+      expect(json.dig("derived", "toughness")).to include("value" => 6, "armor" => 0)
+      expect(json.dig("derived", "pace", "value")).to eq(6)
+    end
+
+    it "previews a blank character with the base statistics" do
+      post "/api/v1/characters/derived_preview", params: { character: { name: "" } }.to_json, headers: json_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(json["derived"].transform_values { |statistic| statistic["value"] }).to eq("pace" => 6, "parry" => 2, "toughness" => 4)
+    end
+
+    it "rejects invalid preview input" do
+      post "/api/v1/characters/derived_preview", params: { character: { gear: { "999999" => 1 } } }.to_json, headers: json_headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "gear")).to be_present
+      expect(Character.count).to eq(0)
+    end
+
+    it "requires authentication for previews" do
+      delete "/api/v1/session", headers: json_headers
+
+      post "/api/v1/characters/derived_preview", params: { character: { name: "" } }.to_json, headers: json_headers
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
     it "rejects unknown gear ids" do
       put_character(character_id, { name: "Broke", gear: { "999999" => 1 } })
 

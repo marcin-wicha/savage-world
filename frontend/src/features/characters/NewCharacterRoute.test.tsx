@@ -109,8 +109,34 @@ const finalizeCalls = () =>
   apiPostMock.mock.calls.filter(([path]) => String(path).endsWith('/finalize'))
 const createCalls = () => apiPostMock.mock.calls.filter(([path]) => path === '/api/v1/characters')
 
+const dieSides = (die: string) => Number(die.replace('d', ''))
+
+function previewFor(body: unknown) {
+  const character =
+    body && typeof body === 'object' && 'character' in body
+      ? (body.character as { attributes?: Record<string, string> })
+      : {}
+  const vigorBonus = dieSides(character.attributes?.vigor ?? 'd4') / 2
+
+  return {
+    derived: {
+      pace: { value: 6, contributions: [{ label: 'Base Pace', value: 6 }] },
+      parry: { value: 2, contributions: [{ label: 'Base Parry', value: 2 }] },
+      toughness: {
+        value: 2 + vigorBonus,
+        armor: 0,
+        contributions: [
+          { label: 'Base Toughness', value: 2 },
+          { label: 'Half Vigor', value: vigorBonus },
+        ],
+      },
+    },
+  }
+}
+
 function mockApi({ stored }: { stored?: CharacterResponse['character'] } = {}) {
-  apiPostMock.mockImplementation((path: string) => {
+  apiPostMock.mockImplementation((path: string, body?: unknown) => {
+    if (path === '/api/v1/characters/derived_preview') return Promise.resolve(previewFor(body))
     if (path === '/api/v1/characters') return Promise.resolve({ character: storedCharacter() })
     if (path.endsWith('/finalize')) {
       return Promise.resolve({ character: storedCharacter({ status: 'alive' }) })
@@ -240,8 +266,77 @@ describe('NewCharacterRoute', () => {
     const vigorGroup = screen.getByRole('group', { name: /vigor die/i })
     await user.click(within(vigorGroup).getByRole('button', { name: /d6/i }))
 
-    expect(screen.getByRole('button', { name: /toughness: 5\(0\)/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /toughness: 5\(0\)/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /toughness: 4\(0\)/i })).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(apiPostMock).toHaveBeenCalledWith('/api/v1/characters/derived_preview', {
+        character: expect.objectContaining({
+          attributes: expect.objectContaining({ vigor: 'd6' }),
+        }),
+      })
+    })
+  })
+
+  it('shows the server-calculated Parry with every contribution', async () => {
+    const user = userEvent.setup()
+    const preview = previewFor({})
+    apiPostMock.mockImplementation((path: string) =>
+      path === '/api/v1/characters/derived_preview'
+        ? Promise.resolve({
+            derived: {
+              ...preview.derived,
+              parry: {
+                value: 11,
+                contributions: [
+                  { label: 'Base Parry', value: 2 },
+                  { label: 'Half Fighting (d12)', value: 6 },
+                  { label: 'Medium Shield', value: 2 },
+                  { label: 'Block', value: 1 },
+                ],
+              },
+            },
+          })
+        : Promise.resolve({ character: storedCharacter() }),
+    )
+
+    renderRoute()
+    await user.type(screen.getByLabelText(/character name/i), 'Radagast')
+    await user.click(screen.getByRole('button', { name: /next/i }))
+
+    const parry = await screen.findByRole('button', { name: 'Parry: 11' })
+    await user.hover(parry)
+
+    const tooltip = await screen.findByTestId('parry-tooltip')
+    for (const text of ['Half Fighting (d12)', '+6', 'Medium Shield', 'Block', '+1']) {
+      expect(within(tooltip).getByText(text)).toBeInTheDocument()
+    }
+  })
+
+  it('starts a saved character from its stored statistics', async () => {
+    mockApi({
+      stored: storedCharacter({
+        name: 'Radagast',
+        status: 'alive',
+        origin_id: 1,
+        derived: {
+          pace: { value: 6, contributions: [{ label: 'Base Pace', value: 6 }] },
+          parry: { value: 12, contributions: [{ label: 'Base Parry', value: 12 }] },
+          toughness: { value: 7, armor: 2, contributions: [{ label: 'Armor', value: 2 }] },
+        },
+      }),
+    })
+
+    renderRoute('/characters/9/edit')
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: /next/i }))
+
+    expect(screen.getByRole('button', { name: 'Parry: 12' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Toughness: 7(2)' })).toBeInTheDocument()
+    await new Promise((resolve) => setTimeout(resolve, 400))
+    expect(apiPostMock).not.toHaveBeenCalledWith(
+      '/api/v1/characters/derived_preview',
+      expect.anything(),
+    )
   })
 
   it('returns to the roster from the first step', async () => {

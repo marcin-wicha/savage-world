@@ -25,8 +25,17 @@ type DerivedStatistic = {
   contributions: readonly DerivedStatisticContribution[]
 }
 
+export type ServerStatistic = {
+  value: number
+  armor?: number
+  contributions: DerivedStatisticContribution[]
+}
+
+export type ServerDerivedStatistics = Record<DerivedStatisticId, ServerStatistic>
+
 type DerivedStatisticsProps = {
   statistics?: readonly DerivedStatistic[]
+  derived?: ServerDerivedStatistics
   vigor?: SkillDieType
   className?: string
 }
@@ -72,6 +81,19 @@ function statisticsFor(vigor: SkillDieType): readonly DerivedStatistic[] {
   ]
 }
 
+function statisticsFromServer(derived: ServerDerivedStatistics): readonly DerivedStatistic[] {
+  return statisticsFor('d4').map((placeholder) => {
+    const statistic = derived[placeholder.id]
+
+    return {
+      ...placeholder,
+      value: statistic.value,
+      armor: placeholder.id === 'toughness' ? (statistic.armor ?? 0) : undefined,
+      contributions: statistic.contributions,
+    }
+  })
+}
+
 function formatValue(value: number) {
   return value > 0 ? `+${value}` : `${value}`
 }
@@ -109,9 +131,15 @@ function StatisticTooltip({ statistic }: { statistic: DerivedStatistic }) {
   )
 }
 
-export function DerivedStatistics({ statistics, vigor = 'd4', className }: DerivedStatisticsProps) {
+export function DerivedStatistics({
+  statistics,
+  derived,
+  vigor = 'd4',
+  className,
+}: DerivedStatisticsProps) {
   const { t } = useLanguage()
-  const statisticsToDisplay = statistics ?? statisticsFor(vigor)
+  const statisticsToDisplay =
+    statistics ?? (derived ? statisticsFromServer(derived) : statisticsFor(vigor))
 
   return (
     <section

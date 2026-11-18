@@ -13,6 +13,7 @@ import { useLanguage } from '@/lib/i18n-context'
 
 import { AttributesStep } from './AttributesStep'
 import { DerivedStatistics } from './DerivedStatistics'
+import { useDerivedPreview } from './derived-preview'
 import { ConceptStep } from './ConceptStep'
 import { CharacterSummaryStep } from './CharacterSummaryStep'
 import { EdgesStep } from './EdgesStep'
@@ -227,6 +228,7 @@ function CharacterEditor({ character }: { character: CharacterResponse['characte
   const formValues = useWatch({ control: form.control })
   const validation = characterFormSchema.safeParse(formValues)
   const vigor = useWatch({ control: form.control, name: 'attributes.vigor' })
+  const derived = useDerivedPreview(toCharacterSaveFields(form.getValues()), character?.derived)
   const earnedHindrancePoints =
     useWatch({ control: form.control, name: 'hindrance_points_earned' }) ?? 0
   const spentHindrancePoints =
@@ -334,7 +336,7 @@ function CharacterEditor({ character }: { character: CharacterResponse['characte
       content:
         index >= 1 ? (
           <div className="grid gap-6">
-            <DerivedStatistics vigor={vigor} />
+            <DerivedStatistics vigor={vigor} derived={derived} />
             {content}
           </div>
         ) : (

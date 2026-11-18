@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { ServerDerivedStatistics } from './DerivedStatistics'
 import { api } from '@/lib/api-client'
 
 import {
@@ -35,6 +36,7 @@ export type CharacterResponse = {
     attributes: CharacterFormValues['attributes']
     skill_dice: Record<string, DieType>
     gear?: { gear_id: number; name: string; quantity: number; equipped: boolean }[]
+    derived?: ServerDerivedStatistics
     creation_points?: {
       earned: number
       spent: { attributes: number; skills: number; edges: number }

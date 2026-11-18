@@ -16,6 +16,18 @@ module Api
         save_character(character)
       end
 
+      def derived_preview
+        character = Current.user.characters.new(status: :draft)
+        authorize character, :create?
+        preview = Characters::DerivedPreview.new(character: character, attributes: character_params)
+
+        if preview.call
+          render json: { derived: preview.derived }
+        else
+          render json: { error: "Validation failed", details: preview.errors }, status: :unprocessable_content
+        end
+      end
+
       def finalize
         character = Character.find(character_id)
         authorize character, :update?

@@ -380,6 +380,12 @@ Routes are defined in `backend/config/routes.rb`:
   server-calculated `creation_points` (`earned` plus `spent` attributes, skills,
   and edges). Returns `201` on success, `401` unauthenticated, and `422` for
   validation or reference errors.
+- `POST /api/v1/characters/derived_preview` — authenticated; accepts the same
+  `character` fields, applies them to a throwaway draft inside a rolled-back
+  transaction (`Characters::DerivedPreview`), and returns `{ "derived": ... }`
+  with Pace, Parry, and Toughness values and their `contributions`. Nothing is
+  saved. `422` for invalid input. The creation wizard's statistics bar uses it
+  (debounced) so it shows the same values as the character API and battles.
 - `POST /api/v1/characters/:id/finalize` — owner only; optionally applies a
   `character` body like `PUT`, then requires a name, an origin, and balanced
   `creation_points` before setting `status` to `alive`. Client-reported point
