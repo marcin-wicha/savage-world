@@ -242,26 +242,28 @@ function StatBlock({
               .join(' · ')}
           </p>
         ) : null}
-        <div className="mt-2 flex gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={onEdit}
-            aria-label={`${t('Edit')} ${template.name}`}
-          >
-            {t('Edit')}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="destructive"
-            onClick={onDelete}
-            aria-label={`${t('Delete')} ${template.name}`}
-          >
-            {t('Delete')}
-          </Button>
-        </div>
+        {!template.read_only ? (
+          <div className="mt-2 flex gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={onEdit}
+              aria-label={`${t('Edit')} ${template.name}`}
+            >
+              {t('Edit')}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="destructive"
+              onClick={onDelete}
+              aria-label={`${t('Delete')} ${template.name}`}
+            >
+              {t('Delete')}
+            </Button>
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   )

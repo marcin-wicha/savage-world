@@ -46,14 +46,37 @@ RSpec.describe "Enemy templates", type: :request do
       expect(json["details"].keys).to include("name", "weapons")
     end
 
-    it "lists only the user's templates" do
+    it "lists shared reference templates alongside the user's own templates" do
       mine = create(:enemy_template, user: user, name: "Bandit")
+      shared = create(:enemy_template, name: "Goblin", source_key: "goblin")
       create(:enemy_template, name: "Someone else's")
 
       get "/api/v1/enemy_templates", headers: json_headers
 
       expect(response).to have_http_status(:ok)
-      expect(json["enemy_templates"].pluck("id")).to eq([ mine.id ])
+      expect(json["enemy_templates"].pluck("id")).to eq([ mine.id, shared.id ])
+      expect(json["enemy_templates"].pluck("read_only")).to eq([ false, true ])
+    end
+
+    it "allows viewing but not changing shared reference templates, even for their owner" do
+      shared = create(:enemy_template, name: "Goblin", source_key: "goblin")
+
+      get "/api/v1/enemy_templates/#{shared.id}", headers: json_headers
+      expect(response).to have_http_status(:ok)
+      expect(json.dig("enemy_template", "read_only")).to be(true)
+
+      patch "/api/v1/enemy_templates/#{shared.id}", params: { enemy_template: { name: "Mine" } }.to_json, headers: json_headers
+      expect(response).to have_http_status(:forbidden)
+
+      delete "/api/v1/enemy_templates/#{shared.id}", headers: json_headers
+      expect(response).to have_http_status(:forbidden)
+      expect(shared.reload.name).to eq("Goblin")
+
+      sign_in_as(shared.user)
+      patch "/api/v1/enemy_templates/#{shared.id}", params: { enemy_template: { name: "Edited" } }.to_json, headers: json_headers
+      expect(response).to have_http_status(:forbidden)
+      delete "/api/v1/enemy_templates/#{shared.id}", headers: json_headers
+      expect(response).to have_http_status(:forbidden)
     end
 
     it "shows, updates, and deletes the user's template" do
