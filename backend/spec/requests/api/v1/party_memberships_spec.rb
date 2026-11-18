@@ -18,6 +18,86 @@ RSpec.describe "Party memberships", type: :request do
     delete "/api/v1/parties/#{party.id}/memberships/#{target.id}", headers: json_headers
   end
 
+  describe "POST (leader adds their own character)" do
+    def add(character_id, party_id: party.id)
+      post "/api/v1/parties/#{party_id}/memberships", params: { character_id: character_id }.to_json, headers: json_headers
+    end
+
+    it "adds the leader's character straight to the roster without an invite" do
+      character = create(:character, user: leader)
+      sign_in_as(leader)
+
+      add(character.id)
+
+      expect(response).to have_http_status(:created)
+      expect(json["membership"]).to include("status" => "accepted", "owned_by_me" => true)
+      expect(json.dig("membership", "character", "id")).to eq(character.id)
+      expect(party.party_memberships.find_by(character: character)).to be_accepted
+    end
+
+    it "rejects drafts, dead characters, and characters already in the party" do
+      draft = create(:character, :draft, user: leader)
+      fallen = create(:character, user: leader, status: :dead)
+      member = create(:character, user: leader).tap { |character| create(:party_membership, party: party, character: character) }
+      sign_in_as(leader)
+
+      add(draft.id)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "character_id")).to eq([ "must be finished before joining a party" ])
+
+      add(fallen.id)
+      expect(json.dig("details", "character_id")).to eq([ "cannot join a party while dead" ])
+
+      add(member.id)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json.dig("details", "character_id")).to eq([ "is already in this party or awaiting approval" ])
+    end
+
+    it "forbids adding someone else's character" do
+      sign_in_as(leader)
+
+      add(membership.character.id)
+      expect(response).to have_http_status(:forbidden)
+
+      add(create(:character).id)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "forbids members who do not lead the party" do
+      character = create(:character, user: participant)
+      sign_in_as(participant)
+
+      add(character.id)
+
+      expect(response).to have_http_status(:forbidden)
+      expect(party.party_memberships.find_by(character: character)).to be_nil
+    end
+
+    it "returns not found for an unknown party or character" do
+      sign_in_as(leader)
+
+      add(create(:character, user: leader).id, party_id: 0)
+      expect(response).to have_http_status(:not_found)
+
+      add(0)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "requires a character id" do
+      sign_in_as(leader)
+
+      post "/api/v1/parties/#{party.id}/memberships", params: {}.to_json, headers: json_headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it "requires authentication" do
+      add(create(:character, user: leader).id)
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
   describe "PATCH accept" do
     it "lets the leader accept a pending request" do
       sign_in_as(leader)

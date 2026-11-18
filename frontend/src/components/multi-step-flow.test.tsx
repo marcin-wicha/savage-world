@@ -32,6 +32,39 @@ describe('MultiStepFlow', () => {
     expect(screen.getByText('Concept content')).toBeInTheDocument()
   })
 
+  it('lets any step be opened directly when step navigation is allowed', async () => {
+    const user = userEvent.setup()
+    const onStepChange = vi.fn()
+
+    render(<MultiStepFlow steps={steps} allowStepNavigation onStepChange={onStepChange} />)
+
+    await user.click(screen.getByRole('button', { name: /edges/i }))
+
+    expect(screen.getByText('Edges content')).toBeInTheDocument()
+    expect(onStepChange).toHaveBeenCalledWith(2)
+    expect(screen.getByRole('button', { name: /attributes/i })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /completed.*attributes/i })).toBeInTheDocument()
+  })
+
+  it('marks steps up to completedThrough as completed', () => {
+    render(<MultiStepFlow steps={steps} completedThrough={2} allowStepNavigation />)
+
+    expect(screen.getByRole('button', { name: /concept/i })).toHaveAttribute('aria-current', 'step')
+    expect(screen.getByRole('button', { name: /completed.*attributes/i })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /completed.*edges/i })).toBeEnabled()
+  })
+
+  it('keeps later steps marked when going back to an earlier one', async () => {
+    const user = userEvent.setup()
+
+    render(<MultiStepFlow steps={steps} defaultStep={2} completedThrough={1} />)
+
+    await user.click(screen.getByRole('button', { name: /completed.*concept/i }))
+
+    expect(screen.getByText('Concept content')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /completed.*attributes/i })).toBeInTheDocument()
+  })
+
   it('returns to the progress heading when changing steps', async () => {
     const user = userEvent.setup()
     const scrollIntoView = vi.fn()

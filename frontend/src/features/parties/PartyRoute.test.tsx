@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { api } from '@/lib/api-client'
@@ -44,8 +44,10 @@ const members: PartyMember[] = [
   member({ membership_id: 2, owner_id: 11, name: 'Rook', status: 'pending' }),
 ]
 
-function renderParty(party: Partial<PartyDetail>) {
-  apiGetMock.mockResolvedValue({
+type OwnCharacter = { id: number; name: string | null; status: 'draft' | 'alive' | 'dead' }
+
+function renderParty(party: Partial<PartyDetail>, ownCharacters: OwnCharacter[] = []) {
+  const partyResponse = {
     party: {
       id: 5,
       name: 'The Crew',
@@ -56,7 +58,10 @@ function renderParty(party: Partial<PartyDetail>) {
       members,
       ...party,
     },
-  })
+  }
+  apiGetMock.mockImplementation((path: string) =>
+    Promise.resolve(path === '/api/v1/characters' ? { characters: ownCharacters } : partyResponse),
+  )
   renderAt('/parties/5', '/parties/:id', <PartyRoute />)
 }
 
@@ -153,6 +158,75 @@ describe('PartyRoute', () => {
     )
     expect(screen.getByText('Vex Morrow')).toBeInTheDocument()
     expect(screen.getByText('VM')).toBeInTheDocument()
+  })
+
+  describe("adding the leader's own characters", () => {
+    const ownCharacters: OwnCharacter[] = [
+      { id: 21, name: 'Sable', status: 'alive' },
+      { id: 22, name: null, status: 'draft' },
+      { id: 23, name: 'Fallen', status: 'dead' },
+      { id: 1, name: 'Katarina', status: 'alive' },
+    ]
+
+    it('offers only living characters that are not already in the party', async () => {
+      renderParty({ led_by_me: true }, ownCharacters)
+
+      const select = await screen.findByLabelText('Character')
+      await waitFor(() => {
+        expect(
+          within(select)
+            .getAllByRole('option')
+            .map((option) => option.textContent),
+        ).toEqual(['Choose a character', 'Sable'])
+      })
+    })
+
+    it('adds the chosen character straight to the party', async () => {
+      const user = userEvent.setup()
+      renderParty({ led_by_me: true }, ownCharacters)
+
+      const addButton = await screen.findByRole('button', { name: 'Add to party' })
+      expect(addButton).toBeDisabled()
+      await user.selectOptions(await screen.findByLabelText('Character'), '21')
+      await user.click(addButton)
+
+      expect(apiPostMock).toHaveBeenCalledWith('/api/v1/parties/5/memberships', {
+        character_id: 21,
+      })
+      await waitFor(() => {
+        const partyFetches = apiGetMock.mock.calls.filter(([path]) => path === '/api/v1/parties/5')
+        expect(partyFetches.length).toBeGreaterThan(1)
+      })
+    })
+
+    it('reports a failed add', async () => {
+      const user = userEvent.setup()
+      apiPostMock.mockRejectedValue(new Error('nope'))
+      renderParty({ led_by_me: true }, ownCharacters)
+
+      await user.selectOptions(await screen.findByLabelText('Character'), '21')
+      await user.click(screen.getByRole('button', { name: 'Add to party' }))
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Could not add the character. Try again.',
+      )
+    })
+
+    it('explains when there is nothing to add', async () => {
+      renderParty({ led_by_me: true }, [{ id: 1, name: 'Katarina', status: 'alive' }])
+
+      expect(
+        await screen.findByText('You have no other finished characters to add.'),
+      ).toBeInTheDocument()
+    })
+
+    it('is not offered to participants', async () => {
+      renderParty({ led_by_me: false }, ownCharacters)
+
+      expect(await screen.findByText('The Crew')).toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: 'Add your characters' })).not.toBeInTheDocument()
+      expect(apiGetMock).not.toHaveBeenCalledWith('/api/v1/characters', expect.anything())
+    })
   })
 
   it('shows an error when the party cannot be loaded', async () => {

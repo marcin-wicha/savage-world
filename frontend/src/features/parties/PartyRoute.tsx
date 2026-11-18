@@ -26,6 +26,10 @@ import {
 
 type UpdatePartyVariables = { party: Partial<PartyFormValues> & { leader_id?: number } }
 type MembershipVariables = { membershipId: number }
+type AddCharacterVariables = { character_id: number }
+type OwnCharactersResponse = {
+  characters: { id: number; name: string | null; status: 'draft' | 'alive' | 'dead' }[]
+}
 
 export function PartyRoute() {
   const { id = '' } = useParams()
@@ -60,6 +64,7 @@ function PartyView({ party }: { party: PartyDetail }) {
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [newLeaderId, setNewLeaderId] = useState('')
+  const [addCharacterId, setAddCharacterId] = useState('')
   const basePath = `/api/v1/parties/${party.id}`
   const accepted = party.members.filter((member) => member.status === 'accepted')
   const pending = party.members.filter((member) => member.status === 'pending')
@@ -106,6 +111,24 @@ function PartyView({ party }: { party: PartyDetail }) {
         if (leaving && !party.led_by_me && !stillMember) navigate('/parties')
       },
       onError: failWith('Could not remove the character. Try again.'),
+    },
+  )
+
+  const ownCharacters = useRestQuery<OwnCharactersResponse>(['characters'], '/api/v1/characters', {
+    enabled: party.led_by_me,
+  })
+  const partyCharacterIds = new Set(party.members.map((member) => member.character.id))
+  const addableCharacters = (ownCharacters.data?.characters ?? []).filter(
+    (character) => character.status === 'alive' && !partyCharacterIds.has(character.id),
+  )
+  const addMutation = useRestMutation<unknown, AddCharacterVariables>(
+    { path: `${basePath}/memberships`, method: 'POST' },
+    {
+      onSuccess: () => {
+        setAddCharacterId('')
+        refresh()
+      },
+      onError: failWith('Could not add the character. Try again.'),
     },
   )
 
@@ -192,6 +215,62 @@ function PartyView({ party }: { party: PartyDetail }) {
 
       {party.led_by_me ? (
         <>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('Add your characters')}</CardTitle>
+              <CardDescription>
+                {t('Your own characters join right away, without an invite link.')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {ownCharacters.isPending ? (
+                <p className="text-muted-foreground text-sm">{t('Loading characters…')}</p>
+              ) : ownCharacters.isError ? (
+                <p className="text-danger text-sm" role="alert">
+                  {t('Could not load characters. Try again.')}
+                </p>
+              ) : addableCharacters.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  {t('You have no other finished characters to add.')}
+                </p>
+              ) : (
+                <form
+                  className="flex flex-wrap items-end gap-3"
+                  onSubmit={(event) => {
+                    event.preventDefault()
+                    if (!addCharacterId) return
+                    setError(null)
+                    addMutation.mutate({ character_id: Number(addCharacterId) })
+                  }}
+                >
+                  <div className="min-w-48 flex-1 space-y-2">
+                    <Label htmlFor="add-character">{t('Character')}</Label>
+                    <select
+                      id="add-character"
+                      value={addCharacterId}
+                      onChange={(event) => setAddCharacterId(event.target.value)}
+                      className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3"
+                    >
+                      <option value="">{t('Choose a character')}</option>
+                      {addableCharacters.map((character) => (
+                        <option key={character.id} value={character.id}>
+                          {character.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={!addCharacterId || addMutation.isPending}
+                  >
+                    {t('Add to party')}
+                  </Button>
+                </form>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>{t('Join requests')}</CardTitle>

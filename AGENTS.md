@@ -429,6 +429,11 @@ Routes are defined in `backend/config/routes.rb`:
     the character must belong to the current user (`403`). Creates a pending
     request, or an accepted membership for the leader's own characters; `422`
     for duplicates.
+  - `POST /api/v1/parties/:party_id/memberships` — `{ "character_id": 1 }`;
+    leader only, for the leader's own characters. Adds the character as an
+    accepted member without an invite link (the party page's "Add your
+    characters" card). `422` for drafts, dead characters, or duplicates; `403`
+    for non-leaders or another user's character.
   - `PATCH /api/v1/parties/:party_id/memberships/:id/accept` — leader only.
   - `DELETE /api/v1/parties/:party_id/memberships/:id` — the leader (reject or
     remove) or the character's owner (leave or cancel a request).
@@ -500,7 +505,8 @@ Prefer GraphQL for domain operations. REST currently covers transport concerns
   upsert and avatar uploads by ownership; `view_avatar?` also admits shared
   party members. `PartyPolicy` (leader edits; leader or accepted
   participant views; scope lists led/joined parties) and
-  `PartyMembershipPolicy` (owner joins and leaves; leader accepts and removes)
+  `PartyMembershipPolicy` (owner joins and leaves; leader accepts, removes,
+  and adds their own characters directly)
   guard parties. `CharacterPolicy` also guards finalize by ownership.
   Multi-step party rules live in `Parties::Join` and
   `Parties::TransferLeadership`. `EnemyTemplatePolicy` limits templates to their

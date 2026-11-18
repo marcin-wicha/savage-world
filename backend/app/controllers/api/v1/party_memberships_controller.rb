@@ -3,6 +3,19 @@ module Api
     class PartyMembershipsController < ApplicationController
       include PartyPayloads
 
+      def create
+        party = Party.find(params[:party_id])
+        character = Character.find(params.require(:character_id))
+        authorize party.party_memberships.new(character: character), :add?
+
+        join = Parties::Join.new(party: party, character: character, user: Current.user)
+        if join.call
+          render json: { membership: membership_payload(join.membership) }, status: :created
+        else
+          render json: { error: "Validation failed", details: join.errors }, status: :unprocessable_content
+        end
+      end
+
       def accept
         membership = find_membership
         authorize membership

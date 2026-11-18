@@ -42,7 +42,10 @@ describe('CharacterSheetRoute', () => {
         attributes: { agility: 'd6', smarts: 'd8', spirit: 'd4', strength: 'd6', vigor: 'd8' },
         skills: [{ id: 5, name: 'Fighting', attribute: 'agility', die: 'd8' }],
         edges: [{ id: 4, name: 'Alertness' }],
-        hindrances: [{ id: 2, name: 'Bloodthirsty' }],
+        hindrances: [
+          { id: 2, name: 'Bloodthirsty', severity: 'major' },
+          { id: 3, name: 'Curious', severity: 'minor' },
+        ],
       },
     })
 
@@ -52,7 +55,8 @@ describe('CharacterSheetRoute', () => {
     expect(screen.getByText('Fighting')).toBeInTheDocument()
     expect(screen.getAllByText('d8').length).toBeGreaterThan(0)
     expect(screen.getByText('Alertness')).toBeInTheDocument()
-    expect(screen.getByText('Bloodthirsty')).toBeInTheDocument()
+    expect(screen.getByText('Bloodthirsty').closest('li')).toHaveTextContent('Bloodthirsty (Major)')
+    expect(screen.getByText('Curious').closest('li')).toHaveTextContent('Curious (Minor)')
     expect(screen.getByRole('button', { name: 'Print sheet' })).toBeInTheDocument()
     expect(screen.getByText('Agility').parentElement?.parentElement).toHaveClass('grid')
     expect(screen.getByText('Agility').parentElement?.parentElement).not.toHaveClass('grid-cols-2')

@@ -40,6 +40,9 @@ RSpec.describe "Character drafts and lifecycle", type: :request do
         "creation_points" => { "earned" => 2, "spent" => { "attributes" => 0, "skills" => 0, "edges" => 0 } }
       )
       expect(draft.reload.character_hindrances.sole.severity).to eq("major")
+      expect(json.dig("character", "hindrances")).to eq([
+        { "id" => flexible.id, "name" => flexible.name, "slug" => flexible.slug, "severity" => "major" }
+      ])
     end
 
     it "rejects invalid severity choices" do

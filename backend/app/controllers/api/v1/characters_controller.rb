@@ -121,7 +121,10 @@ module Api
           edge_ids: character.edge_ids,
           edges: character.edges.map { |edge| { id: edge.id, name: edge.name, slug: edge.slug } },
           hindrance_ids: character.hindrance_ids,
-          hindrances: character.hindrances.map { |hindrance| { id: hindrance.id, name: hindrance.name, slug: hindrance.slug } },
+          hindrances: character.character_hindrances.map do |selection|
+            hindrance = selection.hindrance
+            { id: hindrance.id, name: hindrance.name, slug: hindrance.slug, severity: selection.effective_severity }
+          end,
           hindrance_severities: character.character_hindrances.each_with_object({}) do |selection, severities|
             severities[selection.hindrance_id] = selection.effective_severity
           end,

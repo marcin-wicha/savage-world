@@ -472,6 +472,63 @@ describe('NewCharacterRoute', () => {
     expect(finalizeCalls()).toHaveLength(0)
   })
 
+  describe('step navigation', () => {
+    it('lets a new character jump to any step without marking skipped steps complete', async () => {
+      const user = userEvent.setup()
+
+      renderRoute()
+
+      const header = screen.getByRole('navigation', { name: /progress/i })
+      await user.click(within(header).getByRole('button', { name: /gear/i }))
+
+      expect(
+        await screen.findByRole('heading', { name: /visit the gear shop/i }),
+      ).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /completed/i })).not.toBeInTheDocument()
+    })
+
+    it('marks steps completed once the player moves past them', async () => {
+      const user = userEvent.setup()
+
+      renderRoute()
+
+      await user.type(screen.getByLabelText(/character name/i), 'Katarina Voss')
+      await user.click(screen.getByRole('button', { name: /next/i }))
+      const header = screen.getByRole('navigation', { name: /progress/i })
+      await user.click(within(header).getByRole('button', { name: /completed.*concept/i }))
+
+      expect(screen.getByLabelText(/character name/i)).toHaveValue('Katarina Voss')
+      expect(within(header).getByRole('button', { name: /concept/i })).toHaveAttribute(
+        'aria-current',
+        'step',
+      )
+
+      await user.click(within(header).getByRole('button', { name: /skills/i }))
+      expect(await screen.findByRole('heading', { name: /choose skills/i })).toBeInTheDocument()
+      expect(within(header).getAllByRole('button', { name: /completed/i })).toHaveLength(1)
+    })
+
+    it.each([
+      ['a draft', storedCharacter({ name: 'Mira', creation_step: 2 })],
+      ['a finished character', storedCharacter({ name: 'Mira', status: 'alive', origin_id: 1 })],
+    ])('shows every other step as completed when opening %s', async (_label, stored) => {
+      const user = userEvent.setup()
+      mockApi({ stored })
+
+      renderRoute('/characters/9/edit')
+
+      const header = await screen.findByRole('navigation', { name: /progress/i })
+      const completed = within(header).getAllByRole('button', { name: /completed/i })
+      expect(completed).toHaveLength(7)
+      completed.forEach((button) => expect(button).toBeEnabled())
+
+      await user.click(within(header).getByRole('button', { name: /summary/i }))
+      expect(
+        await screen.findByRole('heading', { name: /review your character/i }),
+      ).toBeInTheDocument()
+    })
+  })
+
   describe('drafts', () => {
     it('does not create a draft before anything is entered', async () => {
       renderRoute()
@@ -497,7 +554,9 @@ describe('NewCharacterRoute', () => {
           },
         ],
       ])
-      expect(screen.getByTestId('location')).toHaveTextContent('/characters/9/edit')
+      await waitFor(() => {
+        expect(screen.getByTestId('location')).toHaveTextContent('/characters/9/edit')
+      })
       expect(screen.getByLabelText(/character name/i)).toHaveValue('Katarina Voss')
 
       await user.click(screen.getByRole('button', { name: /next/i }))
@@ -565,7 +624,9 @@ describe('NewCharacterRoute', () => {
         expect(apiDeleteMock).toHaveBeenCalledWith('/api/v1/characters/9')
       })
       expect(screen.getByLabelText(/character name/i)).toHaveValue('')
-      expect(screen.getByTestId('location')).toHaveTextContent('/characters/new')
+      await waitFor(() => {
+        expect(screen.getByTestId('location')).toHaveTextContent('/characters/new')
+      })
       expect(screen.queryByRole('button', { name: 'Start over' })).not.toBeInTheDocument()
     })
 

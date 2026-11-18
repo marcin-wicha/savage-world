@@ -13,6 +13,13 @@ RSpec.describe PartyMembershipPolicy do
     it { is_expected.to be_accept }
     it { is_expected.to be_destroy }
     it { is_expected.not_to be_create }
+    it { is_expected.not_to be_add }
+
+    context "with their own character" do
+      let(:membership) { PartyMembership.new(party: party, character: create(:character, user: party.leader)) }
+
+      it { is_expected.to be_add }
+    end
   end
 
   context "when the user owns the character" do
@@ -21,6 +28,7 @@ RSpec.describe PartyMembershipPolicy do
     it { is_expected.to be_create }
     it { is_expected.to be_destroy }
     it { is_expected.not_to be_accept }
+    it { is_expected.not_to be_add }
   end
 
   context "when the user is another participant" do
@@ -39,5 +47,6 @@ RSpec.describe PartyMembershipPolicy do
     it { is_expected.not_to be_create }
     it { is_expected.not_to be_accept }
     it { is_expected.not_to be_destroy }
+    it { is_expected.not_to be_add }
   end
 end

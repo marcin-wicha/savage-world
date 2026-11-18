@@ -770,6 +770,12 @@ const translations: Record<string, string> = {
   'Choose a character': 'Wybierz postać',
   'Add to party': 'Dodaj do drużyny',
   'Request to join': 'Poproś o dołączenie',
+  'Add your characters': 'Dodaj swoje postacie',
+  'Your own characters join right away, without an invite link.':
+    'Twoje postacie dołączają od razu, bez linku z zaproszeniem.',
+  'You have no other finished characters to add.':
+    'Nie masz innych ukończonych postaci do dodania.',
+  'Could not add the character. Try again.': 'Nie udało się dodać postaci. Spróbuj ponownie.',
   'This character is already in the party or awaiting approval.':
     'Ta postać jest już w drużynie lub oczekuje na akceptację.',
   'Could not send the request. Try again.': 'Nie udało się wysłać prośby. Spróbuj ponownie.',

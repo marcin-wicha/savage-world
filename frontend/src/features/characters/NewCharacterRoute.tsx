@@ -204,6 +204,9 @@ function CharacterEditor({ character }: { character: CharacterResponse['characte
       ? Math.min(character.creation_step, stepDefinitions.length - 1)
       : 0,
   )
+  const [furthestCompleted, setFurthestCompleted] = useState(() =>
+    character ? stepDefinitions.length - 1 : -1,
+  )
   const [draftRestoredAt, setDraftRestoredAt] = useState(
     character?.status === 'draft' ? character.updated_at : null,
   )
@@ -247,6 +250,7 @@ function CharacterEditor({ character }: { character: CharacterResponse['characte
     await draft.discard()
     form.reset(characterFormDefaults)
     setStep(0)
+    setFurthestCompleted(-1)
     setDraftRestoredAt(null)
     navigate('/characters/new', { replace: true, state: keepEditorState })
   }
@@ -339,8 +343,11 @@ function CharacterEditor({ character }: { character: CharacterResponse['characte
     }
   })
 
-  const validateStep = (index: number) =>
-    form.trigger(characterStepFields[stepDefinitions[index].id])
+  const validateStep = async (index: number) => {
+    const valid = await form.trigger(characterStepFields[stepDefinitions[index].id])
+    if (valid) setFurthestCompleted((furthest) => Math.max(furthest, index))
+    return valid
+  }
 
   const handleComplete = () => {
     if (saving || !hindrancePointsBalanced) return
@@ -414,6 +421,8 @@ function CharacterEditor({ character }: { character: CharacterResponse['characte
               steps={steps}
               currentStep={step}
               onStepChange={setStep}
+              allowStepNavigation
+              completedThrough={furthestCompleted}
               footerClassName="sticky bottom-0 z-10 bg-card/95 py-4 backdrop-blur"
               completeLabel={
                 saving ? t('Saving…') : isEditing ? t('Save changes') : t('Save character')

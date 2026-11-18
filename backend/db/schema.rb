@@ -127,7 +127,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_120000) do
     t.string "name", null: false
     t.text "description"
     t.boolean "wild_card", default: false, null: false
-    t.jsonb "attribute_dice", default: {}, null: false
+    t.jsonb "attribute_dice", default: {"vigor" => "d4", "smarts" => "d4", "spirit" => "d4", "agility" => "d4", "strength" => "d4"}, null: false
     t.jsonb "skills", default: {}, null: false
     t.integer "pace", default: 6, null: false
     t.integer "parry", default: 2, null: false
@@ -267,7 +267,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_120000) do
     t.index ["linked_attribute"], name: "index_skills_on_linked_attribute"
     t.index ["slug"], name: "index_skills_on_slug", unique: true
     t.index ["source_book"], name: "index_skills_on_source_book"
-    t.check_constraint "linked_attribute::text = ANY (ARRAY['agility'::character varying, 'smarts'::character varying, 'spirit'::character varying, 'strength'::character varying, 'vigor'::character varying]::text[])", name: "skills_linked_attribute_valid"
+    t.check_constraint "linked_attribute::text = ANY (ARRAY['agility'::character varying::text, 'smarts'::character varying::text, 'spirit'::character varying::text, 'strength'::character varying::text, 'vigor'::character varying::text])", name: "skills_linked_attribute_valid"
   end
 
   create_table "users", force: :cascade do |t|

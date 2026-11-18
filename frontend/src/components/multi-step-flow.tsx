@@ -16,6 +16,8 @@ type MultiStepFlowProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   currentStep?: number
   defaultStep?: number
   onStepChange?: (step: number) => void
+  allowStepNavigation?: boolean
+  completedThrough?: number
   onComplete?: () => void
   onBack?: () => void
   canAdvance?: (step: MultiStepFlowStep, index: number) => boolean
@@ -38,6 +40,8 @@ function MultiStepFlow({
   currentStep,
   defaultStep = 0,
   onStepChange,
+  allowStepNavigation = false,
+  completedThrough,
   onComplete,
   onBack,
   canAdvance,
@@ -112,9 +116,12 @@ function MultiStepFlow({
         </p>
         <ol className="flex items-center lg:gap-3">
           {steps.map((item, index) => {
-            const isComplete = index < activeStep
             const isCurrent = index === activeStep
-            const isFuture = index > activeStep
+            const isComplete =
+              !isCurrent &&
+              (completedThrough === undefined ? index < activeStep : index <= completedThrough)
+            const isFuture = index > activeStep && !isComplete
+            const isLocked = index > activeStep && !allowStepNavigation
 
             return (
               <li
@@ -127,11 +134,11 @@ function MultiStepFlow({
                 <button
                   type="button"
                   onClick={() => goTo(index)}
-                  disabled={isFuture}
+                  disabled={isLocked}
                   aria-current={isCurrent ? 'step' : undefined}
                   className={cn(
                     'group focus-visible:ring-ring/50 flex min-w-0 items-center gap-3 rounded-lg text-left transition-colors outline-none focus-visible:ring-3 disabled:cursor-default',
-                    !isFuture && 'cursor-pointer',
+                    !isLocked && 'cursor-pointer',
                   )}
                 >
                   {isComplete ? <span className="sr-only">{t('Completed: ')}</span> : null}

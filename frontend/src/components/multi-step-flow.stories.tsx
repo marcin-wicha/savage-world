@@ -94,6 +94,27 @@ export const ValidationBlocked: Story = {
   ),
 }
 
+export const ResumedProgress: Story = {
+  args: {
+    defaultStep: 1,
+    completedThrough: 2,
+    allowStepNavigation: true,
+  },
+  render: (args) => (
+    <Card className="w-full max-w-2xl">
+      <CardHeader>
+        <CardTitle>Continue a saved character</CardTitle>
+        <CardDescription>
+          Every step is already filled in, so any step can be opened directly.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <MultiStepFlow {...args} />
+      </CardContent>
+    </Card>
+  ),
+}
+
 export const LastStep: Story = {
   args: {
     defaultStep: 2,

@@ -19,7 +19,7 @@ Rails.application.routes.draw do
 
       resources :parties, only: %i[index show create update destroy] do
         post :invite_code, on: :member, action: :regenerate_invite_code
-        resources :memberships, controller: :party_memberships, only: :destroy do
+        resources :memberships, controller: :party_memberships, only: %i[create destroy] do
           patch :accept, on: :member
         end
         resources :battles, only: %i[index create]

@@ -7,6 +7,10 @@ class PartyMembershipPolicy < ApplicationPolicy
     record.party.leader?(user)
   end
 
+  def add?
+    accept? && create?
+  end
+
   def destroy?
     accept? || (user.present? && record.character.user_id == user.id)
   end

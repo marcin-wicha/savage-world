@@ -45,7 +45,7 @@ type CharacterSheet = {
   attributes: Record<keyof typeof attributeLabels, string>
   skills: SheetSkill[]
   edges: SheetItem[]
-  hindrances: SheetItem[]
+  hindrances: (SheetItem & { severity?: 'minor' | 'major' })[]
   gear?: SheetGear[]
   derived?: { pace: DerivedValue; parry: DerivedValue; toughness: DerivedValue }
 }
@@ -172,7 +172,13 @@ export function CharacterSheetRoute() {
               </div>
             </SheetSection>
             <SheetSection title="Hindrances">
-              <NameList items={character.hindrances} emptyLines={3} />
+              <NameList
+                items={character.hindrances.map((hindrance) => ({
+                  ...hindrance,
+                  detail: hindrance.severity ? severityLabels[hindrance.severity] : undefined,
+                }))}
+                emptyLines={3}
+              />
             </SheetSection>
           </div>
 
@@ -288,12 +294,21 @@ function StatBox({ label, value }: { label: string; value: string }) {
   )
 }
 
-function NameList({ items, emptyLines }: { items: SheetItem[]; emptyLines: number }) {
+const severityLabels = { minor: 'Minor', major: 'Major' } as const
+
+function NameList({
+  items,
+  emptyLines,
+}: {
+  items: (SheetItem & { detail?: string })[]
+  emptyLines: number
+}) {
   return items.length ? (
     <ul className="grid gap-1">
       {items.map((item) => (
         <li key={item.id} className="sheet-list-row">
           {item.name}
+          {item.detail ? <span className="text-muted-foreground"> ({item.detail})</span> : null}
         </li>
       ))}
     </ul>
